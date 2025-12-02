@@ -1,0 +1,26 @@
+services:
+  askNicely-app:
+    container_name: askNicely-app
+    hostname: askNicely-app
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    networks:
+      - askNicely
+
+  askNicely-api:
+    image: ghcr.io/muchobien/pocketbase:latest
+    container_name: askNicely-api
+    hostname: askNicely-api
+    restart: unless-stopped
+    volumes:
+      - ./api:/api
+      - ./api/data:/pb_data
+    networks:
+      - askNicely
+    ports:
+      - "8090:8090"
+
+networks:
+  askNicely:
+    external: true
