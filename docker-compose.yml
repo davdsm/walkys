@@ -1,26 +1,26 @@
 services:
-  askNicely-app:
-    container_name: askNicely-app
-    hostname: askNicely-app
+  walkys-app:
+    container_name: walkys-app
+    hostname: walkys-app
     build:
       context: ./
       dockerfile: Dockerfile
     networks:
-      - askNicely
+      - walkys
 
-  askNicely-api:
+  walkys-api:
     image: ghcr.io/muchobien/pocketbase:latest
-    container_name: askNicely-api
-    hostname: askNicely-api
+    container_name: walkys-api
+    hostname: walkys-api
     restart: unless-stopped
     volumes:
       - ./api:/api
       - ./api/data:/pb_data
     networks:
-      - askNicely
+      - walkys
     ports:
       - "8090:8090"
 
 networks:
-  askNicely:
+  walkys:
     external: true
