@@ -13,7 +13,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export function meta({ }: Route.MetaArgs) {
     return [
-        { title: "AskNicely - Dashboard" },
+        { title: "Walkys - Dashboard" },
     ];
 }
 

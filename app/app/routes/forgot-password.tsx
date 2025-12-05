@@ -39,8 +39,8 @@ export async function action({ request }: Route.ActionArgs) {
 
 export function meta({ }: Route.MetaArgs) {
     return [
-        { title: "AskNicely - Forgot Password" },
-        { name: "description", content: "Reset your AskNicely account password" },
+        { title: "Walkys - Forgot Password" },
+        { name: "description", content: "Reset your Walkys account password" },
     ];
 }
 

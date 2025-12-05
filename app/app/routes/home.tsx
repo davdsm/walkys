@@ -4,13 +4,6 @@ import { createPocketBase } from "~/lib/pocketbase";
 import { createPageService } from "~/lib/services";
 import { useLoaderData } from "react-router";
 
-export function meta({ }: Route.MetaArgs) {
-  return [
-    { title: "AskNicely - The Boilerplate" },
-    { name: "description", content: "Welcome to AskNicely!" },
-  ];
-}
-
 // Loader: Fetch data on the server/route level
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);

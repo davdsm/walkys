@@ -75,7 +75,7 @@ export const LoginForm = () => {
         <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2 self-start mb-4 hidden md:block">
                 <Link to="/">
-                    <h2 className="font-medium text-lg">AskNicely</h2>
+                    <h2 className="font-medium text-lg">Walkys</h2>
                 </Link>
             </div>
 
