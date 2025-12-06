@@ -41,20 +41,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const location = useLocation();
-  const hideFooter = useFooter();
-  const hideHeader = useHeader();
-
-  // Routes with white backgrounds need dark variant
-  const darkVariantRoutes = [
-    "/auth/login",
-    "/auth/signup",
-    "/dashboard",
-    "/forgot-password",
-  ];
-  const useDarkVariant =
-    darkVariantRoutes.some((route) => location?.pathname?.startsWith(route)) ||
-    location?.pathname?.includes("/reset-password");
+  const { shouldHideFooter, variant: footerVariant } = useFooter();
+  const { shouldHideHeader, variant: headerVariant } = useHeader();
 
   return (
     <html lang="en">
@@ -92,12 +80,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="flex flex-col min-h-screen">
         <LanguageProvider>
-          {!hideHeader && (
-            <Header variant={useDarkVariant ? "dark" : "light"} />
-          )}
+          {!shouldHideHeader && <Header variant={headerVariant} />}
           <main className="flex-1 min-h-screen">{children}</main>
           {/* ScrollRestoration disabled to avoid auto-scrolling during animated page transitions. */}
-          {!hideFooter && <Footer />}
+          {!shouldHideFooter && <Footer variant={footerVariant} />}
           <Scripts />
         </LanguageProvider>
       </body>

@@ -1,22 +1,23 @@
-import { Link } from "react-router";
-import { LanguageSwitcher } from "~/components/Elements/LanguageSwitcher/LanguageSwitcher";
 import { motion } from "framer-motion";
 import SideMenu from "../Elements/SideMenu/SideMenu";
+import { useLanguage } from "~/contexts";
 
 interface HeaderProps {
   variant?: "light" | "dark";
 }
 
 export function Header({ variant = "light" }: HeaderProps) {
+  const { t } = useLanguage();
+
   const menuItems = [
-    { label: "Begin", ariaLabel: "Go to home page", link: "/" },
-    { label: "About", ariaLabel: "Learn about us", link: "/about" },
+    { label: t.header.begin, ariaLabel: "Go to home page", link: "/" },
+    { label: t.header.about, ariaLabel: "Learn about us", link: "/about" },
     {
-      label: "Collection",
+      label: t.header.collection,
       ariaLabel: "View our products",
       link: "/collection",
     },
-    { label: "Contacts", ariaLabel: "Get in touch", link: "/contact" },
+    { label: t.header.contacts, ariaLabel: "Get in touch", link: "/contact" },
   ];
 
   const socialItems = [
@@ -28,6 +29,7 @@ export function Header({ variant = "light" }: HeaderProps) {
   return (
     <>
       <motion.header
+        id="main-header"
         className="w-full fixed top-0 left-0 z-50 flex items-center justify-between bg-transparent"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -38,19 +40,16 @@ export function Header({ variant = "light" }: HeaderProps) {
           socialItems={socialItems}
           displaySocials={true}
           displayItemNumbering={true}
-          menuButtonColor="#ffffff"
-          openMenuButtonColor="#111827"
+          menuButtonColor={variant === "light" ? "#ffffff" : "#000000"}
+          openMenuButtonColor={variant === "light" ? "#ffffff" : "#000000"}
           changeMenuColorOnOpen={true}
-          colors={["#e5e7eb", "#d1d5db"]}
+          colors={["#811568ff", "#d1d5db"]}
           logoUrl="/logo.png"
           accentColor="#000000"
-          isFixed={false}
+          invertLogo={variant === "light"}
           position="right"
           closeOnClickAway={true}
         />
-        {/* <div className="absolute top-30 left-5 z-20">
-          <LanguageSwitcher variant={variant} />
-        </div> */}
       </motion.header>
     </>
   );

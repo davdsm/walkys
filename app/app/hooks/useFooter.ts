@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router";
 
 /**
@@ -10,28 +10,43 @@ import { useLocation } from "react-router";
  * @example
  * ```tsx
  * function MyComponent() {
- *   const showFooter = useFooter();
+ *   const { shouldHideFooter, variant } = useFooter();
  *
- *  return <>{ showFooter && <Footer />}</>
+ *  return <>{ shouldHideFooter && <Footer variant={variant} />}</>
  * }
  * ```
  */
-export function useFooter() {
+export function useFooter(): { shouldHideFooter: boolean; variant: "light" | "dark" } {
   const location = useLocation();
+  const [shouldHideFooter, setShouldHideFooter] = useState(false);
+  const [variant, setVariant] = useState<"light" | "dark">("light");
 
-  return useMemo(() => {
-    // Routes where Footer should NOT be displayed
-    const hideFooterRoutes = [
-      "/auth/login",
-      "/auth/signup",
-      "/dashboard",
-      "/forgot-password",
-      "/logout",
-    ];
+  // Routes where Footer should NOT be displayed
+  const hideFooterRoutes = [
+    "/auth/login",
+    "/auth/signup",
+    "/dashboard",
+    "/forgot-password",
+    "/logout",
+  ];
+
+  // Routes with white backgrounds need dark variant
+  const whiteVariantRoutes = [
+    "/contact"
+  ];
+
+  useEffect(() => {
     const shouldHideFooter = hideFooterRoutes.some((route) =>
       location?.pathname?.startsWith(route)
     );
 
-    return shouldHideFooter;
+    const useWhiteVariant = whiteVariantRoutes.some((route) =>
+      location?.pathname?.startsWith(route)
+    )
+
+    setShouldHideFooter(shouldHideFooter);
+    setVariant(useWhiteVariant ? "light" : "dark");
   }, [location.pathname]);
+
+  return { shouldHideFooter, variant };
 }

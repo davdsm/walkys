@@ -4,6 +4,16 @@ export const translations = {
         about: {
             title: "Viste a transição? crazy",
         },
+        // Header
+        header: {
+            begin: "Início",
+            about: "Sobre",
+            collection: "Coleção",
+            contacts: "Contactos",
+            menu: "Menu",
+            close: "Fechar",
+            socials: "Redes Sociais",
+        },
         // Login
         login: {
             title: "Bem-vindo de volta",
@@ -265,6 +275,12 @@ export const translations = {
             ],
             note: "Nota: substitua support@your-domain.example pelo email real da organização antes de publicar."
         },
+        // Small CTA Component
+        smallCTA: {
+            heading: "SHINNING SINCE 1981",
+            subtitle: "Um texto sobre a empresa, algo icónico, mas fixe e bonito, que tenha algumas linhas até.",
+            buttonText: "SHOP NOW",
+        },
         // Cookie specifics
         cookies: {
             title: "Política de Cookies",
@@ -284,11 +300,56 @@ export const translations = {
             },
             note: "Nota: o comportamento exato depende da configuração do navegador e das escolhas do utilizador."
         },
+        // Contact
+        contact: {
+            title: "VAMOS CONVERSAR",
+            email: "administracao@walkys.pt",
+            name: "Nome",
+            namePlaceholder: "O seu nome",
+            subject: "Assunto",
+            subjectPlaceholder: "ex: Devoluções",
+            company: "Empresa",
+            companyPlaceholder: "A sua empresa",
+            emailLabel: "Email",
+            emailPlaceholder: "Endereço de email",
+            message: "Mensagem",
+            messagePlaceholder: "Comece a escrever aqui...",
+            submit: "Enviar Mensagem",
+            findUs: "ENCONTRE-NOS",
+            address: "V.N. Sande, Famalicão",
+            phone: "+351 253 162 123",
+        },
+        // Footer
+        footer: {
+            begin: "Início",
+            about: "A Walkys",
+            collection: "Outono / Inverno",
+            contacts: "Contactos",
+            terms: "Termos & Condições",
+            privacy: "Privacidade",
+            contact: "Contacto",
+            address: "Morada",
+            email: "Email",
+            schedule: "Seg—Sex",
+            explore: "Explorar",
+            newCollection: "NOVA COLEÇÃO",
+            copyright: "© 2025 – Copyright",
+        },
     },
     en: {
         // About
         about: {
             title: "Did you see the transition? crazy",
+        },
+        // Header
+        header: {
+            begin: "Begin",
+            about: "About",
+            collection: "Collection",
+            contacts: "Contacts",
+            menu: "Menu",
+            close: "Close",
+            socials: "Socials",
         },
         // Login
         login: {
@@ -551,6 +612,12 @@ export const translations = {
             ],
             note: "Note: replace support@your-domain.example with your real contact email before publishing."
         },
+        // Small CTA Component
+        smallCTA: {
+            heading: "SHINNING SINCE 1981",
+            subtitle: "A text about the company, something iconic, but cool and beautiful, that has a few lines to.",
+            buttonText: "SHOP NOW",
+        },
         // Cookie specifics
         cookies: {
             title: "Cookie Policy",
@@ -569,6 +636,41 @@ export const translations = {
                 ]
             },
             note: "Note: exact behavior depends on browser settings and user choices."
+        },
+        // Contact
+        contact: {
+            title: "LET'S TALK",
+            email: "administracao@walkys.pt",
+            name: "Name",
+            namePlaceholder: "Your Name",
+            subject: "Subject",
+            subjectPlaceholder: "i.e. Returns",
+            company: "Company",
+            companyPlaceholder: "Your Company",
+            emailLabel: "Email",
+            emailPlaceholder: "Email Address",
+            message: "Message",
+            messagePlaceholder: "Start typing here...",
+            submit: "Send Message",
+            findUs: "FIND US",
+            address: "V.N. Sande, Famalicão",
+            phone: "+351 253 162 123",
+        },
+        // Footer
+        footer: {
+            begin: "Begin",
+            about: "Walkys",
+            collection: "Autumn / Winter",
+            contacts: "Contacts",
+            terms: "Terms & Conditions",
+            privacy: "Privacy",
+            contact: "Contact",
+            address: "Address",
+            email: "Email",
+            schedule: "Mon—Fri",
+            explore: "Explore",
+            newCollection: "NEW COLLECTION",
+            copyright: "© 2025 – Copyright",
         },
     },
 } as const;

@@ -1,6 +1,8 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { Link } from "react-router";
+import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
+import { motion } from "framer-motion";
 
 export interface StaggeredMenuItem {
   label: string;
@@ -23,7 +25,7 @@ export interface StaggeredMenuProps {
   menuButtonColor?: string;
   openMenuButtonColor?: string;
   accentColor?: string;
-  isFixed: boolean;
+  invertLogo?: boolean;
   changeMenuColorOnOpen?: boolean;
   closeOnClickAway?: boolean;
   onMenuOpen?: () => void;
@@ -43,7 +45,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   openMenuButtonColor = "#fff",
   changeMenuColorOnOpen = true,
   accentColor = "#5227FF",
-  isFixed = false,
+  invertLogo = false,
   closeOnClickAway = true,
   onMenuOpen,
   onMenuClose,
@@ -478,8 +480,11 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           })()}
         </div>
 
-        <div
-          className="border-solid border-1 border-white/10 bg-black/10 backdrop-blur-sm left-1/2 -translate-x-1/2 absolute px-6 py-3 md:px-8 md:py-4 z-20 top-5 w-5/6 rounded-full mx-auto flex items-center justify-between"
+        <motion.div
+          initial={{ x: "0%" }}
+          animate={{ x: open ? "-30%" : "0%" }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+          className="border-solid border-1 border-white/10 bg-black/10 backdrop-blur-sm left-1/2 -translate-x-1/2 absolute px-6 py-3 md:px-8 md:py-3 z-20 top-5 w-5/6 rounded-full mx-auto flex items-center justify-between"
           aria-label="Main navigation header"
         >
           <div
@@ -490,7 +495,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               <img
                 src={logoUrl || "/src/assets/logos/reactbits-gh-white.svg"}
                 alt="Logo"
-                className="sm-logo-img block h-8 w-auto object-contain invert"
+                className={`${invertLogo ? "invert " : ""}sm-logo-img block h-8 w-auto object-contain`}
                 draggable={false}
                 width={110}
                 height={24}
@@ -500,9 +505,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
           <button
             ref={toggleBtnRef}
-            className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto ${
-              open ? "text-black" : "text-[#e9e9ef]"
-            }`}
+            className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto ${invertLogo ? "text-black" : "text-white"}`}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="staggered-menu-panel"
@@ -522,6 +525,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                   <span
                     className="sm-toggle-line block h-[1em] leading-none font-display"
                     key={i}
+                    style={{ color: invertLogo ? "#ffffff" : "#000000" }}
                   >
                     {l}
                   </span>
@@ -536,15 +540,18 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
             >
               <span
                 ref={plusHRef}
+                style={{ color: invertLogo ? "#ffffff" : "#000000" }}
                 className="sm-icon-line absolute left-1/2 top-1/2 w-full h-[2px] bg-current rounded-[2px] -translate-x-1/2 -translate-y-1/2 [will-change:transform]"
               />
               <span
                 ref={plusVRef}
+                style={{ color: invertLogo ? "#ffffff" : "#000000" }}
                 className="sm-icon-line sm-icon-line-v absolute left-1/2 top-1/2 w-full h-[2px] bg-current rounded-[2px] -translate-x-1/2 -translate-y-1/2 [will-change:transform]"
               />
             </span>
           </button>
-        </div>
+
+        </motion.div>
 
         <aside
           id="staggered-menu-panel"
@@ -553,7 +560,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           style={{ WebkitBackdropFilter: "blur(12px)" }}
           aria-hidden={!open}
         >
-          <div className="sm-panel-inner flex-1 flex flex-col gap-5">
+          <div className="pt-20 sm-panel-inner flex-1 flex flex-col gap-5">
             <ul
               className="sm-panel-list list-none m-0 p-0 flex flex-col gap-2"
               role="list"
@@ -627,8 +634,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 .sm-scope .staggered-menu-wrapper { position: relative; width: 100%; height: 100%; z-index: 40; }
 .sm-scope .sm-logo { display: flex; align-items: center; user-select: none; }
 .sm-scope .sm-logo-img { display: block; height: 32px; width: auto; object-fit: contain; }
-.sm-scope .sm-toggle { position: relative; display: inline-flex; align-items: center; gap: 0.3rem; background: transparent; border: none; cursor: pointer; color: #e9e9ef; font-weight: 500; line-height: 1; overflow: visible; }
-.sm-scope .sm-toggle:focus-visible { outline: 2px solid #ffffffaa; outline-offset: 4px; border-radius: 4px; }
+.sm-scope .sm-toggle { position: relative; display: inline-flex; align-items: center; gap: 0.3rem; background: transparent; border: none; cursor: pointer; color: ${invertLogo ? "#e9e9ef" : "#111"}; font-weight: 500; line-height: 1; overflow: visible; }
 .sm-scope .sm-line:last-of-type { margin-top: 6px; }
 .sm-scope .sm-toggle-textWrap { position: relative; margin-right: 0.5em; display: inline-block; height: 1em; overflow: hidden; white-space: nowrap; width: var(--sm-toggle-width, auto); min-width: var(--sm-toggle-width, auto); }
 .sm-scope .sm-toggle-textInner { display: flex; flex-direction: column; line-height: 1; }

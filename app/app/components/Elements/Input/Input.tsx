@@ -7,10 +7,16 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onAnim
     leftIcon?: ReactNode;
     rightIcon?: ReactNode;
     containerClassName?: string;
+    variant?: "default" | "minimal";
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ label, error, leftIcon, rightIcon, className = "", containerClassName = "", ...props }, ref) => {
+    ({ label, error, leftIcon, rightIcon, className = "", containerClassName = "", variant = "default", ...props }, ref) => {
+        const variants = {
+            default: "bg-gray-50 border border-gray-100 rounded-lg px-4 py-3",
+            minimal: "bg-transparent border-b border-gray-200 rounded-none px-0 py-2 focus:border-black placeholder:text-gray-400/60",
+        };
+
         return (
             <div className={`flex flex-col gap-2 ${containerClassName}`}>
                 <style>{`
@@ -25,7 +31,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     }
                 `}</style>
                 {label && (
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className={`text-sm font-bold text-black ${variant === "minimal" ? "text-base" : ""}`}>
                         {label}
                     </label>
                 )}
@@ -38,10 +44,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     <motion.input
                         ref={ref}
                         className={`
-                            w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-3 text-sm 
-                            outline-none transition-all
+                            w-full text-sm outline-none transition-all
                             placeholder:text-gray-400
                             [&::-ms-reveal]:hidden [&::-webkit-password-reveal-button]:hidden
+                            ${variants[variant]}
                             ${leftIcon ? "pl-10" : ""}
                             ${rightIcon ? "pr-10" : ""}
                             ${error ? "border-red-500" : ""}
