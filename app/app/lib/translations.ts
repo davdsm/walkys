@@ -3,6 +3,12 @@ export const translations = {
         // About
         about: {
             title: "Viste a transição? crazy",
+            mold_title: "Molde",
+            shapping_title: "Forma",
+            tabulated_title: "Tabelado",
+            quality_title: "Qualidade",
+            what_about_title: "Sobre",
+            gallery_title: "COMO TUDO COMEÇA",
         },
         // Header
         header: {
@@ -315,6 +321,9 @@ export const translations = {
             message: "Mensagem",
             messagePlaceholder: "Comece a escrever aqui...",
             submit: "Enviar Mensagem",
+            sending: "A enviar...",
+            success: "Mensagem enviada com sucesso!",
+            error: "Erro ao enviar mensagem. Tente novamente.",
             findUs: "ENCONTRE-NOS",
             address: "V.N. Sande, Famalicão",
             phone: "+351 253 162 123",
@@ -340,6 +349,12 @@ export const translations = {
         // About
         about: {
             title: "Did you see the transition? crazy",
+            mold_title: "Mold",
+            shapping_title: "Shape",
+            tabulated_title: "Tabulated",
+            quality_title: "Quality",
+            what_about_title: "What About",
+            gallery_title: "HOW IT ALL STARTS",
         },
         // Header
         header: {
@@ -652,6 +667,9 @@ export const translations = {
             message: "Message",
             messagePlaceholder: "Start typing here...",
             submit: "Send Message",
+            sending: "Sending...",
+            success: "Message sent successfully!",
+            error: "Failed to send message. Please try again.",
             findUs: "FIND US",
             address: "V.N. Sande, Famalicão",
             phone: "+351 253 162 123",

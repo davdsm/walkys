@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 
 /**
@@ -16,7 +16,10 @@ import { useLocation } from "react-router";
  * }
  * ```
  */
-export function useFooter(): { shouldHideFooter: boolean; variant: "light" | "dark" } {
+export function useFooter(): {
+  shouldHideFooter: boolean;
+  variant: "light" | "dark";
+} {
   const location = useLocation();
   const [shouldHideFooter, setShouldHideFooter] = useState(false);
   const [variant, setVariant] = useState<"light" | "dark">("light");
@@ -31,9 +34,7 @@ export function useFooter(): { shouldHideFooter: boolean; variant: "light" | "da
   ];
 
   // Routes with white backgrounds need dark variant
-  const whiteVariantRoutes = [
-    "/contact"
-  ];
+  const whiteVariantRoutes = ["/contact", "/about"];
 
   useEffect(() => {
     const shouldHideFooter = hideFooterRoutes.some((route) =>
@@ -42,7 +43,7 @@ export function useFooter(): { shouldHideFooter: boolean; variant: "light" | "da
 
     const useWhiteVariant = whiteVariantRoutes.some((route) =>
       location?.pathname?.startsWith(route)
-    )
+    );
 
     setShouldHideFooter(shouldHideFooter);
     setVariant(useWhiteVariant ? "light" : "dark");

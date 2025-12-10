@@ -9,6 +9,8 @@ import {
   useLocation,
   useOutlet,
 } from "react-router";
+import { ParallaxProvider } from "react-scroll-parallax";
+import { useEffect } from "react";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -41,9 +43,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { shouldHideFooter, variant: footerVariant } = useFooter();
-  const { shouldHideHeader, variant: headerVariant } = useHeader();
-
   return (
     <html lang="en">
       <head>
@@ -78,14 +77,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="flex flex-col min-h-screen">
-        <LanguageProvider>
-          {!shouldHideHeader && <Header variant={headerVariant} />}
-          <main className="flex-1 min-h-screen">{children}</main>
-          {/* ScrollRestoration disabled to avoid auto-scrolling during animated page transitions. */}
-          {!shouldHideFooter && <Footer variant={footerVariant} />}
-          <Scripts />
-        </LanguageProvider>
+      <body className="flex flex-col overflow-x-hidden">
+        <ParallaxProvider>
+          <LanguageProvider>
+            {children}
+            <Scripts />
+          </LanguageProvider>
+        </ParallaxProvider>
       </body>
     </html>
   );
@@ -93,9 +91,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const { user } = useLoaderData<typeof loader>();
+  const { shouldHideFooter, variant: footerVariant } = useFooter();
+  const { shouldHideHeader, variant: headerVariant } = useHeader();
   const outlet = useOutlet({ user });
+  const location = useLocation();
 
-  return <PageTransition>{outlet}</PageTransition>;
+  // Scroll to top when location changes
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 500);
+  }, [location.pathname]);
+
+  return (
+    <>
+      {!shouldHideHeader && <Header variant={headerVariant} />}
+      <PageTransition>
+        {outlet}
+        {!shouldHideFooter && <Footer variant={footerVariant} />}
+      </PageTransition>
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

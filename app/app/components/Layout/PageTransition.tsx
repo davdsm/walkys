@@ -34,16 +34,16 @@ export function PageTransition({ children }: PageTransitionProps) {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }}
     >
-      <motion.div
+      <motion.main
         key={location.pathname}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.35, ease: "easeInOut" }}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 20 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className="w-full flex flex-col flex-1 min-h-full min-h-screen"
       >
         {children}
-      </motion.div>
+      </motion.main>
     </AnimatePresence>
   );
 }
