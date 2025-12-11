@@ -4,6 +4,8 @@ import AnimatedBackground from "~/components/Elements/AnimatedBackground/Animate
 import { Button } from "~/components/Elements/Button/Button";
 import { useAuth, useTranslatedContent } from "~/hooks";
 import type { PageRecord } from "~/lib/services";
+import CategoryCard from "~/components/Cards/CategoryCard/";
+import ProductCard from "~/components/Cards/ProductCard/";
 
 interface WelcomeProps {
   homepageData: PageRecord[];
@@ -19,8 +21,8 @@ export const Welcome = ({ homepageData }: WelcomeProps) => {
 
 
   return (
-    <main className="w-full min-h-screen bg-black flex flex-col items-center justify-center relative overflow-hidden">
-      <AnimatedBackground className="absolute top-0 left-0 w-full h-full z-10" />
+    <main className="w-full min-h-screen bg-gray-200 flex flex-col items-center justify-center relative overflow-hidden">
+      {/* <AnimatedBackground className="absolute top-0 left-0 w-full h-full z-10" />
 
       {isAuthenticated && (
         <motion.span layout initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 3.5, ease: [0.22, 1, 0.36, 1] }} className="text-white text-md my-6 bg-white/10 px-4 py-2 rounded-full">Olá, {user?.name} 👋</motion.span>
@@ -77,7 +79,11 @@ export const Welcome = ({ homepageData }: WelcomeProps) => {
           )}
         </motion.div>
 
-      </motion.div>
+      </motion.div> */}
+
+      <CategoryCard name="CATEGORIA TESTE TIPO" description="DESCOBRE UMA NOVA CATEGORIA" media={{image: "/images/shoe.png", hover: "/videos/login.mp4"}} link="/contact" />
+
+      <ProductCard name="Sapato Que é Um Teste" media={{image: "/images/personWshoe.png", hover:"/videos/login.mp4"}} link="/about"/>
     </main>
   );
 }
