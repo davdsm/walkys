@@ -16,7 +16,10 @@ import { useLocation } from "react-router";
  * }
  * ```
  */
-export function useHeader(): { shouldHideHeader: boolean; variant: "light" | "dark" } {
+export function useHeader(): {
+  shouldHideHeader: boolean;
+  variant: "light" | "dark";
+} {
   const location = useLocation();
   const [isOverFooter, setIsOverFooter] = useState(false);
 
@@ -30,9 +33,7 @@ export function useHeader(): { shouldHideHeader: boolean; variant: "light" | "da
   ];
 
   // Routes with white backgrounds need dark variant
-  const darkVariantRoutes = [
-    "/contact",
-  ];
+  const darkVariantRoutes = ["/contact"];
 
   const shouldHideHeader = useMemo(() => {
     return hideHeaderRoutes.some((route) =>

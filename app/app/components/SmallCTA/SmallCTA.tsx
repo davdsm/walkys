@@ -50,48 +50,25 @@ export const SmallCTA = ({
 
   return (
     <motion.div
-      className={`flex flex-col items-center justify-center gap-6 px-8 py-12 bg-gray-50 ${className}`}
+      className={`flex flex-col items-center justify-center gap-6 px-8 py-12 bg-gray-50 ${className} md:rounded-2xl md:w-5/6 mx-auto`}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={{ once: true, margin: "-100px", amount: 0.4 }}
     >
       {/* Heading */}
-      <motion.h2
-        className="text-3xl md:text-4xl font-bold text-black text-center tracking-tight"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        viewport={{ once: true, margin: "-100px" }}
-      >
+      <motion.h2 className="text-3xl md:text-4xl font-bold text-black text-center tracking-tight">
         {displayHeading}
       </motion.h2>
 
       {/* Subtitle */}
-      <motion.p
-        className="text-sm md:text-base text-gray-600 text-center max-w-md leading-relaxed"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        viewport={{ once: true, margin: "-100px" }}
-      >
+      <motion.p className="text-sm md:text-base text-gray-600 text-center max-w-md leading-relaxed">
         {displaySubtitle}
       </motion.p>
 
       {/* CTA Button */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        viewport={{ once: true, margin: "-100px" }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <Button
-          to={to}
-          rightIcon={buttonIcon}
-          className="rounded-full"
-        >
+      <motion.div>
+        <Button to={to} rightIcon={buttonIcon} className="rounded-full">
           {displayButtonText}
         </Button>
       </motion.div>
