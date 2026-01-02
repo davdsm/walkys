@@ -287,6 +287,10 @@ export const translations = {
             subtitle: "Um texto sobre a empresa, algo icónico, mas fixe e bonito, que tenha algumas linhas até.",
             buttonText: "SHOP NOW",
         },
+        // Category Card
+        categoryCard: {
+            shopNow: "VER CATEGORIA",
+        },
         // Cookie specifics
         cookies: {
             title: "Política de Cookies",
@@ -632,6 +636,10 @@ export const translations = {
             heading: "SHINNING SINCE 1981",
             subtitle: "A text about the company, something iconic, but cool and beautiful, that has a few lines to.",
             buttonText: "SHOP NOW",
+        },
+        // Category Card
+        categoryCard: {
+            shopNow: "SHOP NOW",
         },
         // Cookie specifics
         cookies: {

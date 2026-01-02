@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { createPocketBase } from "~/lib/pocketbase";
-import { createPageService, type PageRecord } from "~/lib/services";
+import { createPageService, type BaseRecord } from "~/lib/services";
 
 /**
  * Hook to use PageService in components
@@ -20,7 +20,7 @@ import { createPageService, type PageRecord } from "~/lib/services";
  * }
  * ```
  */
-export function usePageService<T extends PageRecord = PageRecord>(collectionName: string) {
+export function usePageService<T extends BaseRecord = BaseRecord>(collectionName: string) {
     return useMemo(() => {
         const pb = createPocketBase();
         return createPageService<T>(pb, collectionName);

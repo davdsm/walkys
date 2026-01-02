@@ -1,14 +1,20 @@
 import type PocketBase from "pocketbase";
 
 /**
- * Generic record interface for PocketBase collections
+ * Base record interface for PocketBase collections
  */
-export interface PageRecord {
+export interface BaseRecord {
     id: string;
     collectionId: string;
     collectionName: string;
     created: string;
     updated: string;
+}
+
+/**
+ * Generic record interface for PocketBase collections
+ */
+export interface PageRecord extends BaseRecord {
     section_name: string;
     section_id: string;
     value_pt: string;
@@ -19,7 +25,7 @@ export interface PageRecord {
 /**
  * Generic service class for interacting with any PocketBase collection
  */
-export class PageService<T extends PageRecord = PageRecord> {
+export class PageService<T extends BaseRecord = BaseRecord> {
     private pb: PocketBase;
     private collectionName: string;
 
@@ -177,7 +183,7 @@ export class PageService<T extends PageRecord = PageRecord> {
  * @param collectionName - Name of the collection
  * @returns PageService instance
  */
-export function createPageService<T extends PageRecord = PageRecord>(
+export function createPageService<T extends BaseRecord = BaseRecord>(
     pb: PocketBase,
     collectionName: string
 ): PageService<T> {
