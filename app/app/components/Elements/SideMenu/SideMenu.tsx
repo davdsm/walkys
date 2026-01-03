@@ -1,4 +1,12 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FC,
+} from "react";
 import { gsap } from "gsap";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
@@ -32,7 +40,7 @@ export interface StaggeredMenuProps {
   onMenuClose?: () => void;
 }
 
-export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
+export const StaggeredMenu: FC<StaggeredMenuProps> = ({
   position = "right",
   colors = ["#B19EEF", "#5227FF"],
   items = [],
@@ -50,6 +58,16 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   onMenuOpen,
   onMenuClose,
 }: StaggeredMenuProps) => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 250);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
 
@@ -336,7 +354,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     [openMenuButtonColor, menuButtonColor, changeMenuColorOnOpen]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (toggleBtnRef.current) {
       if (changeMenuColorOnOpen) {
         const targetColor = openRef.current
@@ -419,7 +437,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     }
   }, [playClose, animateIcon, animateColor, animateText, onMenuClose]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!closeOnClickAway || !open) return;
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -445,11 +463,11 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       <div
         className={
           (className ? className + " " : "") +
-          "staggered-menu-wrapper relative w-full h-full z-40"
+          `staggered-menu-wrapper relative h-full z-40 transition-all duration-500`
         }
         style={
           accentColor
-            ? ({ ["--sm-accent" as any]: accentColor } as React.CSSProperties)
+            ? ({ ["--sm-accent" as any]: accentColor } as CSSProperties)
             : undefined
         }
         data-position={position}
@@ -484,7 +502,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           initial={{ x: "0%" }}
           animate={{ x: open ? "-30%" : "0%" }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
-          className="border-solid border-1 border-white/10 bg-black/10 backdrop-blur-sm left-1/2 -translate-x-1/2 absolute px-6 py-3 md:px-8 md:py-3 z-20 top-5 w-5/6 rounded-full mx-auto flex items-center justify-between"
+          className={`border-solid border-1 border-white/10 bg-black/10 backdrop-blur-sm left-1/2 -translate-x-1/2 absolute px-6 py-3 md:px-8 md:py-3 z-20 top-5 ${scrolled ? "w-5/6" : "w-4/6"} rounded-full mx-auto flex items-center justify-between transition-all duration-800 ease-in-out`}
           aria-label="Main navigation header"
         >
           <div

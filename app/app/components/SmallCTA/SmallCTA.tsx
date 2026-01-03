@@ -49,12 +49,12 @@ export const SmallCTA = ({
   const displayButtonText = buttonText || t.smallCTA.buttonText;
 
   return (
-    <motion.div
+    <motion.article
       className={`flex flex-col items-center justify-center gap-6 px-8 py-12 bg-gray-50 ${className} md:rounded-2xl md:w-5/6 mx-auto`}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      viewport={{ once: true, margin: "-100px", amount: 0.4 }}
+      viewport={{ once: true, margin: "-100px", amount: 0.2 }}
     >
       {/* Heading */}
       <motion.h2 className="text-3xl md:text-4xl font-bold text-black text-center tracking-tight">
@@ -72,6 +72,6 @@ export const SmallCTA = ({
           {displayButtonText}
         </Button>
       </motion.div>
-    </motion.div>
+    </motion.article>
   );
 };

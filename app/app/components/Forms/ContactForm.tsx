@@ -83,7 +83,7 @@ export const ContactForm = () => {
   };
 
   return (
-    <div className="max-w-4xl md:max-w-[1200px] mx-auto px-4 font-sans md:grid md:grid-cols-2 md:gap-x-32 md:items-start">
+    <article className="max-w-4xl md:max-w-[1200px] mx-auto px-4 font-sans md:grid md:grid-cols-2 md:gap-x-32 md:items-start">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -196,7 +196,7 @@ export const ContactForm = () => {
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 1 }}
-          viewport={{ amount: 0.4, once: true }}
+          viewport={{ amount: 0.2, once: true }}
         >
           <h3 className="font-bold mb-6 uppercase text-sm tracking-wider">
             {t.contact.findUs}
@@ -212,12 +212,12 @@ export const ContactForm = () => {
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 1.2 }}
-          viewport={{ amount: 0.4, once: true }}
+          viewport={{ amount: 0.2, once: true }}
         >
           <h3 className="font-bold mb-2 text-lg">{t.contact.address}</h3>
           <p className="text-gray-500 text-lg">{t.contact.phone}</p>
         </motion.div>
       </div>
-    </div>
+    </article>
   );
 };

@@ -27,9 +27,6 @@ export const Welcome = ({ homepageData }: WelcomeProps) => {
   const { categories } = useCategories();
   const { products } = useProducts();
 
-  console.log("categories...", categories);
-  console.log("products...", products);
-
   return (
     <main className="w-full min-h-screen bg-gray-200 flex flex-col items-center justify-center relative overflow-hidden">
       <div className="flex items-center justify-center gap-4 flex-wrap">

@@ -77,7 +77,7 @@ export const Footer = ({
                 </nav>
                 <img
                   className="w-full h-12 my-12 object-contain object-left"
-                  src="images/2020.png"
+                  src="/images/2020.png"
                   alt="Portugal 2020"
                 />
               </div>

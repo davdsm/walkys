@@ -3,6 +3,7 @@ import { type RouteConfig, index, route } from "@react-router/dev/routes";
 export default [
   index("routes/home.tsx"),
   route("auth/:mode", "routes/auth.$mode.tsx"),
+  route("collection/:collection", "routes/collection.$collection.tsx"),
   route("forgot-password", "routes/forgot-password.tsx"),
   route("reset-password/:token", "routes/reset-password.$token.tsx"),
   route("dashboard", "routes/dashboard.tsx"),

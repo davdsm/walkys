@@ -28,10 +28,10 @@ export const Card: FC<CardProps> = ({
         ease: [0.22, 1, 0.36, 1],
         delay: isNumber(index) ? index * 0.7 : 0.8,
       }}
-      className="w-1/2 flex flex-col bg-white rounded-md overflow-hidden h-full p-md"
+      className="w-full flex flex-col bg-white rounded-md overflow-hidden h-full p-md"
     >
       {/* Image Container */}
-      <div className="w-full h-30 md:h-56 overflow-hidden bg-white p-4">
+      <div className="w-full h-56 overflow-hidden bg-white p-4">
         <ParallaxBanner
           layers={[{ image: image, speed: -9 }]}
           aria-label={alt}

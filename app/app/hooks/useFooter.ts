@@ -34,7 +34,7 @@ export function useFooter(): {
   ];
 
   // Routes with white backgrounds need dark variant
-  const whiteVariantRoutes = ["/contact", "/about"];
+  const whiteVariantRoutes = ["/contact", "/about", "/collection/"];
 
   useEffect(() => {
     const shouldHideFooter = hideFooterRoutes.some((route) =>

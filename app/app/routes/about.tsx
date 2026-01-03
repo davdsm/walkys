@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from "react";
 import type { Route } from "./+types/home";
 import { createPocketBase } from "~/lib/pocketbase";
 import { createImageService, createPageService } from "~/lib/services";
+import type { PageRecord } from "~/lib/services";
 import { useLoaderData } from "react-router";
 import { AboutEntry } from "~/components/AboutEntry";
 import { useTranslatedContent } from "~/hooks";
@@ -17,7 +18,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
 
   try {
-    const pageService = createPageService(pb, "AboutPage");
+    const pageService = createPageService<PageRecord>(pb, "AboutPage");
     const aboutPageData = await pageService.getAll();
 
     const imageService = createImageService(pb, "AboutPage", aboutPageData);
@@ -93,27 +94,39 @@ export const About = () => {
   });
 
   const steps = [
-    { title: t.about.mold_title, description: getContent("mold"), img: images!.MoldImage[0] },
-    { title: t.about.shapping_title, description: getContent("shapping"), img: images!.ShapeImage[0] },
-    { title: t.about.tabulated_title, description: getContent("tabulated"), img: images!.TabulatedImage[0] },
-    { title: t.about.quality_title, description: getContent("quality"), img: images!.QualityImage[0] }
+    {
+      title: t.about.mold_title,
+      description: getContent("mold"),
+      img: images!.MoldImage[0],
+    },
+    {
+      title: t.about.shapping_title,
+      description: getContent("shapping"),
+      img: images!.ShapeImage[0],
+    },
+    {
+      title: t.about.tabulated_title,
+      description: getContent("tabulated"),
+      img: images!.TabulatedImage[0],
+    },
+    {
+      title: t.about.quality_title,
+      description: getContent("quality"),
+      img: images!.QualityImage[0],
+    },
   ];
 
   // Pass data to Welcome component as props
   return (
-    <section
-      className="w-full min-h-screen flex flex-col bg-[#f1f1f1] justify-start items-start transition-colors duration-500"
-
-    >
+    <section className="w-full min-h-screen flex flex-col bg-[#f1f1f1] justify-start items-start transition-colors duration-500">
       <AboutEntry
         img={images!.entryImg[0]}
         title={getContent("intro_title")}
         text={getContent("intro_text")}
       />
-      <article className="max-w-7xl px-8 mx-auto pt-8 w-full">
-        <WhatAbout title={t.about.what_about_title} cards={WhatAboutCards} />
-      </article>
-      <motion.article initial={{ opacity: 0, y: 30 }}
+      <WhatAbout title={t.about.what_about_title} cards={WhatAboutCards} />
+      <motion.article
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ amount: 0.1, once: true }}
         transition={{
@@ -124,14 +137,17 @@ export const About = () => {
         className="w-full"
       >
         {GalleryItems && GalleryItems.length > 0 && (
-          <AnimatedGallery gallery={GalleryItems} steps={steps} title={t.about.gallery_title} />
+          <AnimatedGallery
+            gallery={GalleryItems}
+            steps={steps}
+            title={t.about.gallery_title}
+          />
         )}
       </motion.article>
 
       <article className="-mt-4 w-full">
         <SmallCTA />
       </article>
-
     </section>
   );
 };

@@ -15,7 +15,7 @@ export function Header({ variant = "light" }: HeaderProps) {
     {
       label: t.header.collection,
       ariaLabel: "View our products",
-      link: "/collection",
+      link: "/collection/autmn-winter-25",
     },
     { label: t.header.contacts, ariaLabel: "Get in touch", link: "/contact" },
   ];
