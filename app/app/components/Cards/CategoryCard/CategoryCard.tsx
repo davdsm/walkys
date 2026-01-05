@@ -55,11 +55,11 @@ export const CategoryCard = ({
   return (
     <Link to={link} className="no-underline">
       <motion.article
-        className="group flex flex-col text-left md:w-full md:h-full max-h-[227px] bg-white text-center text-lg hover:bg-black duration-250 ease z-20 rounded-xl pt-[12px] pb-[18px] pr-[10px] pl-[10px]"
+        className="group flex flex-col text-left md:w-full md:h-full bg-white text-center text-lg hover:bg-black duration-250 ease z-20 rounded-xl pt-[12px] pb-[18px] pr-[10px] pl-[10px]"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="mb-[12px] h-[145px] w-full bg-[#f3f3f3] rounded-[10px] relative overflow-hidden">
+        <div className="mb-[12px] h-[8rem] md:h-[20rem] w-full bg-[#f3f3f3] rounded-[10px] relative overflow-hidden">
           <img
             src={media.image}
             className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
@@ -82,22 +82,14 @@ export const CategoryCard = ({
             />
           )}
         </div>
-        <div className="flex justify-between items-center gap-4 md:w-full max-w-[382px] md:h-full">
-          <div className="w-3/5 transition group-hover:text-white">
+        <div className="flex justify-between items-center gap-4 md:w-full md:h-full">
+          <div className="w-full transition group-hover:text-white">
             <p className="text-black group-hover:text-white text-base font-bold">
               {name}
             </p>
             <p className="text-black group-hover:text-white text-sm">
               {description}
             </p>
-          </div>
-          <div className="h-2/5 w-[127px]">
-            <Button
-              className="group-hover:bg-white group-hover:text-black h-full w-full"
-              size="sm"
-            >
-              {t.categoryCard.shopNow}
-            </Button>
           </div>
         </div>
       </motion.article>

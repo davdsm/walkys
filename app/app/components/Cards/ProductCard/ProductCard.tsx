@@ -42,14 +42,14 @@ export const ProductCard = ({ name, media, link }: { name: string, media: { imag
     return (
         <Link to={link} className="no-underline">
             <motion.article
-                className="group flex flex-col text-left md:w-full max-w-[167px] md:h-full max-h-[340px] bg-white text-center text-lg hover:bg-black duration-250 ease z-20 rounded-xl pt-[10px] px-[6px] pb-[12px]"
+                className="group flex flex-col text-left bg-white text-center text-lg hover:bg-black duration-250 ease z-20 rounded-xl pt-[10px] px-[6px] pb-[12px]"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
-                <div className="w-[154px] h-[270px] rounded-[14px] bg-[#f3f3f3] relative overflow-hidden mb-[10px]">
+                <div className="w-[154px] md:w-50 h-[200px] md:h-[300px] rounded-[14px] bg-[#f3f3f3] relative overflow-hidden mb-[10px]">
                     <img
                         src={media.image}
-                        className={`absolute inset-0 h-full w-full border-none rounded-[14px] object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? 'opacity-0' : 'opacity-100'}`}
+                        className={`absolute inset-0 h-full w-full border-none rounded-[14px] object-contain transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? 'opacity-0' : 'opacity-100'}`}
                         alt={name}
                     />
                     {media.hover && (
@@ -65,7 +65,7 @@ export const ProductCard = ({ name, media, link }: { name: string, media: { imag
                         ) : (
                             <img
                                 src={media.hover}
-                                className={`absolute inset-0 h-full w-full border-none rounded-[14px] object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? 'opacity-100' : 'opacity-0'}`}
+                                className={`absolute inset-0 h-full w-full border-none rounded-[14px] object-contain transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? 'opacity-100' : 'opacity-0'}`}
                                 alt={name}
                             />
                         )

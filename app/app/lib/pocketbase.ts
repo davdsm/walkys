@@ -1,7 +1,7 @@
 import PocketBase from "pocketbase";
 
 export function createPocketBase(request?: Request) {
-    const url = import.meta.env.VITE_API_ENDPOINT || "http://192.168.1.68:8090";
+    const url = import.meta.env.VITE_API_ENDPOINT || "http://127.0.0.1:8090";
     // console.log("PocketBase URL:", url);
     const pb = new PocketBase(url);
 

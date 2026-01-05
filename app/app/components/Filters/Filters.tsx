@@ -24,10 +24,10 @@ export const Filters = ({
         items.map((item, index: number) => (
           <motion.li
             key={item.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              delay: delay + index / 3,
+              delay: delay + index / 8,
               duration: 1.5,
               ease: [0.22, 1, 0.36, 1],
             }}

@@ -11,8 +11,8 @@ export const FadeEntry = ({
   return (
     <article>
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 2, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
         className="relative"
       >
@@ -30,7 +30,7 @@ export const FadeEntry = ({
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 2.5, ease: [0.22, 1, 0.36, 1], delay: 1.5 }}
-          className="text-3xl md:text-5xl absolute top-0 left-0 w-full flex items-center pt-24 h-full justify-center font-bold text-white z03 text-center"
+          className="text-3xl md:text-8xl absolute top-0 left-0 w-full flex items-center pt-24 h-full justify-center font-bold text-white z03 text-center"
         >
           {title}
         </motion.h2>

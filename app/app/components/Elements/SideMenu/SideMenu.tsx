@@ -502,7 +502,7 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
           initial={{ x: "0%" }}
           animate={{ x: open ? "-30%" : "0%" }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
-          className={`border-solid border-1 border-white/10 bg-black/10 backdrop-blur-sm left-1/2 -translate-x-1/2 absolute px-6 py-3 md:px-8 md:py-3 z-20 top-5 ${scrolled ? "w-5/6" : "w-4/6"} rounded-full mx-auto flex items-center justify-between transition-all duration-800 ease-in-out`}
+          className={`border-solid border-1 border-white/10 bg-black/10 backdrop-blur-sm left-1/2 -translate-x-1/2 absolute px-6 py-3 md:px-8 md:py-3 z-20 top-5 ${scrolled ? "w-5/6" : "w-4/6"} rounded-full mx-auto flex items-center justify-between transition-[width] duration-800 ease-in-out`}
           aria-label="Main navigation header"
         >
           <div
