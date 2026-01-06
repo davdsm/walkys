@@ -291,6 +291,16 @@ export const translations = {
         categoryCard: {
             shopNow: "VER CATEGORIA",
         },
+        // Category Page
+        category: {
+            filters: "Filtros",
+            size: "Tamanho",
+            collection: "Coleção",
+            order: "Ordenar",
+            aToZ: "A→Z",
+            zToA: "Z→A",
+            noProducts: "Nenhum produto corresponde aos filtros selecionados.",
+        },
         // Cookie specifics
         cookies: {
             title: "Política de Cookies",
@@ -347,6 +357,11 @@ export const translations = {
             explore: "Explorar",
             newCollection: "NOVA COLEÇÃO",
             copyright: "© 2025 – Copyright",
+        },
+        // Account / Auth
+        account: {
+            myAccount: "minha conta",
+            loginRegister: "entrar / registar",
         },
     },
     en: {
@@ -641,6 +656,16 @@ export const translations = {
         categoryCard: {
             shopNow: "SHOP NOW",
         },
+        // Category Page
+        category: {
+            filters: "Filters",
+            size: "Size",
+            collection: "Collection",
+            order: "Order",
+            aToZ: "A→Z",
+            zToA: "Z→A",
+            noProducts: "No products match the selected filters.",
+        },
         // Cookie specifics
         cookies: {
             title: "Cookie Policy",
@@ -697,6 +722,11 @@ export const translations = {
             explore: "Explore",
             newCollection: "NEW COLLECTION",
             copyright: "© 2025 – Copyright",
+        },
+        // Account / Auth
+        account: {
+            myAccount: "my account",
+            loginRegister: "login / register",
         },
     },
 } as const;

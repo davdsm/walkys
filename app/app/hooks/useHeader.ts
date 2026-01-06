@@ -33,7 +33,7 @@ export function useHeader(): {
   ];
 
   // Routes with white backgrounds need dark variant
-  const darkVariantRoutes = ["/contact"];
+  const darkVariantRoutes = ["/contact", "/category", "/product"];
 
   const shouldHideHeader = useMemo(() => {
     return hideHeaderRoutes.some((route) =>

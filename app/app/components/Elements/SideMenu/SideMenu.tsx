@@ -11,6 +11,8 @@ import { gsap } from "gsap";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { UserIcon } from "lucide-react";
+import { useLanguage } from "~/contexts";
+import { useAuth } from "~/hooks/useAuth";
 
 export interface StaggeredMenuItem {
   label: string;
@@ -59,6 +61,8 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
   onMenuClose,
 }: StaggeredMenuProps) => {
   const [scrolled, setScrolled] = useState(false);
+  const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -502,7 +506,7 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
           initial={{ x: "0%" }}
           animate={{ x: open ? "-30%" : "0%" }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
-          className={`border-solid border-1 border-white/10 bg-black/10 backdrop-blur-sm left-1/2 -translate-x-1/2 absolute px-6 py-3 md:px-8 md:py-3 z-20 top-5 ${scrolled ? "w-5/6" : "w-4/6"} rounded-full mx-auto flex items-center justify-between transition-[width] duration-800 ease-in-out`}
+          className={`border-solid border-1 border-white/10 bg-black/10 backdrop-blur-sm left-1/2 -translate-x-1/2 absolute px-6 py-3 md:px-12 md:py-6 z-20 top-5 ${scrolled ? "w-5/6" : "w-4/6"} rounded-full mx-auto flex items-center justify-between transition-[width] duration-800 ease-in-out`}
           aria-label="Main navigation header"
         >
           <div
@@ -616,19 +620,19 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
               )}
             </ul>
 
-            {displaySocials && socialItems && socialItems.length > 0 && (
-              <div
-                className="sm-socials mt-auto pt-8 flex flex-col gap-3"
-                aria-label="Social links"
-              >
-                <Link to="/dashboard">
-                  <h3 className="flex items-center gap-2 font-sans sm-socials-title m-0 text-base font-medium [color:var(--sm-accent,#ff0000)]">
-                    <UserIcon className="w-5 h-5" />
-                    my account
-                  </h3>
-                </Link>
-              </div>
-            )}
+            <div
+              className="sm-socials mt-auto pt-8 flex flex-col gap-3"
+              aria-label="Social links"
+            >
+              <Link to={isAuthenticated ? "/dashboard" : "/auth/login"}>
+                <h3 className="flex items-center gap-2 font-sans sm-socials-title m-0 text-base font-medium [color:var(--sm-accent,#ff0000)]">
+                  <UserIcon className="w-5 h-5" />
+                  {isAuthenticated
+                    ? t.account.myAccount
+                    : t.account.loginRegister}
+                </h3>
+              </Link>
+            </div>
           </div>
         </aside>
       </div>
