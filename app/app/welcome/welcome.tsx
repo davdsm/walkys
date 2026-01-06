@@ -11,6 +11,7 @@ import {
 import type { PageRecord } from "~/lib/services";
 import CategoryCard from "~/components/Cards/CategoryCard/";
 import ProductCard from "~/components/Cards/ProductCard/";
+import BackofficeCards from "~/components/Backoffice/BackofficeCards";
 
 interface WelcomeProps {
   homepageData: PageRecord[];
@@ -29,37 +30,70 @@ export const Welcome = ({ homepageData }: WelcomeProps) => {
 
   return (
     <main className="w-full min-h-screen bg-gray-200 flex flex-col items-center justify-center relative overflow-hidden">
-      <div className="flex items-center justify-center gap-4 flex-wrap">
-        {categories.length > 0 &&
-          categories.map((category) => {
-            if (!category.media) return;
-            return (
-              <CategoryCard
-                key={category.name}
-                name={category.name}
-                description={category.description}
-                media={{ image: category.media, hover: category.hover }}
-                link={`/category/${category.link}`}
-              />
-            );
-          })}
-      </div>
+      {/* <AnimatedBackground className="absolute top-0 left-0 w-full h-full z-10" />
 
-      <div className="flex items-center justify-center gap-4 flex-wrap">
-        {products.map((product) => {
-          return (
-            <ProductCard
-              key={product.name}
-              name={product.name}
-              media={{
-                image: product.media[0],
-                hover: product.media_hover,
-              }}
-              link={`/product/${product.slug}`}
-            />
-          );
-        })}
-      </div>
+      {isAuthenticated && (
+        <motion.span layout initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 3.5, ease: [0.22, 1, 0.36, 1] }} className="text-white text-md my-6 bg-white/10 px-4 py-2 rounded-full">Olá, {user?.name} 👋</motion.span>
+      )}
+
+      <motion.div
+        layout
+        className="text-white flex flex-col items-center justify-center gap-8 z-20 relative px-4"
+      >
+        <motion.h1
+          layout
+          initial={{ opacity: 0, scale: 1.3 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            duration: 2,
+            delay: 0.5,
+          }}
+          className="text-6xl md:text-8xl"
+        >
+          {title}
+        </motion.h1>
+
+        <motion.p
+          layout
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          transition={{ duration: 1, delay: 2, ease: [0.22, 1, 0.36, 1] }}
+          className="max-w-xl text-center text-gray-300 text-lg md:text-xl overflow-hidden"
+        >
+          {text}
+        </motion.p>
+
+
+        <motion.div
+          layout
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 3, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center gap-4 overflow-hidden pt-4"
+        >
+          {isAuthenticated ? (
+            <Link to="/dashboard">
+              <Button variant="secondary" size="lg" className="hover:bg-gray-200 ">Dashboard</Button>
+            </Link>
+          ) : (
+            <>
+              <Link to="/auth/login">
+                <Button variant="secondary" size="lg" className="hover:bg-gray-200 ">Login</Button>
+              </Link>
+              <Link to="/auth/signup">
+                <Button variant="outline" size="lg" className="text-white border-white/20">Sign Up</Button>
+              </Link>
+            </>
+          )}
+        </motion.div>
+
+      </motion.div> */}
+
+      <CategoryCard name="CATEGORIA TESTE TIPO" description="DESCOBRE UMA NOVA CATEGORIA" media={{ image: "/images/shoe.png", hover: "/videos/login.mp4" }} link="/contact" />
+
+      <ProductCard name="Sapato Que é Um Teste" media={{ image: "/images/personWshoe.png", hover: "/videos/login.mp4" }} link="/about" />
+
+      <BackofficeCards titulo="Orders" info="16 Orders" link="/dashboard" />
     </main>
   );
 };
