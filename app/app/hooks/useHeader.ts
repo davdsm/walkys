@@ -33,7 +33,7 @@ export function useHeader(): {
   ];
 
   // Routes with white backgrounds need dark variant
-  const darkVariantRoutes = ["/contact", "/category", "/product"];
+  const whiteVariantRoutes = ["/about", "/collection", "/terms", "/privacy"];
 
   const shouldHideHeader = useMemo(() => {
     return hideHeaderRoutes.some((route) =>
@@ -42,10 +42,10 @@ export function useHeader(): {
   }, [location.pathname]);
 
   const routeVariant = useMemo(() => {
-    const useDarkVariant = darkVariantRoutes.some((route) =>
+    const useDarkVariant = whiteVariantRoutes.some((route) =>
       location?.pathname?.startsWith(route)
     );
-    return useDarkVariant ? "dark" : "light";
+    return useDarkVariant ? "light" : "dark";
   }, [location.pathname]);
 
   useEffect(() => {

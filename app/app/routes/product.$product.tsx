@@ -124,7 +124,7 @@ export const ProductPage = () => {
   return (
     <section
       ref={containerRef}
-      className="bg-[#f1f1f1] min-h-[200vh] relative z-0"
+      className="bg-[#f1f1f1] min-h-[200vh] relative z-0 overflow-x-hidden w-screen"
     >
       {/* Desktop Layout */}
       <div className="hidden md:block">
@@ -320,7 +320,7 @@ export const ProductPage = () => {
       {/* Mobile Layout */}
       <div className="md:hidden min-h-screen bg-[#f1f1f1]">
         {/* Full Screen Image Section (70% height) */}
-        <div className="h-[70vh] w-full relative bg-[#f1f1f1] flex items-center justify-center p-6">
+        <div className="h-[70vh] w-full relative bg-[#f1f1f1] flex items-center justify-center p-6 ">
           {media[selectedImage] && (
             <motion.img
               key={selectedImage}
@@ -335,7 +335,7 @@ export const ProductPage = () => {
 
           {/* Size Selector - Square Buttons Overlaid at Bottom */}
           {sortedSizes.length > 0 && (
-            <div className="absolute bottom-16 left-0 w-full flex justify-center gap-2 px-6">
+            <div className="absolute bottom-16 left-0 w-full flex justify-center gap-2 px-6 flex-wrap">
               {sortedSizes.map((size) => (
                 <button
                   key={`size-square-${size}`}
@@ -343,7 +343,7 @@ export const ProductPage = () => {
                   className={`w-12 h-12 flex items-center justify-center text-sm font-medium transition-all rounded-sm ${
                     selectedSize === size
                       ? "bg-white text-black"
-                      : "bg-[#F8F8F8] text-black"
+                      : "bg-[#F9F9F9]/60 text-black"
                   }`}
                 >
                   {size}
@@ -355,6 +355,35 @@ export const ProductPage = () => {
 
         {/* Content Section (White card) */}
         <div className="bg-white rounded-t-[40px] -mt-10 relative z-20 min-h-[50vh] p-8 pb-32">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-5">
+            {breadcrumbs.map((crumb, idx) => (
+              <div key={idx} className="flex items-center gap-2">
+                {crumb.to ? (
+                  <Link
+                    to={crumb.to}
+                    className="hover:text-black transition-colors"
+                  >
+                    {crumb.label}
+                  </Link>
+                ) : (
+                  <span
+                    className={
+                      crumb.active
+                        ? "text-neutral-900 font-medium truncate max-w-[150px]"
+                        : ""
+                    }
+                  >
+                    {crumb.label}
+                  </span>
+                )}
+                {idx < breadcrumbs.length - 1 && (
+                  <ChevronRight size={10} className="text-neutral-300" />
+                )}
+              </div>
+            ))}
+          </nav>
+
           {/* Collection Name */}
           {collectionName && (
             <p className="text-sm text-neutral-500 mb-2 lowercase font-light">
@@ -388,17 +417,9 @@ export const ProductPage = () => {
           {/* Action Buttons Row */}
           <div className="flex gap-4 mb-10">
             <Button
-              variant="outline"
-              onClick={handleBack}
-              className="flex-1 rounded-2xl h-14 bg-neutral-100 border-none flex items-center justify-center gap-2 text-black"
-              leftIcon={<ArrowUpLeft size={18} />}
-            >
-              {language === "pt" ? "Voltar" : "Back"}
-            </Button>
-            <Button
               variant="primary"
               onClick={handleOrder}
-              className="flex-[2] rounded-2xl h-14 bg-neutral-700 hover:bg-neutral-800 border-none transition-colors"
+              className="w-3/4 flex-[2] rounded-2xl h-14 border-none transition-colors"
               rightIcon={<ShoppingBag size={20} />}
             >
               {language === "pt" ? "ENCOMENDAR AGORA" : "ORDER NOW"}
