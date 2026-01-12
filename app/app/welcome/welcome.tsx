@@ -29,8 +29,6 @@ export const Welcome = ({ homepageData }: WelcomeProps) => {
           }}
           link="/about"
         />
-
-        <BackofficeCards titulo="Orders" info="16 Orders" link="/dashboard" />
       </div>
     </main>
   );
