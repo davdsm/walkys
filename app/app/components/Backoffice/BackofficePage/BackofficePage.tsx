@@ -1,4 +1,3 @@
-import { Header } from "~/components/Layout/Header";
 import BackofficeCard from "~/components/Backoffice/BackofficeCards";
 import { Link } from "react-router";
 
@@ -26,7 +25,7 @@ export default function BackofficePage({
                         <BackofficeCard
                             titulo="Orders"
                             info="16 Orders"
-                            link=""
+                            link="/orders"
                             icon={
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +76,7 @@ export default function BackofficePage({
                     <div className="w-full flex justify-between">
                         <Link className="md:text-[15px] text-[12px] font-semibold" to="#">change password</Link>
                         <form action="/logout" method="post" className="ml-4 flex items-center gap-2 inline">
-                            <button type="submit" className="flex items-center gap-[8px] md:text-[15px] text-[12px] font-semibold">
+                            <button type="submit" className="flex items-center gap-[8px] md:text-[15px] text-[12px] font-semibold cursor-pointer">
                                 leave
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
