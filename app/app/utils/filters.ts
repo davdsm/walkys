@@ -1,4 +1,4 @@
-import type { CategoryRecord } from "../hooks";
+import type { TranslatedCategory } from "~/lib/services";
 import type { MouseEventHandler } from "react";
 
 export function getCategoryFilters({
@@ -6,7 +6,7 @@ export function getCategoryFilters({
   language,
   setActiveCategory,
 }: {
-  categories: CategoryRecord[];
+  categories: TranslatedCategory[];
   language: string;
   setActiveCategory: (c: string) => void;
 }): Array<{
@@ -16,7 +16,7 @@ export function getCategoryFilters({
 }> {
   const filters = categories.map((category) => ({
     id: category.id ?? "",
-    text: category[`name_${language}`] ?? "",
+    text: category.name || "",
     onClick: () => {
       setActiveCategory(category.id);
       const section = document.getElementById(category.slug);
@@ -27,7 +27,7 @@ export function getCategoryFilters({
   }));
   filters.unshift({
     id: "todos-0",
-    text: "Todos",
+    text: language === "pt" ? "Todos" : "All",
     onClick: () => {
       setActiveCategory("todos-0");
       window.scrollTo({ top: 0, behavior: "smooth" });

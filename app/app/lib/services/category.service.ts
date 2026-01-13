@@ -1,5 +1,23 @@
 import type PocketBase from "pocketbase";
-import type { CategoryRecord } from "~/hooks/useCategories";
+import type { BaseRecord } from "./page.service";
+
+export interface CategoryRecord extends BaseRecord {
+  name_en?: string;
+  name_pt?: string;
+  description_en?: string;
+  description_pt?: string;
+  slug: string;
+  media?: string;
+  hover?: string;
+  enable?: boolean;
+}
+
+export interface TranslatedCategory extends Omit<CategoryRecord, "name_en" | "name_pt" | "description_en" | "description_pt"> {
+  name: string;
+  description: string;
+  media: string;
+  hover: string;
+}
 
 export interface CategoryServiceOptions {
   filter?: string;
@@ -11,10 +29,9 @@ export interface CategoryServiceOptions {
  * Service class for interacting with category collection
  */
 export class CategoryService {
-  private pb: PocketBase;
-
-  constructor(pb: PocketBase) {
+  constructor(private readonly pb: PocketBase, private readonly language: "en" | "pt" = "en") {
     this.pb = pb;
+    this.language = language;
   }
 
   /**
@@ -24,32 +41,40 @@ export class CategoryService {
     if (!filename) return "";
     const baseUrl = this.pb.baseUrl.replace(/\/$/, "");
     // Handle array media (take first item) or single string
-    if (Array.isArray(filename)) {
-      return filename.length > 0
-        ? `${baseUrl}/api/files/${collectionId}/${recordId}/${filename[0]}`
-        : "";
-    }
-    return `${baseUrl}/api/files/${collectionId}/${recordId}/${filename}`;
+    const actualFilename = Array.isArray(filename) ? filename[0] : filename;
+    if (!actualFilename) return "";
+
+    return `${baseUrl}/api/files/${collectionId}/${recordId}/${actualFilename}`;
   }
 
   /**
-   * Transform category record to include file URLs
+   * Transform category record to include file URLs and translated fields
    */
-  private transformCategory(category: CategoryRecord): CategoryRecord {
+  public transform(category: CategoryRecord): TranslatedCategory {
+    const lang = this.language;
     return {
       ...category,
+      name: (lang === "pt" ? category.name_pt : category.name_en) || "",
+      description: (lang === "pt" ? category.description_pt : category.description_en) || "",
       media: this.buildFileUrl(category.id, category.media, category.collectionId),
       hover: this.buildFileUrl(category.id, category.hover, category.collectionId),
     };
   }
 
   /**
+   * Deprecated: Use transform() instead.
+   */
+  private transformCategory(category: CategoryRecord): TranslatedCategory {
+    return this.transform(category);
+  }
+
+  /**
    * Get all categories
    */
-  async getAll(options?: CategoryServiceOptions): Promise<CategoryRecord[]> {
+  async getAll(options?: CategoryServiceOptions): Promise<TranslatedCategory[]> {
     try {
       const categories = await this.pb.collection("category").getFullList<CategoryRecord>({
-        filter: options?.filter || "enable = true",
+        filter: `enable=true && ${options?.filter}`,
         sort: options?.sort,
         fields: options?.fields,
       });
@@ -64,10 +89,10 @@ export class CategoryService {
   /**
    * Get a single category by slug
    */
-  async getBySlug(slug: string, options?: Omit<CategoryServiceOptions, "filter">): Promise<CategoryRecord | null> {
+  async getBySlug(slug: string, options?: Omit<CategoryServiceOptions, "filter">): Promise<TranslatedCategory | null> {
     try {
       const category = await this.pb.collection("category").getFirstListItem<CategoryRecord>(
-        `slug="${slug}" && enable = true`,
+        `slug="${slug}" && enable=true`,
         {
           fields: options?.fields,
         }
@@ -86,7 +111,7 @@ export class CategoryService {
   /**
    * Get a single category by ID
    */
-  async getById(id: string, options?: Omit<CategoryServiceOptions, "filter">): Promise<CategoryRecord | null> {
+  async getById(id: string, options?: Omit<CategoryServiceOptions, "filter">): Promise<TranslatedCategory | null> {
     try {
       const category = await this.pb.collection("category").getOne<CategoryRecord>(id, {
         fields: options?.fields,
@@ -105,15 +130,15 @@ export class CategoryService {
   /**
    * Get featured categories (first N categories)
    */
-  async getFeatured(count: number = 2, options?: CategoryServiceOptions): Promise<CategoryRecord[]> {
-    const categories = await this.getAll(options);
+  async getFeatured(count: number = 2, options?: CategoryServiceOptions): Promise<TranslatedCategory[]> {
+    const categories = await this.getAll({ ...options, filter: "featured=true" });
     return categories.slice(0, count);
   }
 
   /**
    * Get categories from products (extract unique categories from product expand)
    */
-  getCategoriesFromProducts(products: Array<{ expand?: { category?: CategoryRecord | CategoryRecord[] } }>): CategoryRecord[] {
+  getCategoriesFromProducts(products: Array<any>): TranslatedCategory[] {
     const categoriesMap = new Map<string, CategoryRecord>();
 
     products.forEach((product) => {
@@ -135,7 +160,7 @@ export class CategoryService {
   /**
    * Filter categories
    */
-  async filter(filterString: string, options?: Omit<CategoryServiceOptions, "filter">): Promise<CategoryRecord[]> {
+  async filter(filterString: string, options?: Omit<CategoryServiceOptions, "filter">): Promise<TranslatedCategory[]> {
     try {
       const categories = await this.pb.collection("category").getFullList<CategoryRecord>({
         filter: filterString,
@@ -153,9 +178,9 @@ export class CategoryService {
   /**
    * Search categories by name
    */
-  async search(searchTerm: string, language: "en" | "pt" = "en", options?: Omit<CategoryServiceOptions, "filter">): Promise<CategoryRecord[]> {
+  async search(searchTerm: string, options?: Omit<CategoryServiceOptions, "filter">): Promise<TranslatedCategory[]> {
     try {
-      const field = `name_${language}`;
+      const field = `name_${this.language}`;
       const categories = await this.pb.collection("category").getFullList<CategoryRecord>({
         filter: `${field} ~ "${searchTerm}" && enable = true`,
         sort: options?.sort,
@@ -173,7 +198,8 @@ export class CategoryService {
 /**
  * Factory function to create a CategoryService instance
  */
-export function createCategoryService(pb: PocketBase): CategoryService {
-  return new CategoryService(pb);
+export function createCategoryService(pb: PocketBase, language: "en" | "pt" = "en"): CategoryService {
+  return new CategoryService(pb, language);
 }
+
 

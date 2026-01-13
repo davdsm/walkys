@@ -6,6 +6,7 @@ export { useProducts } from "./useProducts";
 export type { ProductRecord, TranslatedProduct, CollectionRecord, SizeRecord } from "./useProducts";
 export { usePageService } from "./usePageService";
 export { useTranslatedContent } from "./useTranslatedContent";
+export { useScrollLock } from "./useScrollLock";
 
 
 

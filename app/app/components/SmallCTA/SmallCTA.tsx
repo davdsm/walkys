@@ -50,7 +50,7 @@ export const SmallCTA = ({
 
   return (
     <motion.article
-      className={`flex flex-col items-center justify-center gap-6 px-8 py-12 bg-gray-50 ${className} md:rounded-2xl md:w-5/6 mx-auto`}
+      className={`flex flex-col items-center justify-center gap-6 px-8 py-12 bg-gray-50 ${className} md:rounded-2xl mx-auto`}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
