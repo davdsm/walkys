@@ -22,7 +22,7 @@ export const HomeHero = ({
   }[];
 }) => {
   return (
-    <article className="w-full md:py-0 min-h-screen flex flex-col justify-center items-center md:justify-center px-6 lg:px-20 relative flex items-center">
+    <article className="w-full py-30 md:py-12 flex flex-col justify-center items-center px-6 lg:px-20 relative">
       <div className="w-full max-w-[1400px] flex flex-col lg:flex-row items-center justify-center gap-4 md:gap-12">
         {/* Text Content - Desktop: Left, Mobile: Top */}
         <div className="flex flex-col items-start w-full lg:w-1/2 order-1">
@@ -81,7 +81,7 @@ export const HomeHero = ({
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 1 }}
           className="w-full lg:w-[45%] order-2 lg:order-2"
         >
-          <div className="relative aspect-[4/5] lg:aspect-[3/3.8] rounded-[20px] md:rounded-[40px] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] group">
+          <div className="relative aspect-[4/5] lg:aspect-[3/3.8] rounded-[20px] md:rounded-[40px] overflow-hidden group">
             <img
               src={product.image}
               alt={product.name}
@@ -112,7 +112,7 @@ export const HomeHero = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="flex sm:flex-row w-full lg:hidden gap-4 order-3 mt-4 overflow-x-scroll"
+          className="flex sm:flex-row w-full lg:hidden gap-4 order-3 mt-4 overflow-x-auto scrollbar-hide"
         >
           {categories.map((category) => (
             <Button

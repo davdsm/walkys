@@ -58,47 +58,62 @@ export const CollectionPage = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [activeCategory, setActiveCategory] = useState("todos-0");
 
+  // Safely extract loader data with defaults
+  const loaderDataSafe = loaderData || {};
   const {
     products = [],
     categories = [],
     collection,
     language: loaderLanguage,
-  } = loaderData;
+  } = loaderDataSafe;
   const { language: contextLanguage } = useLanguage();
   const language = loaderLanguage || contextLanguage;
 
   const title = collection?.name;
 
   // Show only the first 6 products and 2 categories as featured
-  const featuredProducts = useMemo(() => products.slice(0, 6), [products]);
-  const featuredCategories = useMemo(
-    () => categories.slice(0, 2),
-    [categories]
-  );
+  const featuredProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
+    return products.slice(0, 6);
+  }, [products]);
+
+  const featuredCategories = useMemo(() => {
+    if (!Array.isArray(categories)) return [];
+    return categories.slice(0, 2);
+  }, [categories]);
 
   // Map categories to their products
-  const categoriesWithProductsArray = useMemo(
-    () => mapCategoriesWithProducts(categories, products),
-    [categories, products]
-  );
+  const categoriesWithProductsArray = useMemo(() => {
+    if (!Array.isArray(categories) || !Array.isArray(products)) return [];
+    return mapCategoriesWithProducts(categories, products);
+  }, [categories, products]);
 
-  // Get filters
-  const filters = useMemo(
-    () =>
-      getCategoryFilters({
-        categories,
-        language,
-        setActiveCategory,
-      }),
-    [categories, language]
-  );
+  // Get filters - use useCallback to stabilize setActiveCategory
+  const filters = useMemo(() => {
+    if (!Array.isArray(categories) || !language) return [];
+    return getCategoryFilters({
+      categories,
+      language,
+      setActiveCategory,
+    });
+  }, [categories, language]);
 
-  // Scrollspy
-  useScrollSpy({ categories, setActiveCategory, offset: 200 });
+  // Scrollspy - only if we have categories
+  useScrollSpy({
+    categories: Array.isArray(categories) ? categories : [],
+    setActiveCategory,
+    offset: 200,
+  });
 
   // Sticky filter toggle on scroll
   useEffect(() => {
-    const onScroll = () => setShowFilter(window.scrollY > 550);
+    const onScroll = () => {
+      try {
+        setShowFilter(window.scrollY > 550);
+      } catch (error) {
+        // Silently handle errors during navigation
+      }
+    };
     window.addEventListener("scroll", onScroll);
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
@@ -124,7 +139,7 @@ export const CollectionPage = () => {
           />
         </motion.div>
       )}
-      <article className="relative -mt-40 mb-40">
+      <article className="relative -mt-40 mb-10">
         <Filters
           items={filters}
           activeFilter={activeCategory}
@@ -140,6 +155,7 @@ export const CollectionPage = () => {
                   initial={{ opacity: 0, y: 60 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 2.2 + index / 8, duration: 1.2 }}
+                  className="md:w-1/6 w-[calc(50%-20px)]"
                 >
                   <ProductCard
                     name={product.name}
@@ -183,7 +199,9 @@ export const CollectionPage = () => {
           />
         </div>
       </article>
-      <SmallCTA />
+      <div className="mx-auto max-w-7xl">
+        <SmallCTA />
+      </div>
     </section>
   );
 };

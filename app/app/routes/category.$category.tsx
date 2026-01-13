@@ -43,7 +43,8 @@ export async function loader({
     expand: "sizes,collection,category",
   });
 
-  return { category, products };
+  // Ensure 'products' are returned as ProductRecord[]
+  return { category, products: products as ProductRecord[] };
 }
 
 export const CategoryPage = () => {
@@ -241,17 +242,18 @@ export const CategoryPage = () => {
             </div>
           </motion.aside>
 
-          <main className="flex-1">
+          <main className="flex-1 w-full">
             {filteredProducts.length === 0 ? (
               <p className="text-sm text-neutral-500">{t.noProducts}</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full">
                 {filteredProducts.map((product, index) => (
                   <motion.div
                     key={product.id}
                     initial={{ opacity: 0, y: 60 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 + index / 10, duration: 1.2 }}
+                    className="w-full"
                   >
                     <ProductCard
                       name={
