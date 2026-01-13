@@ -35,7 +35,7 @@ export const CategoriesList = ({
               <hr className="border-2 w-1/2 my-2 rounded" />
             </h1>
           </motion.div>
-          <ul className="flex flex-row gap-3 justify-start items-center flex-wrap md:flex-nowrap">
+          <ul className="w-full flex flex-row gap-3 justify-start items-center flex-wrap md:flex-nowrap">
             {category.products.map(
               (product: TranslatedProduct, indexP: number) => (
                 <motion.li
@@ -47,6 +47,7 @@ export const CategoriesList = ({
                     delay: 0.5 + indexP / 8,
                     duration: 1.2,
                   }}
+                  className="md:w-1/4 w-[calc(50%-10px)]"
                 >
                   <ProductCard
                     name={product.name}

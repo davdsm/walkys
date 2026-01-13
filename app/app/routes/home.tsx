@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { HomeHero } from "~/components/HomeHero";
 import { ProductCarousel } from "~/components/ProductCarousel";
 import CategoryCard from "~/components/Cards/CategoryCard";
@@ -49,6 +49,15 @@ export const Home = () => {
   const lastDataRef = useRef(data);
   const carouselRef = useRef<HTMLDivElement>(null);
 
+  // Reset scroll and overflow on mount to prevent double scrollbars
+  useEffect(() => {
+    // Ensure body has correct overflow settings
+    document.body.style.overflowY = "auto";
+    document.body.style.overflowX = "hidden";
+    // Reset scroll position
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, []);
+
   // Update ref if we have new data
   if (data) {
     lastDataRef.current = data;
@@ -68,7 +77,10 @@ export const Home = () => {
     product: homepageData.find((p) => p.section_id === "intro-product")
       .products[0],
     categories: homepageData.find((p) => p.section_id === "intro-categories")
-      .categories,
+      .categories.map((c: any) => ({
+        name: c.name,
+        link: `/category/${c.slug}`,
+      })) || [],
   };
 
   const productSliderSection = {
@@ -82,7 +94,7 @@ export const Home = () => {
   };
 
   return (
-    <section className="w-full min-h-screen flex flex-col items-start justify-start relative overflow-x-hidden transition-colors duration-500 bg-[#f1f1f1]">
+    <section className="w-full flex flex-col items-start justify-start relative overflow-x-hidden transition-colors duration-500 bg-[#f1f1f1]">
       <HomeHero
         title={heroSection.title}
         subtitle={heroSection.subtitle}
