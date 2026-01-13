@@ -3,6 +3,7 @@ import type { Route } from "../+types/root";
 import { createPocketBase } from "~/lib/pocketbase";
 import OrdersPage from "~/components/Backoffice/OrdersPage/OrdersPage";
 
+<<<<<<< HEAD
 export async function loader({ request }: Route.LoaderArgs) {
     const pb = createPocketBase(request);
     if (!pb.authStore.isValid) {
@@ -14,6 +15,19 @@ export async function loader({ request }: Route.LoaderArgs) {
 export function meta({ }: Route.MetaArgs) {
     return [
         { title: "Walkys - Orders" },
+=======
+// export async function loader({ request }: Route.LoaderArgs) {
+//     const pb = createPocketBase(request);
+//     if (!pb.authStore.isValid) {
+//         return redirect("/auth/login");
+//     }
+//     return {user: pb.authStore.model};
+// }
+
+export function meta({ }: Route.MetaArgs) {
+    return [
+        { title: "Walkys - Dashboard" },
+>>>>>>> fa7a8c9 (Orders Page)
     ];
 }
 
