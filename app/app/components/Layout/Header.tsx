@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import SideMenu from "../Elements/SideMenu/SideMenu";
 import { useLanguage } from "~/contexts";
+import { useScrollLock } from "~/hooks";
 
 interface HeaderProps {
   variant?: "light" | "dark";
@@ -8,6 +10,14 @@ interface HeaderProps {
 
 export function Header({ variant = "light" }: HeaderProps) {
   const { t } = useLanguage();
+  const { lock, unlock } = useScrollLock();
+
+  // Clean up scroll lock on unmount
+  useEffect(() => {
+    return () => {
+      unlock();
+    };
+  }, [unlock]);
 
   const menuItems = [
     { label: t.header.begin, ariaLabel: "Go to home page", link: "/" },
@@ -49,6 +59,8 @@ export function Header({ variant = "light" }: HeaderProps) {
           invertLogo={variant === "light"}
           position="right"
           closeOnClickAway={true}
+          onMenuOpen={lock}
+          onMenuClose={unlock}
         />
       </motion.header>
     </>

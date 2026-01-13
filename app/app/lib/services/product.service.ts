@@ -1,5 +1,35 @@
 import type PocketBase from "pocketbase";
-import type { ProductRecord } from "~/hooks/useProducts";
+import type { BaseRecord } from "./page.service";
+import type { CategoryRecord } from "./category.service";
+import type { CollectionRecord } from "./collection.service";
+
+export interface SizeRecord extends BaseRecord {
+  number: string;
+}
+
+export interface ProductRecord extends BaseRecord {
+  name_en?: string;
+  name_pt?: string;
+  description_en?: string;
+  description_pt?: string;
+  details_en?: string;
+  details_pt?: string;
+  slug: string;
+  media?: string[];
+  media_hover?: string;
+  category?: string[] | CategoryRecord[];
+  collection?: string[] | CollectionRecord[];
+  sizes?: string[] | SizeRecord[];
+  enabled: boolean;
+}
+
+export interface TranslatedProduct extends Omit<ProductRecord, "name_en" | "name_pt" | "description_en" | "description_pt" | "details_en" | "details_pt"> {
+  name: string;
+  description: string;
+  details: string;
+  media: string[];
+  media_hover: string;
+}
 
 export interface ProductServiceOptions {
   filter?: string;
@@ -12,10 +42,9 @@ export interface ProductServiceOptions {
  * Service class for interacting with products collection
  */
 export class ProductService {
-  private pb: PocketBase;
-
-  constructor(pb: PocketBase) {
+  constructor(private readonly pb: PocketBase, private readonly language: "en" | "pt" = "en") {
     this.pb = pb;
+    this.language = language;
   }
 
   /**
@@ -37,11 +66,15 @@ export class ProductService {
   }
 
   /**
-   * Transform product record to include file URLs
+   * Transform product record to include file URLs and translated fields
    */
-  private transformProduct(product: ProductRecord): ProductRecord {
+  public transform(product: ProductRecord): TranslatedProduct {
+    const lang = this.language;
     return {
       ...product,
+      name: (lang === "pt" ? product.name_pt : product.name_en) || "",
+      description: (lang === "pt" ? product.description_pt : product.description_en) || "",
+      details: (lang === "pt" ? product.details_pt : product.details_en) || "",
       media: Array.isArray(product.media)
         ? this.buildFileUrls(product.id, product.media, product.collectionId)
         : [],
@@ -50,12 +83,19 @@ export class ProductService {
   }
 
   /**
+   * Deprecated: Use transform() instead.
+   */
+  private transformProduct(product: ProductRecord): TranslatedProduct {
+    return this.transform(product);
+  }
+
+  /**
    * Get all products
    */
-  async getAll(options?: ProductServiceOptions): Promise<ProductRecord[]> {
+  async getAll(options?: ProductServiceOptions): Promise<TranslatedProduct[]> {
     try {
       const products = await this.pb.collection("products").getFullList<ProductRecord>({
-        filter: options?.filter,
+        filter: `enabled=true && ${options?.filter}`,
         sort: options?.sort,
         expand: options?.expand || "category,sizes",
         fields: options?.fields,
@@ -71,7 +111,7 @@ export class ProductService {
   /**
    * Get products by collection ID
    */
-  async getByCollection(collectionId: string, options?: Omit<ProductServiceOptions, "filter">): Promise<ProductRecord[]> {
+  async getByCollection(collectionId: string, options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct[]> {
     try {
       const products = await this.pb.collection("products").getFullList<ProductRecord>({
         filter: `collection ?~ "${collectionId}" && enabled=true`,
@@ -90,7 +130,7 @@ export class ProductService {
   /**
    * Get products by category ID
    */
-  async getByCategory(categoryId: string, options?: Omit<ProductServiceOptions, "filter">): Promise<ProductRecord[]> {
+  async getByCategory(categoryId: string, options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct[]> {
     try {
       const products = await this.pb.collection("products").getFullList<ProductRecord>({
         filter: `category ?~ "${categoryId}" && enabled=true`,
@@ -109,7 +149,7 @@ export class ProductService {
   /**
    * Get a single product by slug
    */
-  async getBySlug(slug: string, options?: Omit<ProductServiceOptions, "filter">): Promise<ProductRecord | null> {
+  async getBySlug(slug: string, options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct | null> {
     try {
       const product = await this.pb.collection("products").getFirstListItem<ProductRecord>(
         `slug="${slug}" && enabled=true`,
@@ -132,7 +172,7 @@ export class ProductService {
   /**
    * Get a single product by ID
    */
-  async getById(id: string, options?: Omit<ProductServiceOptions, "filter">): Promise<ProductRecord | null> {
+  async getById(id: string, options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct | null> {
     try {
       const product = await this.pb.collection("products").getOne<ProductRecord>(id, {
         expand: options?.expand || "category,sizes,collection",
@@ -152,15 +192,15 @@ export class ProductService {
   /**
    * Get featured products (first N products)
    */
-  async getFeatured(count: number = 6, options?: ProductServiceOptions): Promise<ProductRecord[]> {
-    const products = await this.getAll(options);
+  async getFeatured(count: number = 6, options?: ProductServiceOptions): Promise<TranslatedProduct[]> {
+    const products = await this.getAll({ ...options, filter: "featured=true" });
     return products.slice(0, count);
   }
 
   /**
    * Filter products
    */
-  async filter(filterString: string, options?: Omit<ProductServiceOptions, "filter">): Promise<ProductRecord[]> {
+  async filter(filterString: string, options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct[]> {
     try {
       const products = await this.pb.collection("products").getFullList<ProductRecord>({
         filter: filterString,
@@ -179,9 +219,9 @@ export class ProductService {
   /**
    * Search products by name or description
    */
-  async search(searchTerm: string, language: "en" | "pt" = "en", options?: Omit<ProductServiceOptions, "filter">): Promise<ProductRecord[]> {
+  async search(searchTerm: string, options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct[]> {
     try {
-      const field = `name_${language}`;
+      const field = `name_${this.language}`;
       const products = await this.pb.collection("products").getFullList<ProductRecord>({
         filter: `${field} ~ "${searchTerm}" && enabled=true`,
         sort: options?.sort,
@@ -200,7 +240,8 @@ export class ProductService {
 /**
  * Factory function to create a ProductService instance
  */
-export function createProductService(pb: PocketBase): ProductService {
-  return new ProductService(pb);
+export function createProductService(pb: PocketBase, language: "en" | "pt" = "en"): ProductService {
+  return new ProductService(pb, language);
 }
+
 

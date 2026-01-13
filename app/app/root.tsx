@@ -2,15 +2,12 @@ import {
   isRouteErrorResponse,
   Links,
   Meta,
-  Outlet,
   Scripts,
   // ScrollRestoration,
   useLoaderData,
-  useLocation,
   useOutlet,
 } from "react-router";
 import { ParallaxProvider } from "react-scroll-parallax";
-import { useEffect } from "react";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -94,14 +91,8 @@ export default function App() {
   const { shouldHideFooter, variant: footerVariant } = useFooter();
   const { shouldHideHeader, variant: headerVariant } = useHeader();
   const outlet = useOutlet({ user });
-  const location = useLocation();
 
-  // Scroll to top when location changes
-  useEffect(() => {
-    setTimeout(() => {
-      window.scrollTo(0, 0);
-    }, 500);
-  }, [location.pathname]);
+  // Page transitions and scroll management are handled by the PageTransition component
 
   return (
     <>

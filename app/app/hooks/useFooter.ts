@@ -34,19 +34,19 @@ export function useFooter(): {
   ];
 
   // Routes with white backgrounds need dark variant
-  const whiteVariantRoutes = ["/contact", "/about", "/collection/", "/category/", "/product/"];
+  const darkVariantRoutes = ["/terms", "/privacy"];
 
   useEffect(() => {
     const shouldHideFooter = hideFooterRoutes.some((route) =>
       location?.pathname?.startsWith(route)
     );
 
-    const useWhiteVariant = whiteVariantRoutes.some((route) =>
+    const useWhiteVariant = darkVariantRoutes.some((route) =>
       location?.pathname?.startsWith(route)
     );
 
     setShouldHideFooter(shouldHideFooter);
-    setVariant(useWhiteVariant ? "light" : "dark");
+    setVariant(useWhiteVariant ? "dark" : "light");
   }, [location.pathname]);
 
   return { shouldHideFooter, variant };

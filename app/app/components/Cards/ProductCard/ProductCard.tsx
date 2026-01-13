@@ -81,7 +81,7 @@ export const ProductCard = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="w-[154px] md:w-full md:min-w-[200px] h-[270px] rounded-[14px] bg-[#f3f3f3] relative overflow-hidden mb-[10px]">
+        <div className="w-full md:w-full h-[270px] rounded-[14px] bg-[#f3f3f3] relative overflow-hidden mb-[10px]">
           {defaultMediaType === "video" ? (
             <video
               ref={defaultVideoRef}
