@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Plus } from "lucide-react";
 import { Button } from "~/components/Elements/Button/Button";
@@ -21,6 +22,17 @@ export const HomeHero = ({
     link: string;
   }[];
 }) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    // Trigger animations after component mounts and browser has painted
+    // Using requestAnimationFrame ensures animations run on refresh
+    const frame = requestAnimationFrame(() => {
+      setIsMounted(true);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   return (
     <article className="w-full py-30 md:py-12 flex flex-col justify-center items-center px-6 lg:px-20 relative">
       <div className="w-full max-w-[1400px] flex flex-col lg:flex-row items-center justify-center gap-4 md:gap-12">
@@ -28,7 +40,7 @@ export const HomeHero = ({
         <div className="flex flex-col items-start w-full lg:w-1/2 order-1">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={isMounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-2xl md:text-5xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-black leading-none lg:uppercase"
           >
@@ -37,7 +49,7 @@ export const HomeHero = ({
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={isMounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             className="mt-3 md:mt-8 text-md md:text-xl lg:text-4xl text-black font-thin opacity-90 leading-tight"
           >
@@ -47,7 +59,7 @@ export const HomeHero = ({
           {/* Desktop Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={isMounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
             className="hidden lg:flex flex-wrap gap-4 mt-12"
           >
@@ -55,10 +67,10 @@ export const HomeHero = ({
               <motion.div
                 key={category.name}
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                animate={isMounted ? { opacity: 1, y: 0 } : {}}
                 transition={{
                   duration: 0.8,
-                  delay: index * 0.2,
+                  delay: 0.4 + index * 0.2,
                   ease: "easeOut",
                 }}
               >
@@ -77,7 +89,7 @@ export const HomeHero = ({
         {/* Hero Image - Desktop: Right, Mobile: Middle */}
         <motion.div
           initial={{ opacity: 0, x: 90 }}
-          animate={{ opacity: 1, x: 0 }}
+          animate={isMounted ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 1 }}
           className="w-full lg:w-[45%] order-2 lg:order-2"
         >
@@ -92,8 +104,8 @@ export const HomeHero = ({
             <Link to={product.link}>
               <motion.div
                 initial={{ x: 20 }}
-                animate={{ x: 0 }}
-                transition={{ duration: 1.2, delay: 0.3 }}
+                animate={isMounted ? { x: 0 } : {}}
+                transition={{ duration: 1.2, delay: 1.3 }}
                 className="absolute bottom-8 right-8 md:bottom-12 md:right-12 bg-white/95 backdrop-blur px-5 py-2.5 rounded-full flex items-center gap-3 cursor-pointer hover:bg-black hover:text-white transition-all duration-300 group/tag"
               >
                 <div className="w-5 h-5 flex items-center justify-center rounded-full border border-black group-hover/tag:border-white transition-colors">
@@ -110,7 +122,7 @@ export const HomeHero = ({
         {/* Mobile Buttons - Below Image */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={isMounted ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           className="flex sm:flex-row w-full lg:hidden gap-4 order-3 mt-4 overflow-x-auto scrollbar-hide"
         >

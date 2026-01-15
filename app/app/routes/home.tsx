@@ -26,9 +26,38 @@ export async function loader({ request }: Route.LoaderArgs) {
   try {
     const homepageData = await pageService.getAll();
 
-    const featuredProducts = await productService.getFeatured(6, {
-      expand: "sizes,collection,category",
-    });
+    // Get products from the slider-products-list section
+    const sliderProductsSection = homepageData.find(
+      (p) => p.section_id === "slider-products-list"
+    );
+
+    let homepageProducts: any[] = [];
+    
+    if (sliderProductsSection?.products && Array.isArray(sliderProductsSection.products)) {
+      // Check if products are already expanded (objects with id property) or just IDs (strings)
+      const firstProduct = sliderProductsSection.products[0];
+      
+      if (typeof firstProduct === "string") {
+        // Products are just IDs, fetch them
+        const productIds = sliderProductsSection.products.filter((id: any): id is string => typeof id === "string");
+        if (productIds.length > 0) {
+          homepageProducts = await productService.getByIds(productIds, {
+            expand: "sizes,collection,category",
+          });
+        }
+      } else if (firstProduct && typeof firstProduct === "object" && "id" in firstProduct) {
+        // Products are already expanded by PageService, use them directly
+        // They should already be transformed by PageService
+        homepageProducts = sliderProductsSection.products;
+      }
+    }
+
+    // Fallback to featured products if no products found in homepage
+    const featuredProducts = homepageProducts.length > 0 
+      ? homepageProducts 
+      : await productService.getFeatured(6, {
+          expand: "sizes,collection,category",
+        });
 
     const featureCategories = await categoryService.getFeatured(2);
 

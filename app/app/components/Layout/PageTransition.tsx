@@ -43,8 +43,12 @@ export function PageTransition({ children }: PageTransitionProps) {
     return <>{children}</>;
   }
 
+  // Allow animations on homepage even on refresh
+  // For other pages, use initial={false} to prevent animations on first load
+  const isHomepage = location.pathname === "/";
+
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence mode="wait" initial={isHomepage}>
       <motion.main
         key={location.pathname}
         initial={{ opacity: 0, x: -20 }}

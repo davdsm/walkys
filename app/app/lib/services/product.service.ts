@@ -190,6 +190,35 @@ export class ProductService {
   }
 
   /**
+   * Get multiple products by their IDs
+   */
+  async getByIds(ids: string[], options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct[]> {
+    if (!ids || ids.length === 0) return [];
+    
+    try {
+      // Build filter string for multiple IDs
+      const idFilters = ids.map(id => `id="${id}"`).join(" || ");
+      const products = await this.pb.collection("products").getFullList<ProductRecord>({
+        filter: `(${idFilters}) && enabled=true`,
+        sort: options?.sort,
+        expand: options?.expand || "category,sizes,collection",
+        fields: options?.fields,
+      });
+
+      // Transform and maintain the order from the IDs array
+      const transformedProducts = products.map((product) => this.transformProduct(product));
+      
+      // Sort by the order of IDs in the input array
+      return ids
+        .map(id => transformedProducts.find(p => p.id === id))
+        .filter((p): p is TranslatedProduct => p !== undefined);
+    } catch (error) {
+      console.error("Error fetching products by IDs:", error);
+      throw error;
+    }
+  }
+
+  /**
    * Get featured products (first N products)
    */
   async getFeatured(count: number = 6, options?: ProductServiceOptions): Promise<TranslatedProduct[]> {
