@@ -17,6 +17,7 @@ export function PageTransition({ children }: PageTransitionProps) {
     "/forgot-password",
     "/reset-password",
     "/logout",
+    "/orders",
   ];
 
   const isExcluded = excludedPrefixes.some((prefix) =>

@@ -1,7 +1,7 @@
 import { redirect, useLoaderData } from "react-router";
 import type { Route } from "../+types/root";
 import { createPocketBase } from "~/lib/pocketbase";
-import BackofficePage from "~/components/Backoffice/BackofficePage";
+import OrdersPage from "~/components/Backoffice/OrdersPage/OrdersPage";
 
 export async function loader({ request }: Route.LoaderArgs) {
     const pb = createPocketBase(request);
@@ -13,17 +13,14 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export function meta({ }: Route.MetaArgs) {
     return [
-        { title: "Walkys - Dashboard" },
+        { title: "Walkys - Orders" },
     ];
 }
 
-export default function Dashboard() {
-    const {user} = useLoaderData<typeof loader>();
-    const displayName = user?.name || user?.username || "User";
-
+export default function Orders() {
     return (
         <div className="w-full h-screen bg-white flex flex-col items-center justify-center gap-8">
-            <BackofficePage displayName={displayName} />
+            <OrdersPage />
         </div>
     );
 }
