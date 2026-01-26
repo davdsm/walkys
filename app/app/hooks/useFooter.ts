@@ -31,6 +31,7 @@ export function useFooter(): {
     "/dashboard",
     "/forgot-password",
     "/logout",
+    "/catalog",
     "/orders",
   ];
 
@@ -38,13 +39,16 @@ export function useFooter(): {
   const darkVariantRoutes = ["/terms", "/privacy"];
 
   useEffect(() => {
+    console.log("Current pathname: ", location?.pathname);
     const shouldHideFooter = hideFooterRoutes.some((route) =>
       location?.pathname?.startsWith(route)
     );
+    console.log("shouldHideFooter: ", shouldHideFooter);
 
     const useWhiteVariant = darkVariantRoutes.some((route) =>
       location?.pathname?.startsWith(route)
     );
+    console.log("useWhiteVariant: ", useWhiteVariant);
 
     setShouldHideFooter(shouldHideFooter);
     setVariant(useWhiteVariant ? "dark" : "light");

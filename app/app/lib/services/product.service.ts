@@ -94,8 +94,13 @@ export class ProductService {
    */
   async getAll(options?: ProductServiceOptions): Promise<TranslatedProduct[]> {
     try {
+      const filter =
+        options?.filter && options.filter.trim().length > 0
+          ? `enabled=true && (${options.filter})`
+          : "enabled=true";
+
       const products = await this.pb.collection("products").getFullList<ProductRecord>({
-        filter: `enabled=true && ${options?.filter}`,
+        filter,
         sort: options?.sort,
         expand: options?.expand || "category,sizes",
         fields: options?.fields,

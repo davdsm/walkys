@@ -1,5 +1,5 @@
+import { useFetcher, useNavigate } from "react-router";
 import BackofficeCard from "~/components/Backoffice/BackofficeCards";
-import { Link } from "react-router";
 
 export default function BackofficePage({
     displayName,
@@ -7,6 +7,13 @@ export default function BackofficePage({
     displayName: string;
 }) {
     const firstName = typeof displayName === "string" ? displayName.split(" ")[0] : "User";
+    const fetcher = useFetcher();
+    const navigate = useNavigate();
+
+    const handleChangePassword = async () => {
+        fetcher.submit({}, { method: "post", action: "/logout" });
+        navigate('/forgot-password');
+    }
 
     return (
         <div className="min-h-full w-full bg-[#f1f1f1] flex justify-center md:pt-20">
@@ -48,7 +55,7 @@ export default function BackofficePage({
                         <BackofficeCard
                             titulo="Catalog"
                             info="12 Products"
-                            link=""
+                            link="/catalog"
                             icon={
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +81,10 @@ export default function BackofficePage({
                         />
                     </div>
                     <div className="w-full flex justify-between">
-                        <Link className="md:text-[15px] text-[12px] font-semibold" to="#">change password</Link>
+                        <button type="submit" onClick={handleChangePassword} className="md:text-[15px] text-[12px] font-semibold cursor-pointer">
+                            change password
+                        </button>
+                        <input type="hidde" name="redirectTo" />
                         <form action="/logout" method="post" className="ml-4 flex items-center gap-2 inline">
                             <button type="submit" className="flex items-center gap-[8px] md:text-[15px] text-[12px] font-semibold cursor-pointer">
                                 leave

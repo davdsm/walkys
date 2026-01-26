@@ -32,6 +32,7 @@ export function PageTransition({ children }: PageTransitionProps) {
     "/forgot-password",
     "/reset-password",
     "/logout",
+    "/catalog",
     "/orders",
   ];
 
