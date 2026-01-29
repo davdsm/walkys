@@ -30,7 +30,7 @@ export default function BackofficePage({
                 <section className="flex flex-wrap gap-6">
                     <div className="w-full md:w-[calc(50%-12px)]">
                         <BackofficeCard
-                            titulo="Orders"
+                            title="Orders"
                             info="16 Orders"
                             link="/orders"
                             icon={
@@ -53,7 +53,7 @@ export default function BackofficePage({
                     </div>
                     <div className="w-full md:w-[calc(50%-12px)]">
                         <BackofficeCard
-                            titulo="Catalog"
+                            title="Catalog"
                             info="12 Products"
                             link="/catalog"
                             icon={

@@ -2,12 +2,12 @@ import { motion } from "motion/react";
 import { Link } from "react-router";
 
 export const BackofficeCards = ({
-  titulo,
+  title,
   info,
   link,
   icon,
 }: {
-  titulo: string;
+  title: string;
   info: string;
   link: string;
   icon?: React.ReactNode;
@@ -35,7 +35,7 @@ export const BackofficeCards = ({
             )}
           </div>
           <p className="md:text-xl text-black self-center group-hover:text-white text-lg font-sans">
-            {titulo}
+            {title}
           </p>
         </div>
 
