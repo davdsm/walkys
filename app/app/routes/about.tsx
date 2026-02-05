@@ -1,155 +1,139 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 
-import type { Route } from "./+types/home";
+import type { Route } from "./+types/about";
 import { createPocketBase } from "~/lib/pocketbase";
-import { createImageService, createPageService } from "~/lib/services";
+import { createImageService } from "~/lib/services";
 import type { PageRecord } from "~/lib/services";
+import { getLanguageFromRequest } from "~/lib/utils";
 import { useLoaderData } from "react-router";
-import { AboutEntry } from "~/components/AboutEntry";
 import { useTranslatedContent } from "~/hooks";
 import { useLanguage } from "~/contexts";
-import { WhatAbout } from "~/components/WhatAbout";
 import { SmallCTA } from "~/components/SmallCTA";
-import { AnimatedGallery } from "~/components/AnimatedGallery";
-import { motion } from "framer-motion";
+import { AboutHero, AboutValues, AboutProcess } from "~/components/AboutPage";
 
-// Loader: Fetch data on the server/route level
+const ABOUT_COLLECTION = "AboutPage";
+
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
+  getLanguageFromRequest(request);
 
   try {
-    const pageService = createPageService<PageRecord>(pb, "AboutPage");
-    const aboutPageData = await pageService.getAll();
-
-    const imageService = createImageService(pb, "AboutPage", aboutPageData);
+    const rawRecords = (await pb.collection(ABOUT_COLLECTION).getFullList()) as PageRecord[];
+    const imageService = createImageService(pb, ABOUT_COLLECTION, rawRecords);
     const images = {
-      entryImg: imageService.getImageBySectionName({
-        sectionId: "intro_img",
-      }),
+      entryImg: imageService.getImageBySectionName({ sectionId: "intro_img" }),
       WhatAboutCard1img: imageService.getImageBySectionName({
         sectionId: "what_about_card_1_image",
       }),
       WhatAboutCard2img: imageService.getImageBySectionName({
         sectionId: "what_about_card_2_image",
       }),
-      Gallery: imageService.getImageBySectionName({
-        sectionId: "about_gallery",
-      }),
-      MoldImage: imageService.getImageBySectionName({
-        sectionId: "mold",
-      }),
-      ShapeImage: imageService.getImageBySectionName({
-        sectionId: "shapping",
-      }),
-      TabulatedImage: imageService.getImageBySectionName({
-        sectionId: "tabulated",
-      }),
-      QualityImage: imageService.getImageBySectionName({
-        sectionId: "quality",
-      }),
+      MoldImage: imageService.getImageBySectionName({ sectionId: "mold" }),
+      ShapeImage: imageService.getImageBySectionName({ sectionId: "shapping" }),
+      TabulatedImage: imageService.getImageBySectionName({ sectionId: "tabulated" }),
+      QualityImage: imageService.getImageBySectionName({ sectionId: "quality" }),
     };
-    return { aboutPageData, images };
+    return { aboutPageData: rawRecords, images };
   } catch (error) {
-    console.error("Error loading aboutpage:", error);
-    return { aboutPageData: [], baseUrl: "http://127.0.0.1:8090" };
+    console.error("Error loading about page:", error);
+    const emptyImages = {
+      entryImg: [] as string[],
+      WhatAboutCard1img: [] as string[],
+      WhatAboutCard2img: [] as string[],
+      MoldImage: [] as string[],
+      ShapeImage: [] as string[],
+      TabulatedImage: [] as string[],
+      QualityImage: [] as string[],
+    };
+    return { aboutPageData: [], images: emptyImages };
   }
 }
 
-export const About = () => {
+export default function About() {
   const data = useLoaderData<typeof loader>();
   const lastDataRef = useRef(data);
 
-  // Update ref if we have new data
-  if (data) {
-    lastDataRef.current = data;
-  }
-
-  // Use current data or fallback to last known data
+  if (data) lastDataRef.current = data;
   const effectiveData = data || lastDataRef.current;
-
   if (!effectiveData) return null;
 
   const { aboutPageData, images } = effectiveData;
   const { getContent } = useTranslatedContent(aboutPageData);
   const { t } = useLanguage();
 
-  const WhatAboutCards = [
+  const heroImage = images?.entryImg?.[0] ?? "/cover.jpg";
+  const heroTitle = getContent("intro_title");
+  const heroSubtitle = getContent("intro_text");
+  const heroEyebrow = getContent("intro_eyebrow") || t.about.our_story;
+  const valuesSectionTitle = getContent("what_about_section_title") || t.about.what_about_title;
+  const processSectionTitle = getContent("gallery_section_title") || t.about.gallery_title;
+
+  const values = [
     {
-      image: images!.WhatAboutCard1img[0],
+      image: images?.WhatAboutCard1img?.[0] ?? "",
       title: getContent("what_about_card_1_title"),
       description: getContent("what_about_card_1_text"),
     },
     {
-      image: images!.WhatAboutCard2img[0],
+      image: images?.WhatAboutCard2img?.[0] ?? "",
       title: getContent("what_about_card_2_title"),
       description: getContent("what_about_card_2_text"),
     },
-  ];
+  ].filter((v) => v.image);
 
-  const GalleryItems = images?.Gallery.map((image, index) => {
-    return {
-      id: `imageAboutGallery${index}`,
-      img: image,
-    };
-  });
-
-  const steps = [
+  const processStepsWithTitles = [
     {
-      title: t.about.mold_title,
+      number: "01",
+      title: getContent("mold_title") || t.about.mold_title,
       description: getContent("mold"),
-      img: images!.MoldImage[0],
+      image: images?.MoldImage?.[0] ?? "",
     },
     {
-      title: t.about.shapping_title,
+      number: "02",
+      title: getContent("shapping_title") || t.about.shapping_title,
       description: getContent("shapping"),
-      img: images!.ShapeImage[0],
+      image: images?.ShapeImage?.[0] ?? "",
     },
     {
-      title: t.about.tabulated_title,
+      number: "03",
+      title: getContent("tabulated_title") || t.about.tabulated_title,
       description: getContent("tabulated"),
-      img: images!.TabulatedImage[0],
+      image: images?.TabulatedImage?.[0] ?? "",
     },
     {
-      title: t.about.quality_title,
+      number: "04",
+      title: getContent("quality_title") || t.about.quality_title,
       description: getContent("quality"),
-      img: images!.QualityImage[0],
+      image: images?.QualityImage?.[0] ?? "",
     },
-  ];
+  ].filter((s) => s.image);
 
-  // Pass data to Welcome component as props
   return (
-    <section className="w-full min-h-screen flex flex-col bg-[#f1f1f1] justify-start items-start transition-colors duration-500">
-      <AboutEntry
-        img={images!.entryImg[0]}
-        title={getContent("intro_title")}
-        text={getContent("intro_text")}
+    <main className="w-full min-h-screen flex flex-col bg-[#f1f1f1]">
+      <AboutHero
+        image={heroImage}
+        eyebrow={heroEyebrow}
+        title={heroTitle}
+        subtitle={heroSubtitle}
       />
-      <WhatAbout title={t.about.what_about_title} cards={WhatAboutCards} />
-      <motion.article
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ amount: 0.1, once: true }}
-        transition={{
-          duration: 1,
-          ease: [0.22, 1, 0.36, 1],
-          delay: 0.2,
-        }}
-        className="w-full"
-      >
-        {GalleryItems && GalleryItems.length > 0 && (
-          <AnimatedGallery
-            gallery={GalleryItems}
-            steps={steps}
-            title={t.about.gallery_title}
-          />
-        )}
-      </motion.article>
 
-      <article className="-mt-4 w-full">
+      {values.length > 0 && (
+        <AboutValues
+          sectionTitle={valuesSectionTitle}
+          values={values}
+        />
+      )}
+
+      {processStepsWithTitles.length > 0 && (
+        <AboutProcess
+          sectionTitle={processSectionTitle}
+          steps={processStepsWithTitles}
+        />
+      )}
+
+      <section className="w-full px-6 md:px-16">
         <SmallCTA />
-      </article>
-    </section>
+      </section>
+    </main>
   );
-};
-
-export default About;
+}

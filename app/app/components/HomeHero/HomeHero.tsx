@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { Plus } from "lucide-react";
 import { Button } from "~/components/Elements/Button/Button";
 import { Link } from "react-router";
+import { getMediaType } from "~/lib/utils";
 
 export const HomeHero = ({
   title,
@@ -94,11 +95,22 @@ export const HomeHero = ({
           className="w-full lg:w-[45%] order-2 lg:order-2"
         >
           <div className="relative aspect-[4/5] lg:aspect-[3/3.8] rounded-[20px] md:rounded-[40px] overflow-hidden group">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-            />
+            {getMediaType(product.image) === "video" ? (
+              <video
+                src={product.image}
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                autoPlay
+                loop
+                muted
+                playsInline
+              />
+            ) : (
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+              />
+            )}
 
             {/* Interactive Tag */}
             <Link to={product.link}>

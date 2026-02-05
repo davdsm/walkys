@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router";
+import { useLanguage } from "~/contexts";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { SizeSelector } from "./SizeSelector";
 import { ProductActions } from "./ProductActions";
@@ -33,6 +34,7 @@ export const ProductInfo = ({
   language,
   opacity,
 }: ProductInfoProps) => {
+  const { t } = useLanguage();
   return (
     <motion.div style={{ opacity }} className="space-y-6">
       {/* Breadcrumbs */}
@@ -55,9 +57,7 @@ export const ProductInfo = ({
       {/* Description */}
       <div className="space-y-2">
         <h2 className="text-lg font-semibold text-black">
-          {language === "pt"
-            ? "Informação do Produto"
-            : "Product Information"}
+          {t.product.productInformation}
         </h2>
         <p className="text-neutral-700 leading-relaxed text-lg">
           {productDescription}

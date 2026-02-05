@@ -2,7 +2,9 @@ import { useRef, useEffect } from "react";
 import { HomeHero } from "~/components/HomeHero";
 import { ProductCarousel } from "~/components/ProductCarousel";
 import CategoryCard from "~/components/Cards/CategoryCard";
+import CategoriesList from "~/components/CategoriesList/CategoriesList";
 import { SmallCTA } from "~/components/SmallCTA";
+import { useLanguage } from "~/contexts";
 
 import type { Route } from "./+types/home";
 import { createPocketBase } from "~/lib/pocketbase";
@@ -11,6 +13,7 @@ import {
   createPageService,
   createProductService,
 } from "~/lib/services";
+import { mapCategoriesWithProducts } from "~/utils/categories";
 import { useLoaderData } from "react-router";
 import { getLanguageFromRequest } from "~/lib/utils";
 
@@ -59,32 +62,107 @@ export async function loader({ request }: Route.LoaderArgs) {
           expand: "sizes,collection,category",
         });
 
-    const featureCategories = await categoryService.getFeatured(2);
+    // Card categories: prefer "categories-section-highlighted"; fallback to "categories-section-list" (backward compat)
+    const categoriesSectionHighlighted = homepageData.find((p) => p.section_id === "categories-section-highlighted");
+    const categoriesSectionList = homepageData.find((p) => p.section_id === "categories-section-list");
+    const categoriesSectionTitle = homepageData.find((p) => p.section_id === "categories-section-title");
+    const categoriesSectionSubtitle = homepageData.find((p) => p.section_id === "categories-section-subtitle");
 
-    return { homepageData, featuredProducts, featureCategories, language };
+    const highlightedCategories = categoriesSectionHighlighted?.categories && Array.isArray(categoriesSectionHighlighted.categories) && categoriesSectionHighlighted.categories.length > 0
+      ? categoriesSectionHighlighted.categories
+      : null;
+    const useHighlightedForCards = !!highlightedCategories?.length;
+
+    let featureCategories: any[] = [];
+    if (useHighlightedForCards) {
+      featureCategories = highlightedCategories;
+    } else if (categoriesSectionList?.categories && Array.isArray(categoriesSectionList.categories) && categoriesSectionList.categories.length > 0) {
+      featureCategories = categoriesSectionList.categories;
+    } else {
+      try {
+        featureCategories = await categoryService.getFeatured(2);
+      } catch {
+        featureCategories = [];
+      }
+    }
+
+    // List below (categories + products): only when cards come from highlighted; then list comes from categories-section-list
+    let listCategoriesWithProducts: Awaited<ReturnType<typeof mapCategoriesWithProducts>> = [];
+    if (useHighlightedForCards && categoriesSectionList?.categories && Array.isArray(categoriesSectionList.categories) && categoriesSectionList.categories.length > 0) {
+      const listCategories = categoriesSectionList.categories;
+      const listCategoryIds = listCategories.map((c: any) => typeof c === "string" ? c : c?.id).filter(Boolean) as string[];
+      if (listCategoryIds.length > 0) {
+        const listCats = listCategories.every((c: any) => typeof c === "object" && c?.id)
+          ? listCategories as any[]
+          : await categoryService.getByIds(listCategoryIds);
+        const products = await productService.getByCategoryIds(listCategoryIds, { expand: "category,sizes" });
+        listCategoriesWithProducts = mapCategoriesWithProducts(listCats, products);
+      }
+    }
+
+    return {
+      homepageData,
+      featuredProducts,
+      featureCategories,
+      listCategoriesWithProducts,
+      categoriesSectionTitle: categoriesSectionTitle?.value,
+      categoriesSectionSubtitle: categoriesSectionSubtitle?.value,
+      language,
+    };
   } catch (error) {
     console.error("Error loading homepage:", error);
     return {
       homepageData: [],
       featuredProducts: [],
       featureCategories: [],
+      listCategoriesWithProducts: [],
+      categoriesSectionTitle: undefined,
+      categoriesSectionSubtitle: undefined,
       language,
     };
   }
 }
 
+const HERO_BG = "#ffffff";
+const DEFAULT_BG = "#f1f1f1";
+
 export const Home = () => {
   const data = useLoaderData<typeof loader>();
+  const { t } = useLanguage();
   const lastDataRef = useRef(data);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
 
-  // Reset scroll and overflow on mount to prevent double scrollbars
+  // Reset scroll position on mount
   useEffect(() => {
-    // Ensure body has correct overflow settings
-    document.body.style.overflowY = "auto";
-    document.body.style.overflowX = "hidden";
-    // Reset scroll position
     window.scrollTo({ top: 0, behavior: "auto" });
+  }, []);
+
+  // Body background: white when hero is in view, #f1f1f1 when leaving hero section
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+
+    const setBodyBg = (color: string) => {
+      document.body.style.transition = "background-color 0.4s ease";
+      document.body.style.backgroundColor = color;
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setBodyBg(entry?.isIntersecting ? HERO_BG : DEFAULT_BG);
+      },
+      { threshold: 0.1, rootMargin: "0px" }
+    );
+
+    setBodyBg(DEFAULT_BG);
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      document.body.style.backgroundColor = "";
+      document.body.style.transition = "";
+    };
   }, []);
 
   // Update ref if we have new data
@@ -97,7 +175,7 @@ export const Home = () => {
 
   if (!effectiveData) return null;
 
-  const { homepageData, featuredProducts, featureCategories, language } =
+  const { homepageData, featuredProducts, featureCategories, listCategoriesWithProducts, categoriesSectionTitle, categoriesSectionSubtitle, language } =
     effectiveData;
 
   const heroSection = {
@@ -123,8 +201,9 @@ export const Home = () => {
   };
 
   return (
-    <section className="w-full flex flex-col items-start justify-start relative overflow-x-hidden transition-colors duration-500 bg-[#f1f1f1]">
-      <HomeHero
+    <section className="w-full flex flex-col items-start justify-start relative transition-colors duration-500">
+      <div ref={heroRef} className="w-full">
+        <HomeHero
         title={heroSection.title}
         subtitle={heroSection.subtitle}
         product={{
@@ -134,6 +213,7 @@ export const Home = () => {
         }}
         categories={heroSection.categories}
       />
+      </div>
 
       <article className="p-6 lg:p-20 w-full">
         {featuredProducts?.length > 0 && (
@@ -150,14 +230,21 @@ export const Home = () => {
                 },
                 link: `/product/${p.slug}`,
               }))}
-              ctaText={language === "pt" ? "EXPLORAR MAIS" : "EXPLORE MORE"}
+              ctaText={t.home.exploreMore}
               ctaLink="/collection/autmn-winter-25"
             />
           </div>
         )}
       </article>
 
-      <article className="w-full px-4 md:px-20 flex justify-between gap-10">
+      <article className="w-full px-4 md:px-20 flex flex-col gap-6">
+        {(categoriesSectionTitle || categoriesSectionSubtitle) && (
+          <div className="text-center space-y-1">
+            {categoriesSectionTitle && <h2 className="text-2xl font-bold text-slate-900">{categoriesSectionTitle}</h2>}
+            {categoriesSectionSubtitle && <p className="text-slate-600">{categoriesSectionSubtitle}</p>}
+          </div>
+        )}
+        <div className="flex justify-between gap-10">
         {featureCategories?.map((featureCategory, index) => (
           <div
             key={featureCategory.id}
@@ -174,6 +261,10 @@ export const Home = () => {
             />
           </div>
         ))}
+        </div>
+        {listCategoriesWithProducts?.length > 0 && (
+          <CategoriesList categories={listCategoriesWithProducts} language={language} />
+        )}
       </article>
 
       <article className="w-full pt-8 md:px-20 rounded-xl">

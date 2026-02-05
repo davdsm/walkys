@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { ProductActions } from "./ProductActions";
+import { getMediaType } from "~/lib/utils";
 
 interface MobileProductLayoutProps {
   productName: string;
@@ -38,17 +39,31 @@ export const MobileProductLayout = ({
     <div className="md:hidden min-h-screen bg-[#f1f1f1]">
       {/* Full Screen Image Section (70% height) */}
       <div className="h-[70vh] w-full relative bg-[#f1f1f1] flex items-center justify-center p-6">
-        {media[selectedImage] && (
-          <motion.img
-            key={selectedImage}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            src={media[selectedImage]}
-            alt={productName}
-            className="w-full h-full object-contain"
-          />
-        )}
+        {media[selectedImage] &&
+          (getMediaType(media[selectedImage]) === "video" ? (
+            <motion.video
+              key={selectedImage}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              src={media[selectedImage]}
+              className="w-full h-full object-contain"
+              controls
+              loop
+              muted
+              playsInline
+            />
+          ) : (
+            <motion.img
+              key={selectedImage}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              src={media[selectedImage]}
+              alt={productName}
+              className="w-full h-full object-contain"
+            />
+          ))}
 
         {/* Size Selector - Square Buttons Overlaid at Bottom */}
         {sizes.length > 0 && (
@@ -87,23 +102,37 @@ export const MobileProductLayout = ({
 
         {/* Thumbnail Gallery */}
         <div className="flex gap-4 mb-10 overflow-x-auto pb-2 scrollbar-hide">
-          {media.map((img, index) => (
-            <button
-              key={`mobile-thumb-${index}`}
-              onClick={() => onImageSelect(index)}
-              className={`flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden border-2 transition-all bg-[#f9f9f9] ${
-                selectedImage === index
-                  ? "border-black"
-                  : "border-transparent"
-              }`}
-            >
-              <img
-                src={img}
-                alt={`${productName} thumbnail ${index + 1}`}
-                className="w-full h-full object-contain"
-              />
-            </button>
-          ))}
+          {media.map((url, index) => {
+            const isVideo = getMediaType(url) === "video";
+            return (
+              <button
+                key={`mobile-thumb-${index}`}
+                type="button"
+                onClick={() => onImageSelect(index)}
+                className={`flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden border-2 transition-all bg-[#f9f9f9] ${
+                  selectedImage === index
+                    ? "border-black"
+                    : "border-transparent"
+                }`}
+              >
+                {isVideo ? (
+                  <video
+                    src={url}
+                    className="w-full h-full object-contain"
+                    muted
+                    playsInline
+                    preload="metadata"
+                  />
+                ) : (
+                  <img
+                    src={url}
+                    alt={`${productName} thumbnail ${index + 1}`}
+                    className="w-full h-full object-contain"
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Action Buttons Row */}

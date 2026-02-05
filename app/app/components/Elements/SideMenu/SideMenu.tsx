@@ -85,7 +85,14 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
 
   const textInnerRef = useRef<HTMLSpanElement | null>(null);
   const textWrapRef = useRef<HTMLSpanElement | null>(null);
-  const [textLines, setTextLines] = useState<string[]>(["Menu", "Close"]);
+  const [textLines, setTextLines] = useState<string[]>([
+    t.header.menu,
+    t.header.close,
+  ]);
+
+  useEffect(() => {
+    setTextLines([t.header.menu, t.header.close]);
+  }, [t.header.menu, t.header.close]);
 
   const openTlRef = useRef<gsap.core.Timeline | null>(null);
   const closeTweenRef = useRef<gsap.core.Tween | null>(null);
@@ -371,37 +378,42 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
     }
   }, [changeMenuColorOnOpen, menuButtonColor, openMenuButtonColor]);
 
-  const animateText = useCallback((opening: boolean) => {
-    const inner = textInnerRef.current;
-    if (!inner) return;
+  const animateText = useCallback(
+    (opening: boolean) => {
+      const inner = textInnerRef.current;
+      if (!inner) return;
 
-    textCycleAnimRef.current?.kill();
+      textCycleAnimRef.current?.kill();
 
-    const currentLabel = opening ? "Menu" : "Close";
-    const targetLabel = opening ? "Close" : "Menu";
-    const cycles = 3;
+      const menuLabel = t.header.menu;
+      const closeLabel = t.header.close;
+      const currentLabel = opening ? menuLabel : closeLabel;
+      const targetLabel = opening ? closeLabel : menuLabel;
+      const cycles = 3;
 
-    const seq: string[] = [currentLabel];
-    let last = currentLabel;
-    for (let i = 0; i < cycles; i++) {
-      last = last === "Menu" ? "Close" : "Menu";
-      seq.push(last);
-    }
-    if (last !== targetLabel) seq.push(targetLabel);
-    seq.push(targetLabel);
+      const seq: string[] = [currentLabel];
+      let last = currentLabel;
+      for (let i = 0; i < cycles; i++) {
+        last = last === menuLabel ? closeLabel : menuLabel;
+        seq.push(last);
+      }
+      if (last !== targetLabel) seq.push(targetLabel);
+      seq.push(targetLabel);
 
-    setTextLines(seq);
-    gsap.set(inner, { yPercent: 0 });
+      setTextLines(seq);
+      gsap.set(inner, { yPercent: 0 });
 
-    const lineCount = seq.length;
-    const finalShift = ((lineCount - 1) / lineCount) * 100;
+      const lineCount = seq.length;
+      const finalShift = ((lineCount - 1) / lineCount) * 100;
 
-    textCycleAnimRef.current = gsap.to(inner, {
-      yPercent: -finalShift,
-      duration: 0.5 + lineCount * 0.07,
-      ease: "power4.out",
-    });
-  }, []);
+      textCycleAnimRef.current = gsap.to(inner, {
+        yPercent: -finalShift,
+        duration: 0.5 + lineCount * 0.07,
+        ease: "power4.out",
+      });
+    },
+    [t.header.menu, t.header.close]
+  );
 
   const toggleMenu = useCallback(() => {
     const target = !openRef.current;
@@ -528,7 +540,7 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
           <button
             ref={toggleBtnRef}
             className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto ${invertLogo ? "text-black" : "text-white"}`}
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? t.header.closeMenu : t.header.openMenu}
             aria-expanded={open}
             aria-controls="staggered-menu-panel"
             onClick={toggleMenu}

@@ -5,38 +5,55 @@ export const AboutEntry = ({
   img,
   title,
   text,
+  eyebrow,
 }: {
   img: string;
   title: string;
   text: string;
+  eyebrow?: string;
 }) => {
   return (
-    <motion.article className="relative w-full flex flex-col bg-[#f1f1f1] h-[85vh]">
-      <div className="h-[80vh] relative flex flex-col justify-end items-end">
+    <motion.article className="relative w-full flex flex-col bg-[#f1f1f1] min-h-[75vh] md:min-h-[85vh] overflow-hidden">
+      <div className="absolute inset-0">
         <ParallaxBanner
-          layers={[{ image: img, speed: -9 }]}
-          className="w-full h-full object-cover z-01 rounded-br-[150px] md:rounded-br-[350px] w-full h-full absolute top-0 left-0"
+          layers={[{ image: img, speed: -12 }]}
+          className="w-full h-full absolute inset-0"
         />
         <div
-          className={`z-02 transition duration-700 transition-all ease absolute top-0 h-full bg-black/70 w-full left-0 rounded-br-[150px] md:rounded-br-[350px]`}
-        ></div>
-        <div className="z-03 absolute text-white py-20 px-8 bottom-0 left-0 mx-auto md:w-1/2 md:left-30">
+          className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent rounded-br-[120px] md:rounded-br-[280px]"
+          aria-hidden
+        />
+      </div>
+      <div className="relative z-10 flex flex-col justify-end min-h-[75vh] md:min-h-[85vh] pb-16 md:pb-24 px-6 md:px-16 lg:px-24">
+        <div className="max-w-2xl">
+          {eyebrow && (
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.4 }}
+              className="text-white/90 text-xs md:text-sm font-medium tracking-[0.3em] uppercase mb-4"
+            >
+              {eyebrow}
+            </motion.p>
+          )}
           <motion.h1
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 1 }}
-            className="text-5xl font-bold md:text-8xl"
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.6 }}
+            className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[0.95] tracking-tight"
           >
             {title}
           </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 1.2 }}
-            className="w-3/4 pt-4 text-sm md:text-xl"
-          >
-            {text}
-          </motion.p>
+          {text && (
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.9 }}
+              className="mt-6 text-white/95 text-base md:text-lg lg:text-xl max-w-xl leading-relaxed"
+            >
+              {text}
+            </motion.p>
+          )}
         </div>
       </div>
     </motion.article>

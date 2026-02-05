@@ -22,9 +22,12 @@ export function LanguageProvider({ children, defaultLanguage = "pt" }: LanguageP
 
     const setLanguage = useCallback((lang: Language) => {
         setLanguageState(lang);
-        // Optionally save to localStorage
         if (typeof window !== "undefined") {
             localStorage.setItem("language", lang);
+            // Set cookie so server sees it on next request (fixes PT not persisting)
+            document.cookie = `language=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+            // Refresh page so layout, translations and all loaders run with new language
+            window.location.reload();
         }
     }, []);
 

@@ -29,6 +29,7 @@ export function useFooter(): {
     "/auth/login",
     "/auth/signup",
     "/dashboard",
+    "/backoffice",
     "/forgot-password",
     "/logout",
     "/catalog",

@@ -3,11 +3,11 @@ import type { MouseEventHandler } from "react";
 
 export function getCategoryFilters({
   categories,
-  language,
+  allLabel,
   setActiveCategory,
 }: {
   categories: TranslatedCategory[];
-  language: string;
+  allLabel: string;
   setActiveCategory: (c: string) => void;
 }): Array<{
   id: string;
@@ -27,7 +27,7 @@ export function getCategoryFilters({
   }));
   filters.unshift({
     id: "todos-0",
-    text: language === "pt" ? "Todos" : "All",
+    text: allLabel,
     onClick: () => {
       setActiveCategory("todos-0");
       window.scrollTo({ top: 0, behavior: "smooth" });

@@ -128,6 +128,26 @@ export class CategoryService {
   }
 
   /**
+   * Get multiple categories by their IDs (preserves order)
+   */
+  async getByIds(ids: string[], options?: Omit<CategoryServiceOptions, "filter">): Promise<TranslatedCategory[]> {
+    if (!ids || ids.length === 0) return [];
+    try {
+      const idFilters = ids.map((id) => `id="${id}"`).join(" || ");
+      const categories = await this.pb.collection("category").getFullList<CategoryRecord>({
+        filter: idFilters,
+        sort: options?.sort,
+        fields: options?.fields,
+      });
+      const transformed = categories.map((c) => this.transformCategory(c));
+      return ids.map((id) => transformed.find((c) => c.id === id)).filter((c): c is TranslatedCategory => c != null);
+    } catch (error) {
+      console.error("Error fetching categories by IDs:", error);
+      throw error;
+    }
+  }
+
+  /**
    * Get featured categories (first N categories)
    */
   async getFeatured(count: number = 2, options?: CategoryServiceOptions): Promise<TranslatedCategory[]> {

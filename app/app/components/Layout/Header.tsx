@@ -1,40 +1,49 @@
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import SideMenu from "../Elements/SideMenu/SideMenu";
-import { useLanguage } from "~/contexts";
+import { useLanguage, useLayout } from "~/contexts";
 import { useScrollLock } from "~/hooks";
 
 interface HeaderProps {
   variant?: "light" | "dark";
 }
 
+const defaultMenuItems = [
+  { label_pt: "Início", label_en: "Begin", link: "/" },
+  { label_pt: "A Walkys", label_en: "Walkys", link: "/about" },
+  { label_pt: "Outono / Inverno", label_en: "Autumn / Winter", link: "/collection/autmn-winter-25" },
+  { label_pt: "Contactos", label_en: "Contacts", link: "/contact" },
+];
+
+const defaultSocialItems = [
+  { label: "Instagram", link: "https://instagram.com" },
+  { label: "Facebook", link: "https://facebook.com" },
+  { label: "LinkedIn", link: "https://linkedin.com" },
+];
+
 export function Header({ variant = "light" }: HeaderProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { layout } = useLayout();
   const { lock, unlock } = useScrollLock();
 
-  // Clean up scroll lock on unmount
   useEffect(() => {
-    return () => {
-      unlock();
-    };
+    return () => unlock();
   }, [unlock]);
 
-  const menuItems = [
-    { label: t.header.begin, ariaLabel: "Go to home page", link: "/" },
-    { label: t.header.about, ariaLabel: "Learn about us", link: "/about" },
-    {
-      label: t.header.collection,
-      ariaLabel: "View our products",
-      link: "/collection/autmn-winter-25",
-    },
-    { label: t.header.contacts, ariaLabel: "Get in touch", link: "/contact" },
-  ];
+  const menuItems = useMemo(() => {
+    const items = layout?.header?.content?.menuItems?.length ? layout.header.content.menuItems : defaultMenuItems;
+    return items.map((item) => ({
+      label: language === "pt" ? item.label_pt : item.label_en,
+      ariaLabel: item.link === "/" ? t.header.ariaHome : item.link === "/about" ? t.header.ariaAbout : item.link === "/contact" ? t.header.ariaContacts : t.header.ariaCollection,
+      link: item.link,
+    }));
+  }, [layout?.header?.content?.menuItems, language, t]);
 
-  const socialItems = [
-    { label: "Instagram", link: "https://instagram.com" },
-    { label: "Facebook", link: "https://facebook.com" },
-    { label: "LinkedIn", link: "https://linkedin.com" },
-  ];
+  const socialItems = useMemo(() => {
+    return layout?.header?.content?.socialItems?.length ? layout.header.content.socialItems : defaultSocialItems;
+  }, [layout?.header?.content?.socialItems]);
+
+  const logoUrl = layout?.header?.logoUrl ?? "/logo.png";
 
   return (
     <>
@@ -54,7 +63,7 @@ export function Header({ variant = "light" }: HeaderProps) {
           openMenuButtonColor={variant === "light" ? "#ffffff" : "#000000"}
           changeMenuColorOnOpen={true}
           colors={["#811568ff", "#d1d5db"]}
-          logoUrl="/logo.png"
+          logoUrl={logoUrl}
           accentColor="#000000"
           invertLogo={variant === "light"}
           position="right"

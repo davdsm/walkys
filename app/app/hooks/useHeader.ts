@@ -28,6 +28,7 @@ export function useHeader(): {
     "/auth/login",
     "/auth/signup",
     "/dashboard",
+    "/backoffice",
     "/forgot-password",
     "/logout",
     "/orders",

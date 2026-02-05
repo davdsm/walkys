@@ -66,7 +66,7 @@ export const CollectionPage = () => {
     collection,
     language: loaderLanguage,
   } = loaderDataSafe;
-  const { language: contextLanguage } = useLanguage();
+  const { language: contextLanguage, t } = useLanguage();
   const language = loaderLanguage || contextLanguage;
 
   const title = collection?.name;
@@ -90,13 +90,13 @@ export const CollectionPage = () => {
 
   // Get filters - use useCallback to stabilize setActiveCategory
   const filters = useMemo(() => {
-    if (!Array.isArray(categories) || !language) return [];
+    if (!Array.isArray(categories)) return [];
     return getCategoryFilters({
       categories,
-      language,
+      allLabel: t.common.all,
       setActiveCategory,
     });
-  }, [categories, language]);
+  }, [categories, t.common.all, setActiveCategory]);
 
   // Scrollspy - only if we have categories
   useScrollSpy({

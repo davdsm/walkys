@@ -13,9 +13,10 @@ type CatalogPageProps = {
     products: TranslatedProduct[];
     categories: TranslatedCategory[];
     language: string;
+    noProductsAssigned?: boolean;
 };
 
-export default function CatalogPage({products, categories, language}: CatalogPageProps) {
+export default function CatalogPage({products, categories, language, noProductsAssigned = false}: CatalogPageProps) {
     const { language: contextLanguage } = useLanguage();
     const [activeCategory, setActiveCategory] = useState("todos-0");
     const [showFilter, setShowFilter] = useState(false);
@@ -113,7 +114,11 @@ export default function CatalogPage({products, categories, language}: CatalogPag
                             <CategoriesList categories={categoriesWithProducts} language={resolvedLanguage} />
                         ) : (
                             <div className="flex items-center justify-center py-20">
-                                <p className="text-lg text-gray-500">No products found</p>
+                                <p className="text-lg text-gray-500">
+                                    {noProductsAssigned
+                                        ? "No products have been assigned to your account. Please contact your administrator."
+                                        : "No products found"}
+                                </p>
                             </div>
                         )}
                     </div>

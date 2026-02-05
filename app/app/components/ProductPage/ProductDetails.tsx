@@ -1,16 +1,17 @@
 import { motion } from "framer-motion";
+import { useLanguage } from "~/contexts";
 
 interface ProductDetailsProps {
   productDetails: string;
-  language: string;
+  language?: string;
   opacity: any; // MotionValue from framer-motion
 }
 
 export const ProductDetails = ({
   productDetails,
-  language,
   opacity,
 }: ProductDetailsProps) => {
+  const { t } = useLanguage();
   if (!productDetails) return null;
 
   return (
@@ -26,7 +27,7 @@ export const ProductDetails = ({
       className="space-y-4"
     >
       <h2 className="text-3xl lg:text-4xl font-bold text-black border-b border-black/10 pb-4">
-        {language === "pt" ? "Detalhes do Produto" : "Product Details"}
+        {t.product.productDetails}
       </h2>
       <div
         className="text-neutral-700 text-lg leading-relaxed pt-2 prose prose-neutral max-w-none"

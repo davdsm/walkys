@@ -21,3 +21,7 @@ export type { CollectionRecord, CollectionServiceOptions, TranslatedCollection }
 // Export category service
 export { CategoryService, createCategoryService } from "./category.service";
 export type { CategoryServiceOptions, TranslatedCategory, CategoryRecord } from "./category.service";
+
+// Export user service
+export { UserService, createUserService } from "./user.service";
+export type { UserRecord, CreateUserData, UpdateUserData } from "./user.service";

@@ -11,9 +11,9 @@ import { createPocketBase } from "~/lib/pocketbase";
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
 
-  // If user is already authenticated, redirect to dashboard
   if (pb.authStore.isValid) {
-    return redirect("/dashboard");
+    const user = pb.authStore.model as { admin?: boolean } | null;
+    return redirect(user?.admin === true ? "/backoffice" : "/dashboard");
   }
 
   return null;
@@ -49,9 +49,13 @@ export async function action({ request, params }: Route.ActionArgs) {
       await pb.collection("users").authWithPassword(email, password);
     }
 
-    return redirect("/dashboard", {
+    // Require an "admin" boolean field on the users collection in PocketBase; admins are redirected to /backoffice
+    const user = pb.authStore.model as { admin?: boolean } | null;
+    const isAdmin = user?.admin === true;
+    const redirectTo = isAdmin ? "/backoffice" : "/dashboard";
+    return redirect(redirectTo, {
       headers: {
-        "set-cookie": pb.authStore.exportToCookie({ httpOnly: false }),
+        "set-cookie": pb.authStore.exportToCookie({ httpOnly: true, secure: import.meta.env.PROD }),
       },
     });
   } catch (error: any) {

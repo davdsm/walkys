@@ -15,6 +15,16 @@ export function parseCookies(cookieString: string | null) {
   );
 }
 
+const VIDEO_EXTENSIONS = ["mp4", "webm", "ogg", "mov", "m4v"];
+
+/** Returns "video" if URL looks like a video file (by extension), else "image". Handles query strings. */
+export function getMediaType(url: string): "image" | "video" {
+  if (!url || typeof url !== "string") return "image";
+  const path = url.split("?")[0];
+  const extension = path.split(".").pop()?.toLowerCase();
+  return extension && VIDEO_EXTENSIONS.includes(extension) ? "video" : "image";
+}
+
 export function getLanguageFromRequest(request: Request): "en" | "pt" {
   const cookies = parseCookies(request.headers.get("cookie"));
   if (cookies.language === "en" || cookies.language === "pt") {

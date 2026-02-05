@@ -29,7 +29,7 @@ export function ProductCarousel({
   title,
   subtitle,
   cards,
-  ctaText = "Teste Texto",
+  ctaText,
   ctaLink = "#",
 }: Readonly<ProductCarouselProps>) {
   return (

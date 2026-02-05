@@ -1,23 +1,23 @@
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
-import { useLanguage } from "~/contexts";
+import { useLanguage, useLayout } from "~/contexts";
 import { Button } from "../Elements/Button/Button";
 
 export interface SmallCTAProps {
   /**
    * The main heading text
-   * @default Uses translation from translations.smallCTA.heading
+   * @default Uses layout or translation from translations.smallCTA.heading
    */
   heading?: string;
   /**
    * The subtitle/description text
-   * @default Uses translation from translations.smallCTA.subtitle
+   * @default Uses layout or translation from translations.smallCTA.subtitle
    */
   subtitle?: string;
   /**
    * The button text
-   * @default Uses translation from translations.smallCTA.buttonText
+   * @default Uses layout or translation from translations.smallCTA.buttonText
    */
   buttonText?: string;
   /**
@@ -42,11 +42,15 @@ export const SmallCTA = ({
   className = "",
   buttonIcon = <ArrowRight className="w-5 h-5" />,
 }: SmallCTAProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { layout } = useLayout();
+  const lang = language === "pt" ? "pt" : "en";
+  const c = layout?.smallCta?.content;
 
-  const displayHeading = heading || t.smallCTA.heading;
-  const displaySubtitle = subtitle || t.smallCTA.subtitle;
-  const displayButtonText = buttonText || t.smallCTA.buttonText;
+  const displayHeading = heading ?? (c?.[`heading_${lang}` as keyof typeof c] as string) ?? t.smallCTA.heading;
+  const displaySubtitle = subtitle ?? (c?.[`subtitle_${lang}` as keyof typeof c] as string) ?? t.smallCTA.subtitle;
+  const displayButtonText = buttonText ?? (c?.[`button_text_${lang}` as keyof typeof c] as string) ?? t.smallCTA.buttonText;
+  const displayTo = to ?? c?.button_link ?? "/";
 
   return (
     <motion.article
@@ -68,7 +72,7 @@ export const SmallCTA = ({
 
       {/* CTA Button */}
       <motion.div>
-        <Button to={to} rightIcon={buttonIcon} className="rounded-full">
+        <Button to={displayTo} rightIcon={buttonIcon} className="rounded-full">
           {displayButtonText}
         </Button>
       </motion.div>

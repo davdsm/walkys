@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
+import { getMediaType } from "~/lib/utils";
 
 export const ProductCard = ({
   name,
@@ -22,27 +23,23 @@ export const ProductCard = ({
   const defaultVideoRef = useRef<HTMLVideoElement>(null);
   const hoverVideoRef = useRef<HTMLVideoElement>(null);
 
-  const getMediaType = (url: string): "image" | "video" => {
-    const extension = url.split(".").pop()?.toLowerCase();
-    const videoExtensions = ["mp4", "webm", "ogg", "mov"];
-    return videoExtensions.includes(extension || "") ? "video" : "image";
-  };
-
   useEffect(() => {
-    // Detect media types
+    // Detect media types (image and hover can be image or video)
     setDefaultMediaType(getMediaType(media.image));
-    setHoverMediaType(getMediaType(media.hover));
+    setHoverMediaType(media.hover ? getMediaType(media.hover) : "image");
 
     // Preload hover media
-    if (getMediaType(media.hover) === "video") {
+    if (media.hover && getMediaType(media.hover) === "video") {
       const video = document.createElement("video");
       video.src = media.hover;
       video.onloadeddata = () => setIsMediaLoaded(true);
       video.load();
-    } else {
+    } else if (media.hover) {
       const img = new Image();
       img.src = media.hover;
       img.onload = () => setIsMediaLoaded(true);
+    } else {
+      setIsMediaLoaded(true);
     }
   }, [media.image, media.hover]);
 

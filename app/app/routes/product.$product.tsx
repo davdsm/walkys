@@ -69,7 +69,7 @@ export async function loader({
 }
 
 export const ProductPage = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const navigate = useNavigate();
   const loaderData = useLoaderData() || {};
   const { product, relatedProducts } = loaderData as ProductLoaderData;
@@ -111,7 +111,7 @@ export const ProductPage = () => {
 
   // Breadcrumbs data
   const breadcrumbs = [
-    { label: language === "pt" ? "Início" : "Home", to: "/" },
+    { label: t.common.home, to: "/" },
     {
       label: categoryName,
       to: categorySlug ? `/category/${categorySlug}` : null,

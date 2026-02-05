@@ -82,6 +82,18 @@ Make sure to deploy the output of `npm run build`
 
 This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
 
+## PocketBase schema (Backoffice)
+
+The backoffice expects the following PocketBase collections and fields. Configure them in the PocketBase admin if missing.
+
+| Collection   | Required fields |
+| ------------ | ---------------- |
+| **products** | `media_hover` (file, single, image or video); `sizes` (relation, multiple, to `sizes` collection). |
+| **category** | `hover` (file, single, image or video) — shown on category hover. |
+| **sizes**    | Must exist with at least `number`; products link to it via the `sizes` relation. |
+| **Homepage** | For page editor: relation field(s) for `products` (single or multiple) and `categories` (multiple) on section records. |
+| **translations** | No schema change; already used. |
+
 ---
 
 Built with ❤️ using React Router.

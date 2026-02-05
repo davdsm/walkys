@@ -53,7 +53,13 @@ export class ImageService {
       return [];
     }
 
-    const baseUrl = "http://192.168.1.68:8090";
+    // Media may already be full URLs (e.g. from PageService transformed records)
+    const first = sectionData.media[0];
+    if (typeof first === "string" && (first.startsWith("http://") || first.startsWith("https://"))) {
+      return sectionData.media as string[];
+    }
+
+    const baseUrl = this.pb.baseUrl.replace(/\/$/, "");
     return sectionData.media.map(
       (filename) =>
         `${baseUrl}/api/files/${this.collectionName}/${sectionData.id}/${filename}`

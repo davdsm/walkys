@@ -11,7 +11,7 @@ export async function action({ request }: Route.ActionArgs) {
 
     return redirect(redirectTo as string, {
         headers: {
-            "set-cookie": pb.authStore.exportToCookie({ httpOnly: false }),
+            "set-cookie": pb.authStore.exportToCookie({ httpOnly: true, secure: import.meta.env.PROD }),
         },
     });
 }

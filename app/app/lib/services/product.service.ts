@@ -152,6 +152,48 @@ export class ProductService {
   }
 
   /**
+   * Get products that belong to any of the given category IDs (single request)
+   */
+  async getByCategoryIds(categoryIds: string[], options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct[]> {
+    if (!categoryIds || categoryIds.length === 0) return [];
+    try {
+      const filterParts = categoryIds.map((id) => `category ?~ "${id}"`).join(" || ");
+      const products = await this.pb.collection("products").getFullList<ProductRecord>({
+        filter: `(${filterParts}) && enabled=true`,
+        sort: options?.sort,
+        expand: options?.expand || "category,sizes",
+        fields: options?.fields,
+      });
+      return products.map((product) => this.transformProduct(product));
+    } catch (error) {
+      console.error("Error fetching products by category IDs:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get products by a list of record IDs (e.g. user's catalog_products).
+   */
+  async getByIds(ids: string[], options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct[]> {
+    if (!ids || ids.length === 0) return [];
+    const safeIds = ids.filter((id) => typeof id === "string" && id.trim().length > 0);
+    if (safeIds.length === 0) return [];
+    try {
+      const filterParts = safeIds.map((id) => `id = "${String(id).replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`).join(" || ");
+      const products = await this.pb.collection("products").getFullList<ProductRecord>({
+        filter: `(${filterParts}) && enabled=true`,
+        sort: options?.sort,
+        expand: options?.expand || "category,sizes",
+        fields: options?.fields,
+      });
+      return products.map((product) => this.transformProduct(product));
+    } catch (error) {
+      console.error("Error fetching products by IDs:", error);
+      throw error;
+    }
+  }
+
+  /**
    * Get a single product by slug
    */
   async getBySlug(slug: string, options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct | null> {

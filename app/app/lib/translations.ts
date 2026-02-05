@@ -3,11 +3,12 @@ export const translations = {
         // About
         about: {
             title: "Viste a transição? crazy",
+            our_story: "A nossa história",
             mold_title: "Molde",
             shapping_title: "Forma",
             tabulated_title: "Tabelado",
             quality_title: "Qualidade",
-            what_about_title: "Sobre",
+            what_about_title: "Sobre nós",
             gallery_title: "COMO TUDO COMEÇA",
         },
         // Header
@@ -19,6 +20,21 @@ export const translations = {
             menu: "Menu",
             close: "Fechar",
             socials: "Redes Sociais",
+            ariaHome: "Ir para a página inicial",
+            ariaAbout: "Conhecer a marca",
+            ariaCollection: "Ver os nossos produtos",
+            ariaContacts: "Contactar",
+            openMenu: "Abrir menu",
+            closeMenu: "Fechar menu",
+        },
+        // Home
+        home: {
+            exploreMore: "EXPLORAR MAIS",
+        },
+        // Common
+        common: {
+            all: "Todos",
+            home: "Início",
         },
         // Login
         login: {
@@ -301,6 +317,18 @@ export const translations = {
             zToA: "Z→A",
             noProducts: "Nenhum produto corresponde aos filtros selecionados.",
         },
+        // Product Page
+        product: {
+            productInformation: "Informação do Produto",
+            productDetails: "Detalhes do Produto",
+            orderNow: "ENCOMENDAR AGORA",
+            back: "Voltar",
+            selectSize: "Selecionar Tamanho",
+            chooseSize: "Escolha um tamanho",
+            viewCollection: "VER COLEÇÃO",
+            relatedProductsTitle: "Produtos Recomendados",
+            relatedProductsSubtitle: "Mais produtos desta coleção",
+        },
         // Cookie specifics
         cookies: {
             title: "Política de Cookies",
@@ -357,6 +385,10 @@ export const translations = {
             explore: "Explorar",
             newCollection: "NOVA COLEÇÃO",
             copyright: "© 2025 – Copyright",
+            backToTop: "Voltar ao topo",
+            addressValue: "V.N. Sande, Famalicão",
+            phoneValue: "+351 253 412 421",
+            scheduleHours: "9h—18h",
         },
         // Account / Auth
         account: {
@@ -368,11 +400,12 @@ export const translations = {
         // About
         about: {
             title: "Did you see the transition? crazy",
+            our_story: "Our story",
             mold_title: "Mold",
             shapping_title: "Shape",
             tabulated_title: "Tabulated",
             quality_title: "Quality",
-            what_about_title: "What About",
+            what_about_title: "What we stand for",
             gallery_title: "HOW IT ALL STARTS",
         },
         // Header
@@ -384,6 +417,21 @@ export const translations = {
             menu: "Menu",
             close: "Close",
             socials: "Socials",
+            ariaHome: "Go to home page",
+            ariaAbout: "Learn about us",
+            ariaCollection: "View our products",
+            ariaContacts: "Get in touch",
+            openMenu: "Open menu",
+            closeMenu: "Close menu",
+        },
+        // Home
+        home: {
+            exploreMore: "EXPLORE MORE",
+        },
+        // Common
+        common: {
+            all: "All",
+            home: "Home",
         },
         // Login
         login: {
@@ -666,6 +714,18 @@ export const translations = {
             zToA: "Z→A",
             noProducts: "No products match the selected filters.",
         },
+        // Product Page
+        product: {
+            productInformation: "Product Information",
+            productDetails: "Product Details",
+            orderNow: "ORDER NOW",
+            back: "Back",
+            selectSize: "Select Size",
+            chooseSize: "Choose a size",
+            viewCollection: "VIEW COLLECTION",
+            relatedProductsTitle: "More products from this collection",
+            relatedProductsSubtitle: "More products from this collection",
+        },
         // Cookie specifics
         cookies: {
             title: "Cookie Policy",
@@ -722,6 +782,10 @@ export const translations = {
             explore: "Explore",
             newCollection: "NEW COLLECTION",
             copyright: "© 2025 – Copyright",
+            backToTop: "Back to top",
+            addressValue: "2972 Westheimer Rd. Santa Ana, Illinois 85486",
+            phoneValue: "+351 253 412 421",
+            scheduleHours: "9am—6pm",
         },
         // Account / Auth
         account: {

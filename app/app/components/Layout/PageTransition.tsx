@@ -29,6 +29,7 @@ export function PageTransition({ children }: PageTransitionProps) {
   const excludedPrefixes = [
     "/auth",
     "/dashboard",
+    "/backoffice",
     "/forgot-password",
     "/reset-password",
     "/logout",
@@ -44,23 +45,23 @@ export function PageTransition({ children }: PageTransitionProps) {
     return <>{children}</>;
   }
 
-  // Allow animations on homepage even on refresh
-  // For other pages, use initial={false} to prevent animations on first load
   const isHomepage = location.pathname === "/";
+  // About page: opacity-only transition so position:sticky works (no transform on main)
+  const isAboutPage = location.pathname === "/about";
 
   return (
     <AnimatePresence mode="wait" initial={isHomepage}>
       <motion.main
         key={location.pathname}
-        initial={{ opacity: 0, x: -20 }}
+        initial={isAboutPage ? { opacity: 0 } : { opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: 20 }}
+        exit={isAboutPage ? { opacity: 0 } : { opacity: 0, x: 20 }}
         transition={{
           duration: 0.3,
-          // Smooth easeOutQuart-like curve for a premium feel
           ease: [0.22, 1, 0.36, 1],
         }}
-        className="w-full flex flex-col flex-1 min-h-screen"
+        className="w-full flex flex-col flex-1"
+        style={isAboutPage ? { transform: "none" } : undefined}
       >
         <FrozenRoute>{children}</FrozenRoute>
       </motion.main>

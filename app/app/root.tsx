@@ -6,15 +6,18 @@ import {
   // ScrollRestoration,
   useLoaderData,
   useOutlet,
+  useRouteLoaderData,
 } from "react-router";
 import { ParallaxProvider } from "react-scroll-parallax";
 
 import type { Route } from "./+types/root";
 import "./app.css";
 import { createPocketBase } from "./lib/pocketbase";
+import { getLanguageFromRequest } from "./lib/utils";
+import { getLayoutData, type LayoutData } from "./lib/services/layout.service";
 import { Footer } from "./components/Layout/Footer";
 import { Header } from "./components/Layout/Header";
-import { LanguageProvider } from "./contexts";
+import { LanguageProvider, LayoutProvider } from "./contexts";
 import { PageTransition } from "./components/Layout/PageTransition";
 import { useFooter } from "./hooks/useFooter";
 import { useHeader } from "./hooks/useHeader";
@@ -34,18 +37,25 @@ export const links: Route.LinksFunction = () => [
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
+  const language = getLanguageFromRequest(request);
+  const layout = await getLayoutData(pb);
   return {
     user: pb.authStore.model,
+    language,
+    layout,
   };
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const rootData = useRouteLoaderData("root") as { language?: "pt" | "en"; layout?: LayoutData | null } | undefined;
+  const lang = rootData?.language ?? "pt";
+  const layout = rootData?.layout ?? null;
   return (
-    <html lang="en">
+    <html lang={lang}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/x-icon" href="/favicon.png" />
+        <link rel="icon" type="image/x-icon" href={layout?.favicon?.faviconUrl ?? "/favicon.png"} />
         <title>Walkys - By Shoe Me</title>
         <meta name="title" content="Walkys - By Shoe Me" />
         <meta
@@ -74,11 +84,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="flex flex-col overflow-x-hidden">
+      <body className="flex flex-col min-h-screen">
         <ParallaxProvider>
-          <LanguageProvider>
-            {children}
-            <Scripts />
+          <LanguageProvider defaultLanguage={lang}>
+            <LayoutProvider layout={layout}>
+              {children}
+              <Scripts />
+            </LayoutProvider>
           </LanguageProvider>
         </ParallaxProvider>
       </body>

@@ -1,19 +1,20 @@
 import { Button } from "~/components/Elements/Button/Button";
 import { ArrowUpLeft, ShoppingBag } from "lucide-react";
+import { useLanguage } from "~/contexts";
 
 interface ProductActionsProps {
   onBack: () => void;
   onOrder: () => void;
-  language: string;
+  language?: string;
   variant?: "desktop" | "mobile";
 }
 
 export const ProductActions = ({
   onBack,
   onOrder,
-  language,
   variant = "desktop",
 }: ProductActionsProps) => {
+  const { t } = useLanguage();
   if (variant === "mobile") {
     return (
       <div className="flex gap-4 mb-10">
@@ -23,7 +24,7 @@ export const ProductActions = ({
           className="w-3/4 flex-[2] rounded-2xl h-14 border-none transition-colors"
           rightIcon={<ShoppingBag size={20} />}
         >
-          {language === "pt" ? "ENCOMENDAR AGORA" : "ORDER NOW"}
+          {t.product.orderNow}
         </Button>
       </div>
     );
@@ -37,7 +38,7 @@ export const ProductActions = ({
         className="flex-none rounded-xl py-6"
         leftIcon={<ArrowUpLeft size={16} />}
       >
-        {language === "pt" ? "Voltar" : "Back"}
+        {t.product.back}
       </Button>
 
       <Button
@@ -46,7 +47,7 @@ export const ProductActions = ({
         className="flex-1 rounded-xl py-6"
         rightIcon={<ShoppingBag size={18} />}
       >
-        {language === "pt" ? "ENCOMENDAR AGORA" : "ORDER NOW"}
+        {t.product.orderNow}
       </Button>
     </div>
   );

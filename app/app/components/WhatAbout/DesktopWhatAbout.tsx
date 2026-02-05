@@ -7,7 +7,7 @@ export const DesktopWhatAbout = ({ cards }: { cards: CardProps[] }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!containerRef.current) return;
+      if (!containerRef.current || cards.length === 0) return;
 
       const container = containerRef.current as HTMLElement;
       const rect = container.getBoundingClientRect();
@@ -28,36 +28,34 @@ export const DesktopWhatAbout = ({ cards }: { cards: CardProps[] }) => {
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [activeSection]);
+  }, [activeSection, cards.length]);
 
   return (
     <div
       ref={containerRef}
+      className="relative"
       style={{
         backgroundColor: "#f1f1f1",
         minHeight: `${cards.length * 150}vh`,
-        position: "relative",
       }}
     >
-      {/* Sticky White Box */}
+      {/* Sticky card */}
       <div
-        className="sticky bg-white rounded-xl mx-auto overflow-hidden"
+        className="sticky mx-auto overflow-hidden rounded-2xl shadow-lg"
         style={{
-          top: "15vh",
-          width: "70vw",
-          height: "70vh",
-          maxWidth: "1400px",
-          maxHeight: "900px",
+          top: "12vh",
+          width: "min(72vw, 1320px)",
+          height: "min(68vh, 820px)",
         }}
       >
-        <div className="w-full h-full flex items-center justify-center p-8">
-          <div className="w-full h-full flex items-center gap-16">
-            {/* Image Section */}
-            <div className="flex-1 relative h-full">
+        <div className="w-full h-full bg-white flex items-center justify-center p-10 md:p-14">
+          <div className="w-full h-full flex flex-col lg:flex-row items-stretch gap-12 lg:gap-16">
+            {/* Image */}
+            <div className="flex-1 relative min-h-[280px] lg:min-h-0 rounded-xl overflow-hidden bg-[#f1f1f1]">
               {cards.map((section, index) => (
                 <div
                   key={index}
-                  className="absolute inset-0 transition-opacity duration-700"
+                  className="absolute inset-0 transition-opacity duration-700 ease-out"
                   style={{
                     opacity: activeSection === index ? 1 : 0,
                     pointerEvents: activeSection === index ? "auto" : "none",
@@ -66,30 +64,30 @@ export const DesktopWhatAbout = ({ cards }: { cards: CardProps[] }) => {
                   <img
                     src={section.image}
                     alt={section.title}
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-full object-cover"
                   />
                 </div>
               ))}
             </div>
 
-            {/* Text Section */}
-            <div className="flex-1 relative h-full">
+            {/* Text */}
+            <div className="flex-1 relative flex flex-col justify-center min-h-0">
               {cards.map((section, index) => (
                 <div
                   key={index}
-                  className="absolute inset-0 flex flex-col justify-center transition-opacity duration-700"
+                  className="absolute inset-0 flex flex-col justify-center transition-opacity duration-700 ease-out"
                   style={{
                     opacity: activeSection === index ? 1 : 0,
                     pointerEvents: activeSection === index ? "auto" : "none",
                   }}
                 >
-                  <p className="text-sm tracking-wider mb-4 text-gray-600">
+                  <p className="text-xs font-medium tracking-[0.25em] uppercase text-black/60 mb-3">
                     Walkys
                   </p>
-                  <h2 className="text-5xl font-bold mb-6">
+                  <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black tracking-tight mb-5 leading-tight">
                     {section.title}
-                  </h2>
-                  <p className="text-gray-700 text-lg">
+                  </h3>
+                  <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-lg">
                     {section.description}
                   </p>
                 </div>
