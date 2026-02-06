@@ -88,20 +88,43 @@ export const MobileProductLayout = ({
       {/* Content Section (White card) */}
       <div className="bg-white rounded-t-[40px] -mt-10 relative z-20 min-h-[50vh] p-8 pb-32">
         {/* Breadcrumbs */}
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+        >
+          <Breadcrumbs breadcrumbs={breadcrumbs} />
+        </motion.div>
 
         {/* Collection Name */}
         {collectionName && (
-          <p className="text-sm text-neutral-500 mb-2 lowercase font-light">
+          <motion.p
+            className="text-sm text-neutral-500 mb-2 lowercase font-light"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.05, ease: "easeOut" }}
+          >
             {collectionName}
-          </p>
+          </motion.p>
         )}
 
         {/* Product Name */}
-        <h1 className="text-2xl font-bold text-black mb-6">{productName}</h1>
+        <motion.h1
+          className="text-2xl font-bold text-black mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.1, ease: "easeOut" }}
+        >
+          {productName}
+        </motion.h1>
 
         {/* Thumbnail Gallery */}
-        <div className="flex gap-4 mb-10 overflow-x-auto pb-2 scrollbar-hide">
+        <motion.div
+          className="flex gap-4 mb-10 overflow-x-auto pb-2 scrollbar-hide"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.14, ease: "easeOut" }}
+        >
           {media.map((url, index) => {
             const isVideo = getMediaType(url) === "video";
             return (
@@ -133,18 +156,29 @@ export const MobileProductLayout = ({
               </button>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Action Buttons Row */}
-        <ProductActions
-          onBack={() => {}}
-          onOrder={onOrder}
-          language={language}
-          variant="mobile"
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.18, ease: "easeOut" }}
+        >
+          <ProductActions
+            onBack={() => {}}
+            onOrder={onOrder}
+            language={language}
+            variant="mobile"
+          />
+        </motion.div>
 
         {/* Info Section */}
-        <div className="space-y-4 mb-10">
+        <motion.div
+          className="space-y-4 mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.22, ease: "easeOut" }}
+        >
           <h2 className="text-lg font-bold text-black border-none">
             {language === "pt"
               ? "Informação do Produto"
@@ -153,11 +187,16 @@ export const MobileProductLayout = ({
           <p className="text-neutral-600 leading-relaxed text-sm">
             {productDescription}
           </p>
-        </div>
+        </motion.div>
 
         {/* Details Section */}
         {productDetails && (
-          <div className="space-y-4">
+          <motion.div
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.26, ease: "easeOut" }}
+          >
             <h2 className="text-lg font-bold text-black border-none">
               {language === "pt" ? "Detalhes do Produto" : "Product Details"}
             </h2>
@@ -165,7 +204,7 @@ export const MobileProductLayout = ({
               className="text-neutral-600 text-sm leading-relaxed prose prose-neutral prose-sm max-w-none"
               dangerouslySetInnerHTML={{ __html: productDetails }}
             />
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

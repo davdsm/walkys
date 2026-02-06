@@ -70,15 +70,16 @@ export class ProductService {
    */
   public transform(product: ProductRecord): TranslatedProduct {
     const lang = this.language;
+    const collectionId = product.collectionId ?? "products";
     return {
       ...product,
       name: (lang === "pt" ? product.name_pt : product.name_en) || "",
       description: (lang === "pt" ? product.description_pt : product.description_en) || "",
       details: (lang === "pt" ? product.details_pt : product.details_en) || "",
       media: Array.isArray(product.media)
-        ? this.buildFileUrls(product.id, product.media, product.collectionId)
+        ? this.buildFileUrls(product.id, product.media, collectionId)
         : [],
-      media_hover: this.buildFileUrl(product.id, product.media_hover, product.collectionId),
+      media_hover: this.buildFileUrl(product.id, product.media_hover, collectionId),
     };
   }
 
@@ -173,6 +174,7 @@ export class ProductService {
 
   /**
    * Get products by a list of record IDs (e.g. user's catalog_products).
+   * Preserves the order of the input ids.
    */
   async getByIds(ids: string[], options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct[]> {
     if (!ids || ids.length === 0) return [];
@@ -183,10 +185,13 @@ export class ProductService {
       const products = await this.pb.collection("products").getFullList<ProductRecord>({
         filter: `(${filterParts}) && enabled=true`,
         sort: options?.sort,
-        expand: options?.expand || "category,sizes",
+        expand: options?.expand || "category,sizes,collection",
         fields: options?.fields,
       });
-      return products.map((product) => this.transformProduct(product));
+      const transformed = products.map((product) => this.transformProduct(product));
+      return safeIds
+        .map((id) => transformed.find((p) => p.id === id))
+        .filter((p): p is TranslatedProduct => p !== undefined);
     } catch (error) {
       console.error("Error fetching products by IDs:", error);
       throw error;
@@ -232,35 +237,6 @@ export class ProductService {
         return null;
       }
       console.error("Error fetching product by ID:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get multiple products by their IDs
-   */
-  async getByIds(ids: string[], options?: Omit<ProductServiceOptions, "filter">): Promise<TranslatedProduct[]> {
-    if (!ids || ids.length === 0) return [];
-    
-    try {
-      // Build filter string for multiple IDs
-      const idFilters = ids.map(id => `id="${id}"`).join(" || ");
-      const products = await this.pb.collection("products").getFullList<ProductRecord>({
-        filter: `(${idFilters}) && enabled=true`,
-        sort: options?.sort,
-        expand: options?.expand || "category,sizes,collection",
-        fields: options?.fields,
-      });
-
-      // Transform and maintain the order from the IDs array
-      const transformedProducts = products.map((product) => this.transformProduct(product));
-      
-      // Sort by the order of IDs in the input array
-      return ids
-        .map(id => transformedProducts.find(p => p.id === id))
-        .filter((p): p is TranslatedProduct => p !== undefined);
-    } catch (error) {
-      console.error("Error fetching products by IDs:", error);
       throw error;
     }
   }

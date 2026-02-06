@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Filters from "~/components/Filters/Filters";
 import CategoriesList from "~/components/CategoriesList";
 import { useLanguage } from "~/contexts";
+import { UserBackofficeLanguageSwitcher } from "~/components/Backoffice/UserBackofficeLanguageSwitcher";
 import { mapCategoriesWithProducts } from "~/utils/categories";
 import { getCategoryFilters } from "~/utils/filters";
 import { useScrollSpy } from "~/hooks/useScrollSpy";
@@ -17,7 +18,7 @@ type CatalogPageProps = {
 };
 
 export default function CatalogPage({products, categories, language, noProductsAssigned = false}: CatalogPageProps) {
-    const { language: contextLanguage } = useLanguage();
+    const { language: contextLanguage, t } = useLanguage();
     const [activeCategory, setActiveCategory] = useState("todos-0");
     const [showFilter, setShowFilter] = useState(false);
     const resolvedLanguage = language || contextLanguage || "en";
@@ -53,16 +54,37 @@ export default function CatalogPage({products, categories, language, noProductsA
     }, [categories, resolvedLanguage]);
 
     const categoriesWithProducts = useMemo(() => {
-        if (!Array.isArray(categories) || !Array.isArray(products)) return [];
-        return mapCategoriesWithProducts(categories, products);
-    }, [categories, products]);
+        if (!Array.isArray(products)) return [];
+        if (!Array.isArray(categories)) return [];
+        const mapped = mapCategoriesWithProducts(categories, products);
+        // If we have products but no categories (e.g. products have no category relation), show one "Products" section
+        if (mapped.length === 0 && products.length > 0) {
+            return [
+                {
+                    id: "all",
+                    slug: "products",
+                    name: t.userBackoffice.products,
+                    description: "",
+                    media: "",
+                    hover: "",
+                    products,
+                },
+            ];
+        }
+        return mapped;
+    }, [categories, products, resolvedLanguage, t]);
 
     return (
-        <div className="w-full bg-[#f1f1f1] flex flex-col md:pt-70">
-            <main className="flex flex-col w-full">
-                <div className="pr-[45px] pl-[33px] max-w-[1200px] mx-auto w-full">
+        <div className="min-h-screen w-full bg-[#f1f1f1] flex flex-col md:pt-10">
+            <motion.main
+                className="flex flex-col w-full"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+            >
+                <div className="pr-[45px] pl-[33px] max-w-[1200px] mx-auto w-full flex flex-wrap items-center justify-between gap-4 pt-[48px] pb-[20px]">
                     <Link
-                        className="md:text-[15px] text-lg pt-[48px] pb-[20px] font-semibold flex items-center gap-[12px]"
+                        className="md:text-[15px] text-lg font-semibold flex items-center gap-[12px]"
                         to="/dashboard"
                     >
                         <svg
@@ -79,10 +101,17 @@ export default function CatalogPage({products, categories, language, noProductsA
                                 d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
                             />
                         </svg>
-                        Dashboard
+                        {t.userBackoffice.dashboard}
                     </Link>
+                    <UserBackofficeLanguageSwitcher />
                 </div>
 
+                <motion.section
+                    className="pb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.1, ease: "easeOut" }}
+                >
                 {showFilter && filters.length > 0 && (
                     <motion.div
                         initial={{ opacity: 0, y: -60 }}
@@ -98,7 +127,7 @@ export default function CatalogPage({products, categories, language, noProductsA
                     </motion.div>
                 )}
 
-                <section className="pb-10">
+                <div>
                     {filters.length > 0 && (
                         <div className="pr-[45px] pl-[33px] max-w-[1200px] mx-auto w-full">
                             <Filters
@@ -116,14 +145,15 @@ export default function CatalogPage({products, categories, language, noProductsA
                             <div className="flex items-center justify-center py-20">
                                 <p className="text-lg text-gray-500">
                                     {noProductsAssigned
-                                        ? "No products have been assigned to your account. Please contact your administrator."
-                                        : "No products found"}
+                                        ? t.userBackoffice.noProductsAssigned
+                                        : t.userBackoffice.noProductsFound}
                                 </p>
                             </div>
                         )}
                     </div>
-                </section>
-            </main>
+                </div>
+                </motion.section>
+            </motion.main>
         </div>
     );
 }

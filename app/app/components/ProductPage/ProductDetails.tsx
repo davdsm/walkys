@@ -26,11 +26,19 @@ export const ProductDetails = ({
       }}
       className="space-y-4"
     >
-      <h2 className="text-3xl lg:text-4xl font-bold text-black border-b border-black/10 pb-4">
+      <motion.h2
+        className="text-3xl lg:text-4xl font-bold text-black border-b border-black/10 pb-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
+      >
         {t.product.productDetails}
-      </h2>
-      <div
+      </motion.h2>
+      <motion.div
         className="text-neutral-700 text-lg leading-relaxed pt-2 prose prose-neutral max-w-none"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
         dangerouslySetInnerHTML={{ __html: productDetails }}
       />
     </motion.div>

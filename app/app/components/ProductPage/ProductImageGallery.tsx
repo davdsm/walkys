@@ -18,7 +18,7 @@ export const ProductImageGallery = ({
   const selectedIsVideo = selectedUrl ? getMediaType(selectedUrl) === "video" : false;
 
   return (
-    <div className="w-1/2 relative h-full">
+    <div className="w-full relative h-full">
       {/* Main Image or Video */}
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
@@ -30,7 +30,7 @@ export const ProductImageGallery = ({
           (selectedIsVideo ? (
             <video
               src={selectedUrl}
-              className="w-full h-full object-contain p-8"
+              className="w-full h-full object-contain"
               controls
               loop
               muted
@@ -40,7 +40,7 @@ export const ProductImageGallery = ({
             <img
               src={selectedUrl}
               alt={productName}
-              className="w-full h-full object-contain p-8"
+              className="w-full h-full object-contain"
             />
           ))}
       </motion.div>

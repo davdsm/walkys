@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
-import { useLoaderData, useNavigate } from "react-router";
+import { useLoaderData, useNavigate, useRouteLoaderData } from "react-router";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useLanguage } from "~/contexts";
+import { useLanguage, useCart } from "~/contexts";
 import type { ProductRecord, SizeRecord } from "~/hooks/useProducts";
 import { createPocketBase } from "~/lib/pocketbase";
 import { createProductService } from "~/lib/services";
@@ -71,6 +71,10 @@ export async function loader({
 export const ProductPage = () => {
   const { language, t } = useLanguage();
   const navigate = useNavigate();
+  const { addItem, openCart } = useCart();
+  const rootData = useRouteLoaderData("root") as { user?: unknown } | undefined;
+  const isAuthenticated = !!rootData?.user;
+
   const loaderData = useLoaderData() || {};
   const { product, relatedProducts } = loaderData as ProductLoaderData;
 
@@ -86,6 +90,9 @@ export const ProductPage = () => {
   const productDetails = (product as any)?.[`details_${langKey}`] ?? "";
   const media = product?.media || [];
   const expand = (product as any)?.expand || {};
+  const productSlug = (product as any)?.slug ?? "";
+  const productId = (product as any)?.id ?? "";
+  const firstMediaUrl = Array.isArray(media) && media.length > 0 ? media[0] : undefined;
 
   // Get collection name
   const collectionList = expand.collection
@@ -144,8 +151,18 @@ export const ProductPage = () => {
   };
 
   const handleOrder = () => {
-    // TODO: Implement order functionality
-    console.log("Order product:", product?.id, "Size:", selectedSize);
+    if (isAuthenticated) {
+      addItem({
+        productId,
+        slug: productSlug,
+        name: productName,
+        size: selectedSize,
+        imageUrl: typeof firstMediaUrl === "string" ? firstMediaUrl : undefined,
+      });
+      openCart();
+    } else {
+      navigate("/contact");
+    }
   };
 
   // Calculate the amount to translate to "stick" the desktop layout
@@ -164,15 +181,27 @@ export const ProductPage = () => {
             className="h-screen flex w-full relative"
           >
             {/* Left Column - Full Screen Image with Thumbnails */}
-            <ProductImageGallery
-              media={media}
-              selectedImage={selectedImage}
-              onImageSelect={setSelectedImage}
-              productName={productName}
-            />
+            <motion.div
+              className="w-1/2 relative h-full"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <ProductImageGallery
+                media={media}
+                selectedImage={selectedImage}
+                onImageSelect={setSelectedImage}
+                productName={productName}
+              />
+            </motion.div>
 
             {/* Right Column - Product Info & Details Centered Vertically */}
-            <div className="w-1/2 h-full flex flex-col justify-center px-12 lg:px-20 relative">
+            <motion.div
+              className="w-1/2 h-full flex flex-col justify-center px-12 lg:px-20 relative"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+            >
               <div className="relative w-full">
                 {/* Product Info - Fades Out */}
                 <ProductInfo
@@ -197,12 +226,18 @@ export const ProductPage = () => {
                   opacity={detailsOpacity}
                 />
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
 
         {/* Mobile Layout */}
-        <MobileProductLayout
+        <motion.div
+          className="md:hidden"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          <MobileProductLayout
           productName={productName}
           productDescription={productDescription}
           productDetails={productDetails}
@@ -217,15 +252,22 @@ export const ProductPage = () => {
           breadcrumbs={breadcrumbs}
           language={language}
         />
+        </motion.div>
       </section>
 
       {/* Related Products */}
-      <RelatedProducts
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+      >
+        <RelatedProducts
         relatedProducts={relatedProducts}
         collectionSlug={collectionList[0]?.slug || null}
         language={language}
         langKey={langKey}
       />
+      </motion.div>
     </>
   );
 };

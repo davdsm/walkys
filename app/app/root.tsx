@@ -17,8 +17,9 @@ import { getLanguageFromRequest } from "./lib/utils";
 import { getLayoutData, type LayoutData } from "./lib/services/layout.service";
 import { Footer } from "./components/Layout/Footer";
 import { Header } from "./components/Layout/Header";
-import { LanguageProvider, LayoutProvider } from "./contexts";
+import { LanguageProvider, LayoutProvider, CartProvider } from "./contexts";
 import { PageTransition } from "./components/Layout/PageTransition";
+import { CartSidebar } from "./components/Cart/CartSidebar";
 import { useFooter } from "./hooks/useFooter";
 import { useHeader } from "./hooks/useHeader";
 
@@ -107,13 +108,14 @@ export default function App() {
   // Page transitions and scroll management are handled by the PageTransition component
 
   return (
-    <>
+    <CartProvider>
       {!shouldHideHeader && <Header variant={headerVariant} />}
       <PageTransition>
         {outlet}
         {!shouldHideFooter && <Footer variant={footerVariant} />}
       </PageTransition>
-    </>
+      <CartSidebar />
+    </CartProvider>
   );
 }
 

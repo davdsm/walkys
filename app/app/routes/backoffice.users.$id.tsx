@@ -1,7 +1,7 @@
 import { useLoaderData, useParams, Form, useNavigation, redirect, useActionData } from "react-router";
 import { Link } from "react-router";
 import { BackofficeToast } from "~/components/Backoffice/BackofficeToast";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
 import { createUserService } from "~/lib/services/user.service";
 import type { UserRecord } from "~/lib/services/user.service";
 import type { Route } from "./+types/backoffice.users.$id";
@@ -26,7 +26,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   }
 
   try {
-    const userService = createUserService(pb);
+    // Prefer PocketBase admin client so we reliably get the email field for other users,
+    // falling back to the current auth client if admin credentials are not configured.
+    const adminPb = await createPocketBaseAsAdmin();
+    const client = adminPb ?? pb;
+    const userService = createUserService(client);
     const userRecord = await userService.getOne(id);
     const catalogProductIds = parseCatalogProductIds(userRecord);
 
@@ -51,7 +55,12 @@ export async function action({ request, params }: Route.ActionArgs) {
   const id = params.id;
   const formData = await request.formData();
   const intent = formData.get("intent");
-  const userService = createUserService(pb);
+
+  // Use PocketBase dashboard admin when available so updating other users
+  // (including their password) works reliably, falling back to current user auth.
+  const adminPb = await createPocketBaseAsAdmin();
+  const client = adminPb ?? pb;
+  const userService = createUserService(client);
 
   try {
     if (intent === "delete" && id && id !== "new") {

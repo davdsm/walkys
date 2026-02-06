@@ -33,6 +33,7 @@ export function useHeader(): {
     "/logout",
     "/orders",
     "/catalog",
+    "/checkout",
   ];
 
   // Routes with white backgrounds need dark variant

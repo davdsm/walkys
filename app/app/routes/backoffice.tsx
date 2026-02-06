@@ -15,6 +15,7 @@ import {
   X,
   Layout,
   Users,
+  ClipboardList,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -43,6 +44,7 @@ const navItems = [
   { to: "/backoffice/categories", label: "Categorias", icon: FolderOpen, end: false },
   { to: "/backoffice/collections", label: "Coleções", icon: Layers, end: false },
   { to: "/backoffice/contact-replies", label: "Mensagens", icon: MessageSquare, end: false },
+  { to: "/backoffice/orders", label: "Pedidos", icon: ClipboardList, end: false },
   { to: "/backoffice/users", label: "Utilizadores", icon: Users, end: false },
   { to: "/backoffice/translations", label: "Traduções", icon: Languages, end: false },
 ];

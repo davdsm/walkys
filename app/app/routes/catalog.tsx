@@ -1,6 +1,6 @@
 import { redirect, useLoaderData } from "react-router";
 import type { Route } from "../+types/root";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
 import { getLanguageFromRequest } from "~/lib/utils";
 import { createProductService, createCategoryService } from "~/lib/services";
 import CatalogPage from "~/components/Backoffice/CatalogPage";
@@ -26,9 +26,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     let productIds: string[] = [];
     let noProductsAssigned = false;
 
+    // Prefer admin client so we can read catalog_products and list products even when
+    // API rules restrict listing to admins. Fall back to user client.
+    const adminPb = await createPocketBaseAsAdmin();
+    const client = adminPb ?? pb;
+
     if (userId) {
         try {
-            const userRecord = await pb.collection("users").getOne(userId, { fields: "catalog_products" });
+            const userRecord = await client.collection("users").getOne(userId, { fields: "catalog_products" });
             const raw = (userRecord as { catalog_products?: unknown }).catalog_products;
             productIds = normalizeCatalogProductIds(raw);
         } catch {
@@ -39,8 +44,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     }
 
     const language = getLanguageFromRequest(request);
-    const productService = createProductService(pb, language);
-    const categoryService = createCategoryService(pb, language);
+    const productService = createProductService(client, language);
+    const categoryService = createCategoryService(client, language);
 
     const products =
         productIds.length > 0 ? await productService.getByIds(productIds) : [];

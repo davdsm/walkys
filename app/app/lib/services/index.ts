@@ -25,3 +25,16 @@ export type { CategoryServiceOptions, TranslatedCategory, CategoryRecord } from 
 // Export user service
 export { UserService, createUserService } from "./user.service";
 export type { UserRecord, CreateUserData, UpdateUserData } from "./user.service";
+
+// Export order service
+export {
+  createOrder,
+  getOrdersByUser,
+  getOrderCountByUser,
+  getAllOrders,
+  getOrderById,
+  updateOrder,
+  deleteOrder,
+} from "./order.service";
+export type { OrderRecord, OrderItem, OrderRecordWithUser, OrderStatus } from "./order.service";
+export { ORDER_STATUSES } from "./order.service";

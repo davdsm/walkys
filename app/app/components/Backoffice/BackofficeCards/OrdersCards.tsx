@@ -40,28 +40,38 @@ export const OrdersCards = ({
   title,
   date,
   icon,
-  info
+  info,
+  statusLabel,
 }: {
   title: string;
   date: string;
   info: Array<string>;
   icon?: keyof typeof svgIcons;
+  /** Optional order status label (e.g. "Novo", "Enviado") */
+  statusLabel?: string;
 }) => {
   const displayIcon = icon ? svgIcons[icon] : svgIcons["code"];
   return (
-    <motion.article className="pt-[23px] pl-[23px] pb-[23px] pr-[23px] group flex flex-col gap-[12px] text-left w-full md:h-[220px] h-[196px] bg-white text-lg duration-250 ease z-20 rounded-xl">
-      <div className="flex justify-between">
+    <motion.article className="pt-[23px] pl-[23px] pb-[23px] pr-[23px] group flex flex-col gap-[12px] text-left w-full md:min-h-[220px] min-h-[196px] bg-white text-lg duration-250 ease z-20 rounded-xl">
+      <div className="flex justify-between items-start">
         <div className="flex items-center gap-[12px]">
-          <div className="h-[22px] w-[22px] flex items-center justify-center">
+          <div className="h-[22px] w-[22px] flex items-center justify-center shrink-0">
             {displayIcon}
           </div>
           <p className="text-black self-center text-lg font-sans">
             {title}
           </p>
         </div>
-        <p className="text-black self-center text-xs font-sans">
-          {date}
-        </p>
+        <div className="flex flex-col items-end gap-1">
+          {statusLabel && (
+            <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-200 text-slate-700 shrink-0">
+              {statusLabel}
+            </span>
+          )}
+          <p className="text-black text-xs font-sans">
+            {date}
+          </p>
+        </div>
       </div>
       <div>
         <p className="leading-5 text-xs whitespace-pre-line">{Array.isArray(info) ? info.join("\n") : info}</p>

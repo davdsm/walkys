@@ -1,12 +1,20 @@
 import { useFetcher, useNavigate } from "react-router";
+import { motion } from "framer-motion";
 import BackofficeCard from "~/components/Backoffice/BackofficeCards";
+import { UserBackofficeLanguageSwitcher } from "~/components/Backoffice/UserBackofficeLanguageSwitcher";
+import { useLanguage } from "~/contexts";
 
 export default function BackofficePage({
     displayName,
+    catalogCount = 0,
+    ordersCount = 0,
 }: {
     displayName: string;
+    catalogCount?: number;
+    ordersCount?: number;
 }) {
-    const firstName = typeof displayName === "string" ? displayName.split(" ")[0] : "User";
+    const { t } = useLanguage();
+    const firstName = typeof displayName === "string" ? displayName.split(" ")[0] : t.userBackoffice.userFallback;
     const fetcher = useFetcher();
     const navigate = useNavigate();
 
@@ -17,21 +25,34 @@ export default function BackofficePage({
 
     return (
         <div className="min-h-full w-full bg-[#f1f1f1] flex justify-center md:pt-20">
-            <main className="pr-[45px] pl-[33px] flex flex-col gap-8 w-full max-w-[1300px]">
-                <h1 className="md:text-5xl/17 text-4xl/13 w-full font-bold text-black font-display pt-[58px] pb-[28px] uppercase">
+            <motion.main
+                className="pr-[45px] pl-[33px] flex flex-col gap-8 w-full max-w-[1300px]"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+            >
+                <div className="flex flex-wrap items-start justify-between gap-4 pt-[58px] pb-[28px]">
+                    <h1 className="md:text-5xl/17 text-4xl/13 font-bold text-black font-display uppercase">
                     <span>
-                        Hi {firstName}
+                        {t.userBackoffice.greetingHi} {firstName}
                         <span role="img" aria-label="waving hand">👋</span>,
                     </span>
-                    <span className="block">Good to have</span>
-                    <span className="block">you back!</span>
-                </h1>
+                    <span className="block">{t.userBackoffice.goodToHave}</span>
+                    <span className="block">{t.userBackoffice.youBack}</span>
+                    </h1>
+                    <UserBackofficeLanguageSwitcher />
+                </div>
 
-                <section className="flex flex-wrap gap-6">
+                <motion.section
+                    className="flex flex-wrap gap-6"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.1, ease: "easeOut" }}
+                >
                     <div className="w-full md:w-[calc(50%-12px)]">
                         <BackofficeCard
-                            title="Orders"
-                            info="16 Orders"
+                            title={t.userBackoffice.orders}
+                            info={`${ordersCount} ${ordersCount === 1 ? t.userBackoffice.order : t.userBackoffice.orders}`}
                             link="/orders"
                             icon={
                                 <svg
@@ -53,8 +74,8 @@ export default function BackofficePage({
                     </div>
                     <div className="w-full md:w-[calc(50%-12px)]">
                         <BackofficeCard
-                            title="Catalog"
-                            info="12 Products"
+                            title={t.userBackoffice.catalog}
+                            info={`${catalogCount} ${catalogCount === 1 ? t.userBackoffice.product : t.userBackoffice.products}`}
                             link="/catalog"
                             icon={
                                 <svg
@@ -80,14 +101,19 @@ export default function BackofficePage({
                             }
                         />
                     </div>
-                    <div className="w-full flex justify-between">
+                    <motion.div
+                        className="w-full flex justify-between"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.45, delay: 0.2, ease: "easeOut" }}
+                    >
                         <button type="submit" onClick={handleChangePassword} className="md:text-[15px] text-[12px] font-semibold cursor-pointer">
-                            change password
+                            {t.userBackoffice.changePassword}
                         </button>
                         <input type="hidde" name="redirectTo" />
                         <form action="/logout" method="post" className="ml-4 flex items-center gap-2 inline">
                             <button type="submit" className="flex items-center gap-[8px] md:text-[15px] text-[12px] font-semibold cursor-pointer">
-                                leave
+                                {t.userBackoffice.leave}
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
@@ -104,9 +130,9 @@ export default function BackofficePage({
                                 </svg>
                             </button>
                         </form>
-                    </div>
-                </section>
-            </main>
+                    </motion.div>
+                </motion.section>
+            </motion.main>
         </div>
     );
 }

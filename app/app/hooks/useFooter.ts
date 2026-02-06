@@ -34,6 +34,7 @@ export function useFooter(): {
     "/logout",
     "/catalog",
     "/orders",
+    "/checkout",
   ];
 
   // Routes with white backgrounds need dark variant

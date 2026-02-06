@@ -9,6 +9,12 @@ export interface UserRecord {
   created?: string;
   updated?: string;
   catalog_products?: string[] | { id: string }[];
+  /** Checkout / profile fields (stored for prefill). */
+  address?: string;
+  postal_code?: string;
+  nif?: string;
+  city?: string;
+  country?: string;
 }
 
 /** Payload to create a new user. */
@@ -28,12 +34,17 @@ export interface UpdateUserData {
   password?: string;
   passwordConfirm?: string;
   catalog_products?: string[];
+  address?: string;
+  postal_code?: string;
+  nif?: string;
+  city?: string;
+  country?: string;
 }
 
 const USERS_COLLECTION = "users";
 const DEFAULT_FIELDS = "id,email,name,admin,created";
 const LIST_FIELDS = "id,email,name,admin,created";
-const EDIT_FIELDS = "id,email,name,admin,catalog_products";
+const EDIT_FIELDS = "id,email,name,admin,catalog_products,address,postal_code,nif,city,country";
 
 /**
  * User service: CRUD for PocketBase users collection.
@@ -85,6 +96,11 @@ export class UserService {
       payload.password = data.password;
       payload.passwordConfirm = data.passwordConfirm;
     }
+    if (data.address !== undefined) payload.address = data.address;
+    if (data.postal_code !== undefined) payload.postal_code = data.postal_code;
+    if (data.nif !== undefined) payload.nif = data.nif;
+    if (data.city !== undefined) payload.city = data.city;
+    if (data.country !== undefined) payload.country = data.country;
     const record = await this.pb.collection(USERS_COLLECTION).update<UserRecord>(id, payload);
     return record;
   }

@@ -35,50 +35,71 @@ export const ProductInfo = ({
   opacity,
 }: ProductInfoProps) => {
   const { t } = useLanguage();
+  const fadeUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.45, ease: "easeOut" as const },
+  };
   return (
     <motion.div style={{ opacity }} className="space-y-6">
       {/* Breadcrumbs */}
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
+      <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0 }}>
+        <Breadcrumbs breadcrumbs={breadcrumbs} />
+      </motion.div>
 
       {/* Collection */}
       {collectionName && collectionSlug && (
-        <Link to={`/collection/${collectionSlug}`}>
-          <p className="text-sm text-neutral-600 uppercase tracking-wide pb-8">
-            {collectionName}
-          </p>
-        </Link>
+        <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.06 }}>
+          <Link to={`/collection/${collectionSlug}`}>
+            <p className="text-sm text-neutral-600 uppercase tracking-wide pb-8">
+              {collectionName}
+            </p>
+          </Link>
+        </motion.div>
       )}
 
       {/* Product Name */}
-      <h1 className="text-4xl lg:text-5xl font-bold text-black">
+      <motion.h1
+        className="text-4xl lg:text-5xl font-bold text-black"
+        {...fadeUp}
+        transition={{ ...fadeUp.transition, delay: 0.1 }}
+      >
         {productName}
-      </h1>
+      </motion.h1>
 
       {/* Description */}
-      <div className="space-y-2">
+      <motion.div
+        className="space-y-2"
+        {...fadeUp}
+        transition={{ ...fadeUp.transition, delay: 0.14 }}
+      >
         <h2 className="text-lg font-semibold text-black">
           {t.product.productInformation}
         </h2>
         <p className="text-neutral-700 leading-relaxed text-lg">
           {productDescription}
         </p>
-      </div>
+      </motion.div>
 
       {/* Size Selector */}
-      <SizeSelector
-        sizes={sizes}
-        selectedSize={selectedSize}
-        onSizeSelect={onSizeSelect}
-        language={language}
-      />
+      <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.18 }}>
+        <SizeSelector
+          sizes={sizes}
+          selectedSize={selectedSize}
+          onSizeSelect={onSizeSelect}
+          language={language}
+        />
+      </motion.div>
 
       {/* Action Buttons */}
-      <ProductActions
-        onBack={onBack}
-        onOrder={onOrder}
-        language={language}
-        variant="desktop"
-      />
+      <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.22 }}>
+        <ProductActions
+          onBack={onBack}
+          onOrder={onOrder}
+          language={language}
+          variant="desktop"
+        />
+      </motion.div>
     </motion.div>
   );
 };
