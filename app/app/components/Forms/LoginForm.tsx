@@ -135,11 +135,7 @@ export const LoginForm = () => {
                 </Button>
             </form>
 
-            <div className="text-center text-sm text-gray-500 mt-4">
-                {t.login.noAccount} <Link to="/auth/signup" className="text-black font-bold hover:underline">{t.login.signUp}</Link>
-            </div>
-
-            <Link to="/" className="text-center text-xs text-gray-500 underline">{t.login.backToHome}</Link>
+            <Link to="/" className="text-center text-xs text-gray-500 underline mt-4 block">{t.login.backToHome}</Link>
         </div>
     );
 };

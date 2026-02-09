@@ -26,7 +26,6 @@ export function useHeader(): {
   // Routes where Header should NOT be displayed
   const hideHeaderRoutes = [
     "/auth/login",
-    "/auth/signup",
     "/dashboard",
     "/backoffice",
     "/forgot-password",

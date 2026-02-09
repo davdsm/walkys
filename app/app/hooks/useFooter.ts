@@ -27,7 +27,6 @@ export function useFooter(): {
   // Routes where Footer should NOT be displayed
   const hideFooterRoutes = [
     "/auth/login",
-    "/auth/signup",
     "/dashboard",
     "/backoffice",
     "/forgot-password",

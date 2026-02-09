@@ -443,7 +443,7 @@ export const translations = {
         // Account / Auth
         account: {
             myAccount: "minha conta",
-            loginRegister: "entrar / registar",
+            loginRegister: "entrar",
         },
     },
     en: {
@@ -890,7 +890,7 @@ export const translations = {
         // Account / Auth
         account: {
             myAccount: "my account",
-            loginRegister: "login / register",
+            loginRegister: "login",
         },
     },
 } as const;

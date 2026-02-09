@@ -1,16 +1,12 @@
 import type { Route } from "../+types/root";
-import { useParams } from "react-router";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { LoginForm } from "~/components/Forms/LoginForm";
-import { SignupForm } from "~/components/Forms/SignupForm";
 
 import { redirect, data } from "react-router";
-import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
-import { createNotification } from "~/lib/services";
-import { getAdminEmail, getLanguageFromRequest, sendEmail, buildNewUserAdmin } from "~/lib/email";
+import { createPocketBase } from "~/lib/pocketbase";
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
 
   if (pb.authStore.isValid) {
@@ -18,60 +14,22 @@ export async function loader({ request }: Route.LoaderArgs) {
     return redirect(user?.admin === true ? "/backoffice" : "/dashboard");
   }
 
+  if (params.mode && params.mode !== "login") {
+    return redirect("/auth/login");
+  }
+
   return null;
 }
 
-export async function action({ request, params }: Route.ActionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const pb = createPocketBase(request);
   const formData = await request.formData();
-  const mode = params.mode || "login";
 
   try {
-    if (mode === "login") {
-      const email = formData.get("email") as string;
-      const password = formData.get("password") as string;
-      await pb.collection("users").authWithPassword(email, password);
-    } else {
-      const email = formData.get("email") as string;
-      const password = formData.get("password") as string;
-      const passwordConfirm = formData.get("repeatPassword") as string;
-      const name = formData.get("fullName") as string;
-      const birthDate = formData.get("birthDate") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    await pb.collection("users").authWithPassword(email, password);
 
-      // Create user
-      const userRecord = await pb.collection("users").create({
-        email,
-        password,
-        passwordConfirm,
-        name,
-        birthDate: new Date(birthDate).toISOString(),
-      });
-
-      // Auto login after signup
-      await pb.collection("users").authWithPassword(email, password);
-
-      // Notify admin of new user
-      try {
-        const adminPb = await createPocketBaseAsAdmin();
-        if (adminPb) {
-          await createNotification(adminPb, {
-            type: "user_registered",
-            user: null,
-            payload: { userId: userRecord.id, email },
-          });
-        }
-        const lang = getLanguageFromRequest(request);
-        const adminTo = getAdminEmail();
-        if (adminTo) {
-          const { subject, html } = buildNewUserAdmin(lang, email, userRecord.id);
-          await sendEmail(adminTo, subject, html);
-        }
-      } catch {
-        // ignore notification errors
-      }
-    }
-
-    // Require an "admin" boolean field on the users collection in PocketBase; admins are redirected to /backoffice
     const user = pb.authStore.model as { admin?: boolean } | null;
     const isAdmin = user?.admin === true;
     const redirectTo = isAdmin ? "/backoffice" : "/dashboard";
@@ -82,7 +40,6 @@ export async function action({ request, params }: Route.ActionArgs) {
     });
   } catch (error: any) {
     console.error("Auth Error:", error);
-    console.error("Original Error:", error.originalError);
     return data(
       {
         error:
@@ -95,24 +52,14 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 }
 
-export function meta({ params }: Route.MetaArgs) {
-  const mode = params.mode || "login";
+export function meta() {
   return [
-    { title: `Walkys - ${mode === "login" ? "Login" : "Sign Up"}` },
-    {
-      name: "description",
-      content:
-        mode === "login"
-          ? "Login to your Walkys account"
-          : "Create your Walkys account",
-    },
+    { title: "Walkys - Login" },
+    { name: "description", content: "Login to your Walkys account" },
   ];
 }
 
 export const Auth = () => {
-  const params = useParams();
-  const mode = params.mode || "login";
-  const isLogin = mode === "login";
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -204,17 +151,7 @@ export const Auth = () => {
               transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="w-full max-w-md bg-white rounded-[20px] p-12 md:p-0"
             >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={mode}
-                  initial={{ opacity: 0, x: isLogin ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: isLogin ? 20 : -20 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  {isLogin ? <LoginForm /> : <SignupForm />}
-                </motion.div>
-              </AnimatePresence>
+              <LoginForm />
             </motion.div>
           </motion.div>
         </div>
