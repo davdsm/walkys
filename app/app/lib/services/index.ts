@@ -38,3 +38,8 @@ export {
 } from "./order.service";
 export type { OrderRecord, OrderItem, OrderRecordWithUser, OrderStatus } from "./order.service";
 export { ORDER_STATUSES } from "./order.service";
+
+// Export notifications service
+export type { NotificationRecord, NotificationType, CreateNotificationData } from "./notification.service";
+export { getAdminNotifications, getUserNotifications, createNotification, markNotificationsAsRead } from "./notification.service";
+

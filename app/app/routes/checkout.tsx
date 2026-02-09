@@ -2,7 +2,14 @@ import { redirect, useLoaderData, useNavigation, Form, useSearchParams } from "r
 import { Link } from "react-router";
 import type { Route } from "./+types/checkout";
 import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
-import { createUserService, createOrder, type OrderItem } from "~/lib/services";
+import { createUserService, createOrder, createNotification, type OrderItem } from "~/lib/services";
+import {
+  getAdminEmail,
+  getLanguageFromRequest,
+  sendEmail,
+  buildOrderReceivedUser,
+  buildNewOrderAdmin,
+} from "~/lib/email";
 import { useCart } from "~/contexts/CartContext";
 import { useLanguage } from "~/contexts";
 
@@ -87,7 +94,27 @@ export async function action({ request }: Route.ActionArgs) {
       country: country || undefined,
     });
 
-    await createOrder(client, authUser.id, items);
+    const order = await createOrder(client, authUser.id, items);
+    await createNotification(client, {
+      type: "order_new",
+      user: null,
+      payload: { orderId: order.id },
+    });
+
+    const lang = getLanguageFromRequest(request);
+    const userRecord = await client.collection("users").getOne(authUser.id, { fields: "email,name" }) as { email?: string; name?: string };
+    const userEmail = userRecord?.email ?? email;
+    const userName = userRecord?.name ?? (name || userEmail || "—");
+
+    const { subject: userSubject, html: userHtml } = buildOrderReceivedUser(lang, order.id, userName);
+    await sendEmail(userEmail, userSubject, userHtml);
+
+    const adminTo = getAdminEmail();
+    if (adminTo) {
+      const { subject: adminSubject, html: adminHtml } = buildNewOrderAdmin(lang, order.id);
+      await sendEmail(adminTo, adminSubject, adminHtml);
+    }
+
     return redirect("/orders?placed=1");
   } catch (err) {
     console.error("Checkout error:", err);

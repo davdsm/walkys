@@ -1,6 +1,6 @@
 import { redirect, Outlet, Link, useLocation, Form, useLoaderData } from "react-router";
 import type { Route } from "./+types/backoffice";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
 import {
   LayoutDashboard,
   FileText,
@@ -18,6 +18,29 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { useState } from "react";
+import { NotificationBell, type NotificationItem } from "~/components/Backoffice/NotificationBell";
+import { getAdminNotifications, markNotificationsAsRead, type NotificationRecord } from "~/lib/services";
+
+export async function action({ request }: Route.ActionArgs) {
+  const pb = createPocketBase(request);
+  if (!pb.authStore.isValid) return null;
+  const user = pb.authStore.model as { admin?: boolean } | null;
+  if (!user?.admin) return null;
+
+  const formData = await request.formData();
+  if (formData.get("intent") !== "markRead") return null;
+  const ids = formData.getAll("ids").filter((v): v is string => typeof v === "string" && v.length > 0);
+  if (ids.length === 0) return null;
+
+  try {
+    const adminPb = await createPocketBaseAsAdmin();
+    const client = adminPb ?? pb;
+    await markNotificationsAsRead(client, ids);
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
@@ -28,7 +51,15 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user?.admin) {
     return redirect("/dashboard");
   }
-  return { user };
+  let notifications: NotificationRecord[] = [];
+  try {
+    const adminPb = await createPocketBaseAsAdmin();
+    const client = adminPb ?? pb;
+    notifications = await getAdminNotifications(client);
+  } catch {
+    notifications = [];
+  }
+  return { user, notifications };
 }
 
 export function meta() {
@@ -83,8 +114,57 @@ function SidebarNav({
 
 export default function BackofficeLayout() {
   const location = useLocation();
-  const { user } = useLoaderData<typeof loader>();
+  const { user, notifications } = useLoaderData<typeof loader>();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const adminNotifications: NotificationItem[] = (notifications ?? []).map(
+    (n: NotificationRecord) => {
+      let title = "";
+      let message = "";
+      let href: string | undefined;
+
+      const payload = n.payload as Record<string, string> | undefined;
+
+      switch (n.type) {
+        case "order_new":
+          title = "Novo pedido";
+          message = "Foi registado um novo pedido.";
+          href = payload?.orderId
+            ? `/backoffice/orders/${payload.orderId}`
+            : "/backoffice/orders";
+          break;
+        case "message_new":
+          title = "Nova mensagem";
+          message = "Recebeu uma nova mensagem de contacto.";
+          href = payload?.messageId
+            ? `/backoffice/contact-replies/${payload.messageId}`
+            : "/backoffice/contact-replies";
+          break;
+        case "user_registered":
+          title = "Novo utilizador";
+          message = "Um novo utilizador registou-se.";
+          href = payload?.userId
+            ? `/backoffice/users/${payload.userId}`
+            : "/backoffice/users";
+          break;
+        default:
+          title = "Notificação";
+          message =
+            typeof n.payload === "string"
+              ? n.payload
+              : "";
+      }
+
+      return {
+        id: n.id,
+        title,
+        message,
+        read: n.read,
+        created: n.created,
+        href,
+      };
+    }
+  );
 
   return (
     <div
@@ -201,6 +281,9 @@ export default function BackofficeLayout() {
             <Menu className="w-6 h-6" aria-hidden />
           </button>
           <span className="md:sr-only font-semibold text-slate-800">Backoffice</span>
+          <div className="ml-auto flex items-center gap-2 relative">
+            <NotificationBell items={adminNotifications} markReadAction="/backoffice" />
+          </div>
         </header>
 
         <main

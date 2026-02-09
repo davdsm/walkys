@@ -6,7 +6,9 @@ import { LoginForm } from "~/components/Forms/LoginForm";
 import { SignupForm } from "~/components/Forms/SignupForm";
 
 import { redirect, data } from "react-router";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
+import { createNotification } from "~/lib/services";
+import { getAdminEmail, getLanguageFromRequest, sendEmail, buildNewUserAdmin } from "~/lib/email";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
@@ -37,7 +39,7 @@ export async function action({ request, params }: Route.ActionArgs) {
       const birthDate = formData.get("birthDate") as string;
 
       // Create user
-      await pb.collection("users").create({
+      const userRecord = await pb.collection("users").create({
         email,
         password,
         passwordConfirm,
@@ -47,6 +49,26 @@ export async function action({ request, params }: Route.ActionArgs) {
 
       // Auto login after signup
       await pb.collection("users").authWithPassword(email, password);
+
+      // Notify admin of new user
+      try {
+        const adminPb = await createPocketBaseAsAdmin();
+        if (adminPb) {
+          await createNotification(adminPb, {
+            type: "user_registered",
+            user: null,
+            payload: { userId: userRecord.id, email },
+          });
+        }
+        const lang = getLanguageFromRequest(request);
+        const adminTo = getAdminEmail();
+        if (adminTo) {
+          const { subject, html } = buildNewUserAdmin(lang, email, userRecord.id);
+          await sendEmail(adminTo, subject, html);
+        }
+      } catch {
+        // ignore notification errors
+      }
     }
 
     // Require an "admin" boolean field on the users collection in PocketBase; admins are redirected to /backoffice

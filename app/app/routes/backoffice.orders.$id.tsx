@@ -6,11 +6,13 @@ import {
   getOrderById,
   updateOrder,
   deleteOrder,
+  createNotification,
   ORDER_STATUSES,
   type OrderRecordWithUser,
   type OrderItem,
   type OrderStatus,
 } from "~/lib/services";
+import { sendEmail, buildOrderStatusChangedUser } from "~/lib/email";
 import type { Route } from "./+types/backoffice.orders.$id";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -57,7 +59,22 @@ export async function action({ request, params }: Route.ActionArgs) {
     if (intent === "updateStatus") {
       const status = formData.get("status") as OrderStatus | null;
       if (status && ORDER_STATUSES.includes(status)) {
+        const order = await getOrderById(client, id);
+        const oldStatus = (order?.status ?? "new") as OrderStatus;
         await updateOrder(client, id, { status });
+        if (order && oldStatus !== status) {
+          await createNotification(client, {
+            type: "order_status_changed",
+            user: order.user,
+            payload: { orderId: id, oldStatus, newStatus: status },
+          });
+          const userEmail = order.expand?.user?.email;
+          if (userEmail) {
+            const lang = "pt";
+            const { subject, html } = buildOrderStatusChangedUser(lang, id, status, userEmail);
+            await sendEmail(userEmail, subject, html);
+          }
+        }
       }
       return { ok: true };
     }
@@ -67,7 +84,22 @@ export async function action({ request, params }: Route.ActionArgs) {
       const itemsJson = formData.get("items") as string | null;
       const updates: { items?: OrderItem[]; status?: OrderStatus } = {};
       if (status && ORDER_STATUSES.includes(status)) {
+        const order = await getOrderById(client, id);
+        const oldStatus = (order?.status ?? "new") as OrderStatus;
         updates.status = status;
+        if (order && oldStatus !== status) {
+          await createNotification(client, {
+            type: "order_status_changed",
+            user: order.user,
+            payload: { orderId: id, oldStatus, newStatus: status },
+          });
+          const userEmail = order.expand?.user?.email;
+          if (userEmail) {
+            const lang = "pt";
+            const { subject, html } = buildOrderStatusChangedUser(lang, id, status, userEmail);
+            await sendEmail(userEmail, subject, html);
+          }
+        }
       }
       if (itemsJson) {
         let items: OrderItem[];

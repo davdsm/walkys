@@ -3,16 +3,23 @@ import { motion } from "framer-motion";
 import BackofficeCard from "~/components/Backoffice/BackofficeCards";
 import { UserBackofficeLanguageSwitcher } from "~/components/Backoffice/UserBackofficeLanguageSwitcher";
 import { useLanguage } from "~/contexts";
+import { NotificationBell, type NotificationItem } from "~/components/Backoffice/NotificationBell";
+
+interface BackofficePageProps {
+    displayName: string;
+    catalogCount?: number;
+    ordersCount?: number;
+    notifications?: NotificationItem[];
+    markReadAction?: string;
+}
 
 export default function BackofficePage({
     displayName,
     catalogCount = 0,
     ordersCount = 0,
-}: {
-    displayName: string;
-    catalogCount?: number;
-    ordersCount?: number;
-}) {
+    notifications = [],
+    markReadAction,
+}: BackofficePageProps) {
     const { t } = useLanguage();
     const firstName = typeof displayName === "string" ? displayName.split(" ")[0] : t.userBackoffice.userFallback;
     const fetcher = useFetcher();
@@ -33,14 +40,17 @@ export default function BackofficePage({
             >
                 <div className="flex flex-wrap items-start justify-between gap-4 pt-[58px] pb-[28px]">
                     <h1 className="md:text-5xl/17 text-4xl/13 font-bold text-black font-display uppercase">
-                    <span>
-                        {t.userBackoffice.greetingHi} {firstName}
-                        <span role="img" aria-label="waving hand">👋</span>,
-                    </span>
-                    <span className="block">{t.userBackoffice.goodToHave}</span>
-                    <span className="block">{t.userBackoffice.youBack}</span>
+                        <span>
+                            {t.userBackoffice.greetingHi} {firstName}
+                            <span role="img" aria-label="waving hand">👋</span>,
+                        </span>
+                        <span className="block">{t.userBackoffice.goodToHave}</span>
+                        <span className="block">{t.userBackoffice.youBack}</span>
                     </h1>
-                    <UserBackofficeLanguageSwitcher />
+                    <div className="flex items-center gap-2">
+                        <NotificationBell items={notifications} markReadAction={markReadAction} />
+                        <UserBackofficeLanguageSwitcher />
+                    </div>
                 </div>
 
                 <motion.section

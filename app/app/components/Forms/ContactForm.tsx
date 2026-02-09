@@ -1,15 +1,15 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect } from "react";
+import { useFetcher } from "react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useLanguage } from "~/contexts";
 import { Input } from "../Elements/Input/Input";
 import { Button } from "../Elements/Button/Button";
-import { createPocketBase } from "~/lib/pocketbase";
-import { createContactService } from "~/lib/services";
 import confetti from "canvas-confetti";
 
 export const ContactForm = () => {
   const { t } = useLanguage();
+  const fetcher = useFetcher<{ ok?: boolean; error?: string }>();
   const [formData, setFormData] = useState({
     name: "",
     subject: "",
@@ -17,63 +17,27 @@ export const ContactForm = () => {
     email: "",
     message: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus("idle");
+  const isSubmitting = fetcher.state === "submitting";
+  const submitStatus =
+    fetcher.data?.ok === true
+      ? "success"
+      : fetcher.data?.ok === false
+        ? "error"
+        : "idle";
 
-    try {
-      const pb = createPocketBase();
-      const contactService = createContactService(pb);
-
-      await contactService.submitContactForm({
-        Name: formData.name,
-        Subject: formData.subject,
-        Company: formData.company,
-        Email: formData.email,
-        Message: formData.message,
-      });
-
-      // Artificial delay before success
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-
-      setSubmitStatus("success");
-      setFormData({
-        name: "",
-        subject: "",
-        company: "",
-        email: "",
-        message: "",
-      });
-
-      // Trigger confetti
+  useEffect(() => {
+    if (fetcher.data?.ok === true) {
+      setFormData({ name: "", subject: "", company: "", email: "", message: "" });
       const button = document.getElementById("contact-submit-btn");
       if (button) {
         const rect = button.getBoundingClientRect();
         const x = (rect.left + rect.right) / 2 / window.innerWidth;
         const y = (rect.top + rect.bottom) / 2 / window.innerHeight;
-
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { x, y },
-        });
+        confetti({ particleCount: 100, spread: 70, origin: { x, y } });
       }
-
-      // Clear success message after 5 seconds
-      setTimeout(() => setSubmitStatus("idle"), 5000);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      setSubmitStatus("error");
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+  }, [fetcher.data]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -101,12 +65,9 @@ export const ContactForm = () => {
         </a>
       </motion.div>
 
-      <motion.form
-        onSubmit={handleSubmit}
+      <fetcher.Form
+        method="post"
         className="space-y-12 md:col-start-2 md:row-span-2"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.8 }}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
           <Input
@@ -125,7 +86,6 @@ export const ContactForm = () => {
             variant="minimal"
             value={formData.subject}
             onChange={handleChange}
-            required
           />
           <Input
             label={t.contact.company}
@@ -189,7 +149,7 @@ export const ContactForm = () => {
             <p className="text-red-600 font-medium">{t.contact.error}</p>
           )}
         </div>
-      </motion.form>
+      </fetcher.Form>
 
       <div className="mt-32 md:mt-0 flex flex-col md:flex-row justify-between items-start md:items-end gap-12 md:col-start-1 md:row-start-2 md:self-end">
         <motion.div

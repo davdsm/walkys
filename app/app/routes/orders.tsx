@@ -81,10 +81,10 @@ export default function Orders() {
                         </h2>
                         <p className="text-slate-600 mb-6">{t.userBackoffice.orderSuccessMessage}</p>
                         <Link
-                            to="/"
+                            to="/orders"
                             className="inline-block w-full py-3 px-4 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-colors"
                         >
-                            {t.userBackoffice.goToHome}
+                            {t.userBackoffice.goToOrders}
                         </Link>
                     </div>
                 </div>
