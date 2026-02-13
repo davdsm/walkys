@@ -74,16 +74,16 @@ export const ProductCard = ({
   return (
     <Link to={link} className="no-underline">
       <motion.article
-        className="group flex flex-col text-left bg-white text-center text-lg hover:bg-black duration-250 ease z-20 rounded-xl pt-[10px] px-[6px] pb-[12px]"
+        className="group flex flex-col text-left bg-white text-center text-lg hover:bg-black duration-250 ease z-20 rounded-xl pt-2.5 px-1.5 pb-3"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="w-full md:w-full h-[270px] rounded-[14px] bg-[#f3f3f3] relative overflow-hidden mb-[10px]">
+        <div className="w-full md:w-full h-[270px] rounded-xl bg-[#f3f3f3] relative overflow-hidden mb-2.5">
           {defaultMediaType === "video" ? (
             <video
               ref={defaultVideoRef}
               src={media.image}
-              className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-contain transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
+              className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
               loop
               muted
               playsInline
@@ -92,7 +92,7 @@ export const ProductCard = ({
           ) : (
             <img
               src={media.image}
-              className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-contain transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
+              className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
               alt={name}
             />
           )}
@@ -101,7 +101,7 @@ export const ProductCard = ({
               <video
                 ref={hoverVideoRef}
                 src={media.hover}
-                className={`absolute inset-0 h-full w-full border-none rounded-[14px] object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
+                className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
                 loop
                 muted
                 playsInline
@@ -109,13 +109,13 @@ export const ProductCard = ({
             ) : (
               <img
                 src={media.hover}
-                className={`absolute inset-0 h-full w-full border-none rounded-[14px] object-contain transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
+                className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
                 alt={name}
               />
             ))}
         </div>
         <div className="flex justify-between items-start w-full">
-          <p className="text-black group-hover:text-white leading-[1.5] text-[13px] max-w-[79px]">
+          <p className="text-black group-hover:text-white leading-[1.5] text-xs max-w-[79px]">
             {name}
           </p>
         </div>

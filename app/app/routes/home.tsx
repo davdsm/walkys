@@ -16,6 +16,7 @@ import {
 import { mapCategoriesWithProducts } from "~/utils/categories";
 import { useLoaderData } from "react-router";
 import { getLanguageFromRequest } from "~/lib/utils";
+import HomepageCard from "~/components/Cards/HomepageCard";
 
 // Loader: Fetch data on the server/route level
 export async function loader({ request }: Route.LoaderArgs) {
@@ -31,24 +32,30 @@ export async function loader({ request }: Route.LoaderArgs) {
 
     // Get products from the slider-products-list section
     const sliderProductsSection = homepageData.find(
-      (p) => p.section_id === "slider-products-list"
+      (p) => p.section_id === "slider-products-list",
     );
 
     let homepageProducts: any[] = [];
-    
+
     if (sliderProductsSection?.products && Array.isArray(sliderProductsSection.products)) {
       // Check if products are already expanded (objects with id property) or just IDs (strings)
       const firstProduct = sliderProductsSection.products[0];
-      
+
       if (typeof firstProduct === "string") {
         // Products are just IDs, fetch them
-        const productIds = sliderProductsSection.products.filter((id: any): id is string => typeof id === "string");
+        const productIds = sliderProductsSection.products.filter(
+          (id: any): id is string => typeof id === "string",
+        );
         if (productIds.length > 0) {
           homepageProducts = await productService.getByIds(productIds, {
             expand: "sizes,collection,category",
           });
         }
-      } else if (firstProduct && typeof firstProduct === "object" && "id" in firstProduct) {
+      } else if (
+        firstProduct &&
+        typeof firstProduct === "object" &&
+        "id" in firstProduct
+      ) {
         // Products are already expanded by PageService, use them directly
         // They should already be transformed by PageService
         homepageProducts = sliderProductsSection.products;
@@ -56,27 +63,42 @@ export async function loader({ request }: Route.LoaderArgs) {
     }
 
     // Fallback to featured products if no products found in homepage
-    const featuredProducts = homepageProducts.length > 0 
-      ? homepageProducts 
+    const featuredProducts = homepageProducts.length > 0
+      ? homepageProducts
       : await productService.getFeatured(6, {
-          expand: "sizes,collection,category",
-        });
+        expand: "sizes,collection,category",
+      });
 
     // Card categories: prefer "categories-section-highlighted"; fallback to "categories-section-list" (backward compat)
-    const categoriesSectionHighlighted = homepageData.find((p) => p.section_id === "categories-section-highlighted");
-    const categoriesSectionList = homepageData.find((p) => p.section_id === "categories-section-list");
-    const categoriesSectionTitle = homepageData.find((p) => p.section_id === "categories-section-title");
-    const categoriesSectionSubtitle = homepageData.find((p) => p.section_id === "categories-section-subtitle");
+    const categoriesSectionHighlighted = homepageData.find(
+      (p) => p.section_id === "categories-section-highlighted",
+    );
+    const categoriesSectionList = homepageData.find(
+      (p) => p.section_id === "categories-section-list",
+    );
+    const categoriesSectionTitle = homepageData.find(
+      (p) => p.section_id === "categories-section-title",
+    );
+    const categoriesSectionSubtitle = homepageData.find(
+      (p) => p.section_id === "categories-section-subtitle",
+    );
 
-    const highlightedCategories = categoriesSectionHighlighted?.categories && Array.isArray(categoriesSectionHighlighted.categories) && categoriesSectionHighlighted.categories.length > 0
-      ? categoriesSectionHighlighted.categories
-      : null;
+    const highlightedCategories =
+      categoriesSectionHighlighted?.categories &&
+      Array.isArray(categoriesSectionHighlighted.categories) &&
+      categoriesSectionHighlighted.categories.length > 0
+        ? categoriesSectionHighlighted.categories
+        : null;
     const useHighlightedForCards = !!highlightedCategories?.length;
 
     let featureCategories: any[] = [];
     if (useHighlightedForCards) {
       featureCategories = highlightedCategories;
-    } else if (categoriesSectionList?.categories && Array.isArray(categoriesSectionList.categories) && categoriesSectionList.categories.length > 0) {
+    } else if (
+      categoriesSectionList?.categories &&
+      Array.isArray(categoriesSectionList.categories) &&
+      categoriesSectionList.categories.length > 0
+    ) {
       featureCategories = categoriesSectionList.categories;
     } else {
       try {
@@ -87,16 +109,33 @@ export async function loader({ request }: Route.LoaderArgs) {
     }
 
     // List below (categories + products): only when cards come from highlighted; then list comes from categories-section-list
-    let listCategoriesWithProducts: Awaited<ReturnType<typeof mapCategoriesWithProducts>> = [];
-    if (useHighlightedForCards && categoriesSectionList?.categories && Array.isArray(categoriesSectionList.categories) && categoriesSectionList.categories.length > 0) {
+    let listCategoriesWithProducts: Awaited<
+      ReturnType<typeof mapCategoriesWithProducts>
+    > = [];
+    if (
+      useHighlightedForCards &&
+      categoriesSectionList?.categories &&
+      Array.isArray(categoriesSectionList.categories) &&
+      categoriesSectionList.categories.length > 0
+    ) {
       const listCategories = categoriesSectionList.categories;
-      const listCategoryIds = listCategories.map((c: any) => typeof c === "string" ? c : c?.id).filter(Boolean) as string[];
+      const listCategoryIds = listCategories
+        .map((c: any) => (typeof c === "string" ? c : c?.id))
+        .filter(Boolean) as string[];
       if (listCategoryIds.length > 0) {
-        const listCats = listCategories.every((c: any) => typeof c === "object" && c?.id)
-          ? listCategories as any[]
+        const listCats = listCategories.every(
+          (c: any) => typeof c === "object" && c?.id,
+        )
+          ? (listCategories as any[])
           : await categoryService.getByIds(listCategoryIds);
-        const products = await productService.getByCategoryIds(listCategoryIds, { expand: "category,sizes" });
-        listCategoriesWithProducts = mapCategoriesWithProducts(listCats, products);
+        const products = await productService.getByCategoryIds(
+          listCategoryIds,
+          { expand: "category,sizes" },
+        );
+        listCategoriesWithProducts = mapCategoriesWithProducts(
+          listCats,
+          products,
+        );
       }
     }
 
@@ -153,7 +192,7 @@ export const Home = () => {
         const [entry] = entries;
         setBodyBg(entry?.isIntersecting ? HERO_BG : DEFAULT_BG);
       },
-      { threshold: 0.1, rootMargin: "0px" }
+      { threshold: 0.1, rootMargin: "0px" },
     );
 
     setBodyBg(DEFAULT_BG);
@@ -175,26 +214,35 @@ export const Home = () => {
 
   if (!effectiveData) return null;
 
-  const { homepageData, featuredProducts, featureCategories, listCategoriesWithProducts, categoriesSectionTitle, categoriesSectionSubtitle, language } =
-    effectiveData;
+  const {
+    homepageData,
+    featuredProducts,
+    featureCategories,
+    listCategoriesWithProducts,
+    categoriesSectionTitle,
+    categoriesSectionSubtitle,
+    language,
+  } = effectiveData;
 
   const heroSection = {
     title: homepageData.find((p) => p.section_id === "intro-title").value,
     subtitle: homepageData.find((p) => p.section_id === "intro-text").value,
     product: homepageData.find((p) => p.section_id === "intro-product")
       .products[0],
-    categories: homepageData.find((p) => p.section_id === "intro-categories")
-      .categories.map((c: any) => ({
-        name: c.name,
-        link: `/category/${c.slug}`,
-      })) || [],
+    categories:
+      homepageData
+        .find((p) => p.section_id === "intro-categories")
+        .categories.map((c: any) => ({
+          name: c.name,
+          link: `/category/${c.slug}`,
+        })) || [],
   };
 
   const productSliderSection = {
     title: homepageData.find((p) => p.section_id === "slider-products-title")
       .value,
     subtitle: homepageData.find(
-      (p) => p.section_id === "slider-products-subtitle"
+      (p) => p.section_id === "slider-products-subtitle",
     ).value,
     products: homepageData.find((p) => p.section_id === "slider-products-list")
       .products,
@@ -204,15 +252,15 @@ export const Home = () => {
     <section className="w-full flex flex-col items-start justify-start relative transition-colors duration-500">
       <div ref={heroRef} className="w-full">
         <HomeHero
-        title={heroSection.title}
-        subtitle={heroSection.subtitle}
-        product={{
-          image: heroSection.product.media[0],
-          name: heroSection.product.name,
-          link: `/product/${heroSection.product.slug}`,
-        }}
-        categories={heroSection.categories}
-      />
+          title={heroSection.title}
+          subtitle={heroSection.subtitle}
+          product={{
+            image: heroSection.product.media[0],
+            name: heroSection.product.name,
+            link: `/product/${heroSection.product.slug}`,
+          }}
+          categories={heroSection.categories}
+        />
       </div>
 
       <article className="p-6 lg:p-20 w-full">
@@ -240,31 +288,62 @@ export const Home = () => {
       <article className="w-full px-4 md:px-20 flex flex-col gap-6">
         {(categoriesSectionTitle || categoriesSectionSubtitle) && (
           <div className="text-center space-y-1">
-            {categoriesSectionTitle && <h2 className="text-2xl font-bold text-slate-900">{categoriesSectionTitle}</h2>}
-            {categoriesSectionSubtitle && <p className="text-slate-600">{categoriesSectionSubtitle}</p>}
+            {categoriesSectionTitle && (
+              <h2 className="text-2xl font-bold text-slate-900">
+                {categoriesSectionTitle}
+              </h2>
+            )}
+            {categoriesSectionSubtitle && (
+              <p className="text-slate-600">{categoriesSectionSubtitle}</p>
+            )}
           </div>
         )}
         <div className="flex justify-between gap-10">
-        {featureCategories?.map((featureCategory, index) => (
-          <div
-            key={featureCategory.id}
-            className={`${featureCategories?.length === 1 ? "w-full" : `md:w-1/2 w-full ${index === 1 ? "hidden md:block" : ""}`}`}
-          >
-            <CategoryCard
-              name={featureCategory.name}
-              description={featureCategory.description}
-              media={{
-                image: featureCategory.media,
-                hover: featureCategory.hover,
-              }}
-              link={`/category/${featureCategory.slug}`}
-            />
-          </div>
-        ))}
+          {featureCategories?.map((featureCategory, index) => (
+            <div
+              key={featureCategory.id}
+              className={`${featureCategories?.length === 1 ? "w-full" : `md:w-1/2 w-full ${index === 1 ? "hidden md:block" : ""}`}`}
+            >
+              <CategoryCard
+                name={featureCategory.name}
+                description={featureCategory.description}
+                media={{
+                  image: featureCategory.media,
+                  hover: featureCategory.hover,
+                }}
+                link={`/category/${featureCategory.slug}`}
+              />
+            </div>
+          ))}
         </div>
         {listCategoriesWithProducts?.length > 0 && (
-          <CategoriesList categories={listCategoriesWithProducts} language={language} />
+          <CategoriesList
+            categories={listCategoriesWithProducts}
+            language={language}
+          />
         )}
+
+        <HomepageCard
+          variant="light"
+          cardImage={{
+            image: "/images/hero_sandals.png",
+          }}
+          title="Loafers"
+          subtitle="Isto é um texto de uma categoria como loafers ou assim, algo com até bastantes linhas  para dar uma hipótese de colocar uns textos bonitos"
+          link="#"
+        />
+      </article>
+
+      <article className="w-full h-[585px] md:h-screen px-4 md:px-20 md:pt-13 md:pb-[113px]">
+        <HomepageCard
+          variant="light"
+          cardImage={{
+            image: "/images/hero_sandals.png",
+          }}
+          title="Loafers"
+          subtitle="Isto é um texto de uma categoria como loafers ou assim, algo com até bastantes linhas  para dar uma hipótese de colocar uns textos bonitos"
+          link="#"
+        />
       </article>
 
       <article className="w-full pt-8 md:px-20 rounded-xl">

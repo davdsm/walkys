@@ -1,6 +1,5 @@
 import { motion } from "motion/react";
 import { useState, useEffect, useRef } from "react";
-import { Button } from "../../Elements/Button/Button";
 import { Link } from "react-router";
 import { getMediaType } from "~/lib/utils";
 
