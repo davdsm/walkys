@@ -37,7 +37,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 
     let homepageProducts: any[] = [];
 
-    if (sliderProductsSection?.products && Array.isArray(sliderProductsSection.products)) {
+    if (
+      sliderProductsSection?.products &&
+      Array.isArray(sliderProductsSection.products)
+    ) {
       // Check if products are already expanded (objects with id property) or just IDs (strings)
       const firstProduct = sliderProductsSection.products[0];
 
@@ -63,11 +66,12 @@ export async function loader({ request }: Route.LoaderArgs) {
     }
 
     // Fallback to featured products if no products found in homepage
-    const featuredProducts = homepageProducts.length > 0
-      ? homepageProducts
-      : await productService.getFeatured(6, {
-        expand: "sizes,collection,category",
-      });
+    const featuredProducts =
+      homepageProducts.length > 0
+        ? homepageProducts
+        : await productService.getFeatured(6, {
+            expand: "sizes,collection,category",
+          });
 
     // Card categories: prefer "categories-section-highlighted"; fallback to "categories-section-list" (backward compat)
     const categoriesSectionHighlighted = homepageData.find(
@@ -298,19 +302,16 @@ export const Home = () => {
             )}
           </div>
         )}
-        <div className="flex justify-between gap-10">
+        <div className="flex flex-col w-full justify-between gap-10">
           {featureCategories?.map((featureCategory, index) => (
-            <div
-              key={featureCategory.id}
-              className={`${featureCategories?.length === 1 ? "w-full" : `md:w-1/2 w-full ${index === 1 ? "hidden md:block" : ""}`}`}
-            >
-              <CategoryCard
-                name={featureCategory.name}
-                description={featureCategory.description}
-                media={{
+            <div key={featureCategory.id} className="w-full">
+              <HomepageCard
+                variant="light"
+                cardImage={{
                   image: featureCategory.media,
-                  hover: featureCategory.hover,
                 }}
+                title={featureCategory.name}
+                subtitle={featureCategory.description || 'bla bla bla'}
                 link={`/category/${featureCategory.slug}`}
               />
             </div>
@@ -322,28 +323,6 @@ export const Home = () => {
             language={language}
           />
         )}
-
-        <HomepageCard
-          variant="light"
-          cardImage={{
-            image: "/images/hero_sandals.png",
-          }}
-          title="Loafers"
-          subtitle="Isto é um texto de uma categoria como loafers ou assim, algo com até bastantes linhas  para dar uma hipótese de colocar uns textos bonitos"
-          link="#"
-        />
-      </article>
-
-      <article className="w-full h-[585px] md:h-screen px-4 md:px-20 md:pt-13 md:pb-[113px]">
-        <HomepageCard
-          variant="light"
-          cardImage={{
-            image: "/images/hero_sandals.png",
-          }}
-          title="Loafers"
-          subtitle="Isto é um texto de uma categoria como loafers ou assim, algo com até bastantes linhas  para dar uma hipótese de colocar uns textos bonitos"
-          link="#"
-        />
       </article>
 
       <article className="w-full pt-8 md:px-20 rounded-xl">
