@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { NotificationBell, type NotificationItem } from "~/components/Backoffice/NotificationBell";
-import { getAdminNotifications, markNotificationsAsRead, type NotificationRecord } from "~/lib/services";
+import { getAdminNotifications, markNotificationsAsRead, ensureSizesRange, type NotificationRecord } from "~/lib/services";
 
 export async function action({ request }: Route.ActionArgs) {
   const pb = createPocketBase(request);
@@ -28,7 +28,18 @@ export async function action({ request }: Route.ActionArgs) {
   if (!user?.admin) return null;
 
   const formData = await request.formData();
-  if (formData.get("intent") !== "markRead") return null;
+  const intent = formData.get("intent");
+
+  if (intent === "seedSizes") {
+    try {
+      const created = await ensureSizesRange(pb, 35, 47);
+      return { seedSizes: true, created };
+    } catch {
+      return { seedSizes: false, created: 0 };
+    }
+  }
+
+  if (intent !== "markRead") return null;
   const ids = formData.getAll("ids").filter((v): v is string => typeof v === "string" && v.length > 0);
   if (ids.length === 0) return null;
 
@@ -168,7 +179,7 @@ export default function BackofficeLayout() {
 
   return (
     <div
-      className="min-h-screen bg-slate-100 flex"
+      className="backoffice-layout min-h-screen bg-slate-100 flex"
       role="application"
       aria-label="Backoffice"
     >

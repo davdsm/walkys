@@ -5,12 +5,12 @@ import { getMediaType } from "~/lib/utils";
 
 export const CategoryCard = ({
   name,
-  description,
+  description = "",
   media,
   link,
 }: {
   name: string;
-  description: string;
+  description?: string;
   media: { image: string; hover: string };
   link: string;
 }) => {
@@ -24,6 +24,7 @@ export const CategoryCard = ({
   );
   const defaultVideoRef = useRef<HTMLVideoElement>(null);
   const hoverVideoRef = useRef<HTMLVideoElement>(null);
+  const hasHover = !!(media.hover && media.hover.trim());
 
   useEffect(() => {
     // Detect media types (image and hover can be image or video)
@@ -47,23 +48,23 @@ export const CategoryCard = ({
 
   useEffect(() => {
     // Handle default video autoplay
-    if (defaultVideoRef.current && !isHovered) {
+    if (defaultVideoRef.current && (!hasHover || !isHovered)) {
       defaultVideoRef.current.play();
     }
 
-    // Handle hover video
-    if (hoverVideoRef.current) {
+    // Handle hover video (only when hover media exists)
+    if (hasHover && hoverVideoRef.current) {
       if (isHovered) {
         hoverVideoRef.current.play();
         hoverVideoRef.current.loop = true;
       } else {
         hoverVideoRef.current.pause();
-        hoverVideoRef.current.currentTime = 0; // Comment to have pause and play
+        hoverVideoRef.current.currentTime = 0;
       }
     }
 
-    // Pause and reset default video when hovered
-    if (defaultVideoRef.current) {
+    // Pause default video when hovered and hover media exists
+    if (hasHover && defaultVideoRef.current) {
       if (isHovered) {
         defaultVideoRef.current.pause();
         defaultVideoRef.current.currentTime = 0;
@@ -71,7 +72,7 @@ export const CategoryCard = ({
         defaultVideoRef.current.play();
       }
     }
-  }, [isHovered]);
+  }, [isHovered, hasHover]);
 
   return (
     <Link to={link} className="no-underline">
@@ -85,7 +86,7 @@ export const CategoryCard = ({
             <video
               ref={defaultVideoRef}
               src={media.image}
-              className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
+              className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-cover transition-opacity duration-300 ease-in ${hasHover && isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
               loop
               muted
               playsInline
@@ -94,35 +95,38 @@ export const CategoryCard = ({
           ) : (
             <img
               src={media.image}
-              className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
+              className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-cover transition-opacity duration-300 ease-in ${hasHover && isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
               alt={name}
             />
           )}
-          {hoverMediaType === "video" ? (
-            <video
-              ref={hoverVideoRef}
-              src={media.hover}
-              className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
-              loop
-              muted
-              playsInline
-            />
-          ) : (
-            <img
-              src={media.hover}
-              className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
-              alt={name}
-            />
-          )}
+          {hasHover &&
+            (hoverMediaType === "video" ? (
+              <video
+                ref={hoverVideoRef}
+                src={media.hover}
+                className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-cover transition-opacity duration-300 ease-in ${hasHover && isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
+                loop
+                muted
+                playsInline
+              />
+            ) : (
+              <img
+                src={media.hover}
+                className={`absolute inset-0 h-full w-full border-none rounded-[10px] object-cover transition-opacity duration-300 ease-in ${hasHover && isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
+                alt={name}
+              />
+            ))}
         </div>
         <div className="flex justify-between items-center gap-4 md:w-full md:h-full max-h-[40px]">
           <div className="transition group-hover:text-white">
             <p className="text-black group-hover:text-white text-base font-bold">
               {name}
             </p>
-            <p className="text-black group-hover:text-white text-sm">
-              {description}
-            </p>
+            {description ? (
+              <p className="text-black group-hover:text-white text-sm whitespace-pre-line">
+                {description}
+              </p>
+            ) : null}
           </div>
         </div>
       </motion.article>

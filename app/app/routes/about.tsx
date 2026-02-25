@@ -64,9 +64,6 @@ export default function About() {
   const heroImage = images?.entryImg?.[0] ?? "/cover.jpg";
   const heroTitle = getContent("intro_title");
   const heroSubtitle = getContent("intro_text");
-  const heroEyebrow = getContent("intro_eyebrow") || t.about.our_story;
-  const valuesSectionTitle = getContent("what_about_section_title") || t.about.what_about_title;
-  const processSectionTitle = getContent("gallery_section_title") || t.about.gallery_title;
 
   const values = [
     {
@@ -81,7 +78,7 @@ export default function About() {
     },
   ].filter((v) => v.image);
 
-  const processStepsWithTitles = [
+  const processSteps = [
     {
       number: "01",
       title: getContent("mold_title") || t.about.mold_title,
@@ -112,22 +109,22 @@ export default function About() {
     <main className="w-full min-h-screen flex flex-col bg-[#f1f1f1]">
       <AboutHero
         image={heroImage}
-        eyebrow={heroEyebrow}
+        eyebrow={t.about.our_story}
         title={heroTitle}
         subtitle={heroSubtitle}
       />
 
       {values.length > 0 && (
         <AboutValues
-          sectionTitle={valuesSectionTitle}
+          sectionTitle={t.about.what_about_title}
           values={values}
         />
       )}
 
-      {processStepsWithTitles.length > 0 && (
+      {processSteps.length > 0 && (
         <AboutProcess
-          sectionTitle={processSectionTitle}
-          steps={processStepsWithTitles}
+          sectionTitle={getContent("gallery_section_title") || t.about.gallery_title}
+          steps={processSteps}
         />
       )}
 

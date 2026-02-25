@@ -16,4 +16,7 @@ export default defineConfig({
       "/app": path.resolve(__dirname, "app"),
     },
   },
+  optimizeDeps: {
+    include: ["@mladenilic/threesixty.js"],
+  },
 });

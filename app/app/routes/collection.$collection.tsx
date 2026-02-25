@@ -93,10 +93,10 @@ export const CollectionPage = () => {
     if (!Array.isArray(categories)) return [];
     return getCategoryFilters({
       categories,
-      allLabel: t.common.all,
+      allLabel: t?.common?.all ?? "All",
       setActiveCategory,
     });
-  }, [categories, t.common.all, setActiveCategory]);
+  }, [categories, t]);
 
   // Scrollspy - only if we have categories
   useScrollSpy({

@@ -250,6 +250,8 @@ export const Home = () => {
     ).value,
     products: homepageData.find((p) => p.section_id === "slider-products-list")
       .products,
+    ctaText: homepageData.find((p) => p.section_id === "slider-products-cta-text")?.value ?? undefined,
+    ctaLink: homepageData.find((p) => p.section_id === "slider-products-cta-link")?.value ?? undefined,
   };
 
   return (
@@ -282,8 +284,8 @@ export const Home = () => {
                 },
                 link: `/product/${p.slug}`,
               }))}
-              ctaText={t.home.exploreMore}
-              ctaLink="/collection/autmn-winter-25"
+              ctaText={productSliderSection.ctaText ?? t.home.exploreMore}
+              ctaLink={productSliderSection.ctaLink ?? "/collection/autmn-winter-25"}
             />
           </div>
         )}
@@ -293,12 +295,12 @@ export const Home = () => {
         {(categoriesSectionTitle || categoriesSectionSubtitle) && (
           <div className="text-center space-y-1">
             {categoriesSectionTitle && (
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl md:text-4xl font-bold text-slate-900">
                 {categoriesSectionTitle}
               </h2>
             )}
             {categoriesSectionSubtitle && (
-              <p className="text-slate-600">{categoriesSectionSubtitle}</p>
+              <p className="text-slate-600 w-full px-30 pt-2 mx-auto">{categoriesSectionSubtitle}</p>
             )}
           </div>
         )}
@@ -306,12 +308,12 @@ export const Home = () => {
           {featureCategories?.map((featureCategory, index) => (
             <div key={featureCategory.id} className="w-full">
               <HomepageCard
-                variant="light"
+                variant="dark"
                 cardImage={{
                   image: featureCategory.media,
                 }}
                 title={featureCategory.name}
-                subtitle={featureCategory.description || 'bla bla bla'}
+                subtitle={featureCategory.description ?? ""}
                 link={`/category/${featureCategory.slug}`}
               />
             </div>

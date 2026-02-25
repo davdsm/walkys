@@ -143,7 +143,7 @@ export const CategoryPage = () => {
           initial={{ opacity: 0, y: -60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="text-3xl md:text-5xl font-semibold tracking-tight text-black mb-8"
+          className="text-3xl md:text-5xl font-semibold text-black mb-8 font-display"
         >
           {title}
         </motion.h1>

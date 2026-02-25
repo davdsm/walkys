@@ -93,7 +93,7 @@ export const SignupForm = () => {
     return (
         <div className="flex flex-col gap-4">
             <div className="text-center md:text-left mb-2">
-                <span className="text-3xl md:text-4xl mb-2 font-bold">{t.signup.title}</span>
+                <span className="text-3xl md:text-4xl mb-2 font-bold font-display">{t.signup.title}</span>
                 <p className="text-gray-500 text-sm mt-2">{t.signup.subtitle}</p>
                 {actionData?.error && (
                     <div className="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">

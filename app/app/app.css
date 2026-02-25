@@ -1,12 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Reddit+Sans:wght@400;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Reddit Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-display: "Reem Kufi", cursive;
+  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display: "Italiana", serif;
+  --font-serif: "Italiana", serif;
 
   /* Premium Color Palette */
   --color-primary: #0f172a;
@@ -31,26 +31,51 @@
 html {
   overflow-x: hidden;
   overflow-y: visible;
+  font-family: var(--font-sans);
 }
 
 body {
   min-height: 100vh;
-  font-family: var(--font-sans);
+  font-family: inherit;
   color: var(--color-foreground);
   background-color: var(--color-background);
-  font-weight: 400;
+  font-weight: 100;
+  font-size: 20px;
   font-style: normal;
   overflow-x: hidden;
   overflow-y: visible;
 }
 
+/* Texts and descriptions: 20px, font-weight 100 (frontoffice only) */
+p,
+.prose,
+.prose p {
+  font-weight: 100;
+  font-size: 20px;
+}
+
+/* Backoffice: normal font weight and size (override frontoffice body/p rules) */
+.backoffice-layout {
+  font-weight: 400;
+  font-size: 1rem;
+}
+.backoffice-layout p,
+.backoffice-layout .prose,
+.backoffice-layout .prose p {
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+/* Every title and heading uses the display font (Italiana) */
 h1,
 h2,
 h3,
 h4,
 h5,
-h6 {
-  font-family: var(--font-display);
+h6,
+[class*="font-display"],
+.font-display {
+  font-family: var(--font-display) !important;
 }
 
 @theme inline {

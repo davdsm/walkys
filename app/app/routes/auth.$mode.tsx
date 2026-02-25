@@ -119,7 +119,7 @@ export const Auth = () => {
             </div>
 
             <div className="absolute bottom-20 left-12 z-20 max-w-md text-white">
-              <h1 className="text-6xl font-serif mb-6 leading-tight">
+              <h1 className="text-6xl font-display mb-6 leading-tight">
                 Get
                 <br />
                 Everything

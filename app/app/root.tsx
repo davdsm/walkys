@@ -23,18 +23,7 @@ import { CartSidebar } from "./components/Cart/CartSidebar";
 import { useFooter } from "./hooks/useFooter";
 import { useHeader } from "./hooks/useHeader";
 
-export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&display=swap",
-  },
-];
+export const links: Route.LinksFunction = () => [];
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
@@ -57,6 +46,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/x-icon" href={layout?.favicon?.faviconUrl ?? "/favicon.png"} />
+        {/* Google Fonts - load early so they apply before first paint */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Italiana&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+          crossOrigin="anonymous"
+        />
         <title>Walkys - By Shoe Me</title>
         <meta name="title" content="Walkys - By Shoe Me" />
         <meta

@@ -6,7 +6,7 @@ import type { ProductRecord, SizeRecord } from "~/hooks/useProducts";
 import { createPocketBase } from "~/lib/pocketbase";
 import { createProductService } from "~/lib/services";
 import {
-  ProductImageGallery,
+  ProductMediaView,
   ProductInfo,
   ProductDetails,
   MobileProductLayout,
@@ -50,7 +50,7 @@ export async function loader({
       collectionList[0].id,
       {
         expand: "sizes,collection,category",
-      }
+      },
     )) as ProductRecord[];
     // Filter out current product and limit to 6
     relatedProducts = lrelatedProducts
@@ -88,11 +88,17 @@ export const ProductPage = () => {
   const productName = (product as any)?.[`name_${langKey}`] ?? "";
   const productDescription = (product as any)?.[`description_${langKey}`] ?? "";
   const productDetails = (product as any)?.[`details_${langKey}`] ?? "";
-  const media = product?.media || [];
+  const mediaMain = product?.media ?? [];
+  const mediaGallery = (product as any)?.media_gallery ?? [];
+  const media = Array.isArray(mediaMain) && Array.isArray(mediaGallery)
+    ? [...mediaMain, ...mediaGallery]
+    : mediaMain;
+  const media360 = (product as any)?.media_360 ?? [];
   const expand = (product as any)?.expand || {};
   const productSlug = (product as any)?.slug ?? "";
   const productId = (product as any)?.id ?? "";
-  const firstMediaUrl = Array.isArray(media) && media.length > 0 ? media[0] : undefined;
+  const firstMediaUrl =
+    Array.isArray(media) && media.length > 0 ? media[0] : undefined;
 
   // Get collection name
   const collectionList = expand.collection
@@ -143,7 +149,7 @@ export const ProductPage = () => {
   const detailsOpacity = useTransform(
     scrollYProgress,
     [0.3, 0.5, 0.7],
-    [0, 0.5, 1]
+    [0, 0.5, 1],
   );
 
   const handleBack = () => {
@@ -187,10 +193,11 @@ export const ProductPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <ProductImageGallery
+              <ProductMediaView
+                media360={media360}
                 media={media}
-                selectedImage={selectedImage}
-                onImageSelect={setSelectedImage}
+                selectedIndex={selectedImage}
+                onSelectIndex={setSelectedImage}
                 productName={productName}
               />
             </motion.div>
@@ -238,20 +245,21 @@ export const ProductPage = () => {
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
           <MobileProductLayout
-          productName={productName}
-          productDescription={productDescription}
-          productDetails={productDetails}
-          collectionName={collectionName}
-          media={media}
-          selectedImage={selectedImage}
-          onImageSelect={setSelectedImage}
-          sizes={sortedSizes}
-          selectedSize={selectedSize}
-          onSizeSelect={setSelectedSize}
-          onOrder={handleOrder}
-          breadcrumbs={breadcrumbs}
-          language={language}
-        />
+            productName={productName}
+            productDescription={productDescription}
+            productDetails={productDetails}
+            collectionName={collectionName}
+            media360={media360}
+            media={media}
+            selectedImage={selectedImage}
+            onImageSelect={setSelectedImage}
+            sizes={sortedSizes}
+            selectedSize={selectedSize}
+            onSizeSelect={setSelectedSize}
+            onOrder={handleOrder}
+            breadcrumbs={breadcrumbs}
+            language={language}
+          />
         </motion.div>
       </section>
 
@@ -262,11 +270,11 @@ export const ProductPage = () => {
         transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
       >
         <RelatedProducts
-        relatedProducts={relatedProducts}
-        collectionSlug={collectionList[0]?.slug || null}
-        language={language}
-        langKey={langKey}
-      />
+          relatedProducts={relatedProducts}
+          collectionSlug={collectionList[0]?.slug || null}
+          language={language}
+          langKey={langKey}
+        />
       </motion.div>
     </>
   );

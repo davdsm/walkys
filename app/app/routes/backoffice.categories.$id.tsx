@@ -33,6 +33,8 @@ export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
   const name_pt = (formData.get("name_pt") as string) ?? "";
   const name_en = (formData.get("name_en") as string) ?? "";
+  const description_pt = (formData.get("description_pt") as string) ?? "";
+  const description_en = (formData.get("description_en") as string) ?? "";
   const slug = (formData.get("slug") as string) ?? "";
   const enable = formData.get("enable") === "on";
   const imageFile = formData.get("image");
@@ -43,6 +45,8 @@ export async function action({ request, params }: Route.ActionArgs) {
       const data = new FormData();
       data.append("name_pt", name_pt);
       data.append("name_en", name_en);
+      data.append("description_pt", description_pt);
+      data.append("description_en", description_en);
       data.append("slug", slug);
       data.append("enable", String(enable));
       if (imageFile instanceof File && imageFile.size > 0) data.append("media", imageFile);
@@ -56,13 +60,15 @@ export async function action({ request, params }: Route.ActionArgs) {
       const body = new FormData();
       body.append("name_pt", name_pt);
       body.append("name_en", name_en);
+      body.append("description_pt", description_pt);
+      body.append("description_en", description_en);
       body.append("slug", slug);
       body.append("enable", String(enable));
       if (imageFile instanceof File && imageFile.size > 0) body.append("media", imageFile);
       if (hoverFile instanceof File && hoverFile.size > 0) body.append("hover", hoverFile);
       await pb.collection("category").update(id, body);
     } else {
-      await pb.collection("category").update(id, { name_pt, name_en, slug, enable });
+      await pb.collection("category").update(id, { name_pt, name_en, description_pt, description_en, slug, enable });
     }
     return { ok: true };
   } catch (e) {
@@ -80,7 +86,7 @@ export default function BackofficeCategoryEdit() {
   const { category, baseUrl, isNew } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const actionData = useActionData<typeof action>();
-  const c = category as { id?: string; name_pt?: string; name_en?: string; slug?: string; enable?: boolean; media?: string | string[]; image?: string | string[]; hover?: string } | null;
+  const c = category as { id?: string; name_pt?: string; name_en?: string; description_pt?: string; description_en?: string; slug?: string; enable?: boolean; media?: string | string[]; image?: string | string[]; hover?: string } | null;
 
   const imageFilename = c?.media ?? c?.image;
   const imageFile = imageFilename ? (Array.isArray(imageFilename) ? imageFilename[0] : imageFilename) : null;
@@ -99,7 +105,7 @@ export default function BackofficeCategoryEdit() {
           {isNew ? "Nova categoria" : "Editar categoria"}
         </h1>
         <p className="text-slate-600 mt-1">
-          Campos da coleção PocketBase: nome (PT/EN), slug, imagem, ativo.
+          Campos da coleção PocketBase: nome (PT/EN), descrição (PT/EN), slug, imagem, ativo.
         </p>
       </div>
 
@@ -138,6 +144,30 @@ export default function BackofficeCategoryEdit() {
               className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50 font-mono"
               required
             />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label htmlFor="description_pt" className="block text-sm font-medium text-slate-700 mb-1">Descrição (PT)</label>
+              <textarea
+                id="description_pt"
+                name="description_pt"
+                rows={3}
+                defaultValue={c?.description_pt ?? ""}
+                className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50"
+                placeholder="Breve descrição da categoria"
+              />
+            </div>
+            <div>
+              <label htmlFor="description_en" className="block text-sm font-medium text-slate-700 mb-1">Descrição (EN)</label>
+              <textarea
+                id="description_en"
+                name="description_en"
+                rows={3}
+                defaultValue={c?.description_en ?? ""}
+                className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50"
+                placeholder="Short category description"
+              />
+            </div>
           </div>
         </div>
 

@@ -80,7 +80,7 @@ export const LoginForm = () => {
             </div>
 
             <div className="text-center md:text-left mb-2">
-                <span className="text-3xl md:text-4xl mb-2 font-bold">{t.login.title}</span>
+                <span className="text-3xl md:text-4xl mb-2 font-bold font-display">{t.login.title}</span>
                 <p className="text-gray-500 text-sm mt-2">{t.login.subtitle}</p>
                 {actionData?.error && (
                     <div className="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { ParallaxBanner } from "react-scroll-parallax";
 
 export interface AboutHeroProps {
   image: string;
@@ -10,12 +11,11 @@ export interface AboutHeroProps {
 export function AboutHero({ image, eyebrow, title, subtitle }: AboutHeroProps) {
   return (
     <header className="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden bg-black">
-      {/* Background image */}
+      {/* Background image with parallax */}
       <div className="absolute inset-0">
-        <img
-          src={image}
-          alt=""
-          className="w-full h-full object-cover opacity-70"
+        <ParallaxBanner
+          layers={[{ image, speed: -20 }]}
+          className="absolute inset-0 w-full h-full [&>div]:min-h-[120%] [&>div]:bg-cover [&>div]:bg-center"
         />
         <div
           className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"
@@ -37,7 +37,7 @@ export function AboutHero({ image, eyebrow, title, subtitle }: AboutHeroProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-          className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[0.92] tracking-tight"
+          className="text-4xl md:text-6xl lg:text-7xl xl:text-7xl font-bold text-white leading-[0.92] font-display"
         >
           {title}
         </motion.h1>

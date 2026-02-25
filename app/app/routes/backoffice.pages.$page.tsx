@@ -16,6 +16,8 @@ const HOMEPAGE_SECTION_LABELS: Record<string, string> = {
   "slider-products-title": "Título do slider de produtos",
   "slider-products-subtitle": "Subtítulo do slider",
   "slider-products-list": "Lista de produtos do slider",
+  "slider-products-cta-text": "Botão CTA do slider (texto)",
+  "slider-products-cta-link": "Botão CTA do slider (link)",
 };
 
 function sectionNeedsMedia(sectionId: string): boolean {
@@ -130,14 +132,29 @@ export async function action({ request, params }: Route.ActionArgs) {
       const idTitle = formData.get("id_title") as string;
       const idSubtitle = formData.get("id_subtitle") as string;
       const idList = formData.get("id_list") as string;
+      const idCtaText = (formData.get("id_cta_text") as string) || "";
+      const idCtaLink = (formData.get("id_cta_link") as string) || "";
       const titlePt = (formData.get("title_pt") as string) ?? "";
       const titleEn = (formData.get("title_en") as string) ?? "";
       const subtitlePt = (formData.get("subtitle_pt") as string) ?? "";
       const subtitleEn = (formData.get("subtitle_en") as string) ?? "";
+      const ctaTextPt = (formData.get("cta_text_pt") as string) ?? "";
+      const ctaTextEn = (formData.get("cta_text_en") as string) ?? "";
+      const ctaLink = (formData.get("cta_link") as string) ?? "";
       const productsIds = formData.getAll("products").filter((v): v is string => typeof v === "string" && v.length > 0);
       if (idTitle) await pb.collection(collectionName).update(idTitle, { value_pt: titlePt, value_en: titleEn });
       if (idSubtitle) await pb.collection(collectionName).update(idSubtitle, { value_pt: subtitlePt, value_en: subtitleEn });
       if (idList) await pb.collection(collectionName).update(idList, { products: productsIds });
+      if (idCtaText) {
+        await pb.collection(collectionName).update(idCtaText, { value_pt: ctaTextPt, value_en: ctaTextEn });
+      } else if (ctaTextPt || ctaTextEn) {
+        await pb.collection(collectionName).create({ section_id: "slider-products-cta-text", section_name: "Botão CTA do slider (texto)", value_pt: ctaTextPt, value_en: ctaTextEn, media: [], categories: [], products: [] });
+      }
+      if (idCtaLink) {
+        await pb.collection(collectionName).update(idCtaLink, { value_pt: ctaLink, value_en: ctaLink });
+      } else if (ctaLink) {
+        await pb.collection(collectionName).create({ section_id: "slider-products-cta-link", section_name: "Botão CTA do slider (link)", value_pt: ctaLink, value_en: ctaLink, media: [], categories: [], products: [] });
+      }
       return { ok: true };
     }
     if (intent === "update_categories_section") {
@@ -470,6 +487,8 @@ export default function BackofficePagesPage() {
     const sliderTitle = getRecordBySectionId(records, "slider-products-title");
     const sliderSubtitle = getRecordBySectionId(records, "slider-products-subtitle");
     const sliderList = getRecordBySectionId(records, "slider-products-list");
+    const sliderCtaText = getRecordBySectionId(records, "slider-products-cta-text");
+    const sliderCtaLink = getRecordBySectionId(records, "slider-products-cta-link");
     const catSectionTitle = getRecordBySectionId(records, "categories-section-title");
     const catSectionSubtitle = getRecordBySectionId(records, "categories-section-subtitle");
     const catSectionList = getRecordBySectionId(records, "categories-section-list");
@@ -556,6 +575,8 @@ export default function BackofficePagesPage() {
               {sliderTitle && <input type="hidden" name="id_title" value={sliderTitle.id} />}
               {sliderSubtitle && <input type="hidden" name="id_subtitle" value={sliderSubtitle.id} />}
               {sliderList && <input type="hidden" name="id_list" value={sliderList.id} />}
+              {sliderCtaText && <input type="hidden" name="id_cta_text" value={sliderCtaText.id} />}
+              {sliderCtaLink && <input type="hidden" name="id_cta_link" value={sliderCtaLink.id} />}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <span className="block text-sm font-semibold text-slate-800 mb-2">{getHomepageSectionLabel("slider-products-title")}</span>
@@ -590,6 +611,24 @@ export default function BackofficePagesPage() {
                       <span className="text-sm text-slate-700">{p.name_pt ?? p.name_en ?? p.id}</span>
                     </label>
                   ))}
+                </div>
+              </div>
+              <div className="border-t border-slate-200 pt-4">
+                <span className="block text-sm font-semibold text-slate-800 mb-2">{getHomepageSectionLabel("slider-products-cta-text")}</span>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Texto do botão (PT)</label>
+                    <input type="text" name="cta_text_pt" defaultValue={sliderCtaText?.value_pt ?? ""} placeholder="ex: Ver mais" className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50 text-slate-900" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Texto do botão (EN)</label>
+                    <input type="text" name="cta_text_en" defaultValue={sliderCtaText?.value_en ?? ""} placeholder="ex: Explore more" className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50 text-slate-900" />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <span className="block text-sm font-semibold text-slate-800 mb-2">{getHomepageSectionLabel("slider-products-cta-link")}</span>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">URL do botão</label>
+                  <input type="text" name="cta_link" defaultValue={sliderCtaLink?.value_pt ?? sliderCtaLink?.value_en ?? ""} placeholder="ex: /collection/autmn-winter-25" className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50 text-slate-900" />
                 </div>
               </div>
               <button type="submit" disabled={navigation.state === "submitting"} className="px-4 py-2.5 bg-slate-800 text-white rounded-sm hover:bg-slate-900 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-50 font-medium text-sm">

@@ -35,15 +35,15 @@ export const HomeHero = ({
   }, []);
 
   return (
-    <article className="w-full py-30 md:py-12 flex flex-col justify-center items-center px-6 lg:px-20 relative">
+    <article className="h-screen w-full py-30 md:py-12 flex flex-col justify-center items-center px-6 lg:px-20 relative">
       <div className="w-full max-w-[1400px] flex flex-col lg:flex-row items-center justify-center gap-4 md:gap-12">
         {/* Text Content - Desktop: Left, Mobile: Top */}
-        <div className="flex flex-col items-start w-full lg:w-1/2 order-1">
+        <div className="flex flex-col items-start w-full lg:w-1/2 order-1 pr-30">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={isMounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-2xl md:text-5xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-black leading-none lg:uppercase"
+            className="text-2xl md:text-6xl font-bold text-black leading-none lg:uppercase font-display"
           >
             {title}
           </motion.h1>
@@ -52,7 +52,7 @@ export const HomeHero = ({
             initial={{ opacity: 0, y: 20 }}
             animate={isMounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="mt-3 md:mt-8 text-md md:text-xl lg:text-4xl text-black font-thin opacity-90 leading-tight"
+            className="mt-3 md:mt-8 text-md md:text-xl text-black font-thin opacity-90 leading-tight"
           >
             {subtitle}
           </motion.p>
@@ -92,9 +92,9 @@ export const HomeHero = ({
           initial={{ opacity: 0, x: 90 }}
           animate={isMounted ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 1 }}
-          className="w-full lg:w-[45%] order-2 lg:order-2"
+          className="w-full lg:w-[45%] order-2 lg:order-2 h-screen py-15"
         >
-          <div className="relative aspect-[4/5] lg:aspect-[3/3.8] rounded-[20px] md:rounded-[40px] overflow-hidden group">
+          <div className="relative h-full rounded-[20px] md:rounded-[40px] overflow-hidden group">
             {getMediaType(product.image) === "video" ? (
               <video
                 src={product.image}

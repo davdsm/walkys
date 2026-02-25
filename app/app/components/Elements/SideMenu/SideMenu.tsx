@@ -539,7 +539,7 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
 
           <button
             ref={toggleBtnRef}
-            className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto ${invertLogo ? "text-black" : "text-white"}`}
+            className={`sm-toggle relative inline-flex items-center gap-[0.25rem] bg-transparent border-0 cursor-pointer font-medium text-sm leading-none overflow-visible pointer-events-auto ${invertLogo ? "text-black" : "text-white"}`}
             aria-label={open ? t.header.closeMenu : t.header.openMenu}
             aria-expanded={open}
             aria-controls="staggered-menu-panel"
@@ -548,16 +548,16 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
           >
             <span
               ref={textWrapRef}
-              className="font-display sm-toggle-textWrap relative inline-block h-[1em] overflow-hidden whitespace-nowrap w-[var(--sm-toggle-width,auto)] min-w-[var(--sm-toggle-width,auto)]"
+              className="font-sans sm-toggle-textWrap relative inline-block h-[1em] overflow-hidden whitespace-nowrap w-[var(--sm-toggle-width,auto)] min-w-[var(--sm-toggle-width,auto)]"
               aria-hidden="true"
             >
               <span
                 ref={textInnerRef}
-                className="sm-toggle-textInner flex flex-col leading-none font-display"
+                className="sm-toggle-textInner flex flex-col leading-none font-sans"
               >
                 {textLines.map((l, i) => (
                   <span
-                    className="sm-toggle-line block h-[1em] leading-none font-display"
+                    className="sm-toggle-line block h-[1em] leading-none font-sans"
                     key={i}
                     style={{ color: invertLogo ? "#ffffff" : "#000000" }}
                   >
@@ -569,7 +569,7 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
 
             <span
               ref={iconRef}
-              className="sm-icon relative w-[14px] h-[14px] shrink-0 inline-flex items-center justify-center [will-change:transform]"
+              className="sm-icon relative w-[12px] h-[12px] shrink-0 inline-flex items-center justify-center [will-change:transform]"
               aria-hidden="true"
             >
               <span

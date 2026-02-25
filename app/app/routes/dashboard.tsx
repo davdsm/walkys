@@ -121,7 +121,7 @@ export default function Dashboard() {
     });
 
     return (
-        <div className="w-full h-screen bg-white flex flex-col items-center justify-center gap-8">
+        <div className="backoffice-layout w-full h-screen bg-white flex flex-col items-center justify-center gap-8">
             <BackofficePage
                 displayName={displayName}
                 catalogCount={catalogCount}

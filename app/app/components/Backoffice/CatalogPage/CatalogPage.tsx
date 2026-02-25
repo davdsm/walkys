@@ -45,13 +45,13 @@ export default function CatalogPage({products, categories, language, noProductsA
     });
 
     const filters = useMemo(() => {
-        if (!Array.isArray(categories) || !resolvedLanguage) return [];
+        if (!Array.isArray(categories)) return [];
         return getCategoryFilters({
             categories: categories,
-            language: resolvedLanguage,
+            allLabel: t?.common?.all ?? "All",
             setActiveCategory: setActiveCategory,
         });
-    }, [categories, resolvedLanguage]);
+    }, [categories, t]);
 
     const categoriesWithProducts = useMemo(() => {
         if (!Array.isArray(products)) return [];

@@ -60,7 +60,7 @@ export const ProductInfo = ({
 
       {/* Product Name */}
       <motion.h1
-        className="text-4xl lg:text-5xl font-bold text-black"
+        className="text-4xl lg:text-5xl font-bold text-black font-display"
         {...fadeUp}
         transition={{ ...fadeUp.transition, delay: 0.1 }}
       >

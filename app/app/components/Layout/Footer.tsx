@@ -54,7 +54,7 @@ export const Footer = ({
             <div className="flex justify-between items-start mb-32 flex-col md:flex-row">
               <div className="w-1/2">
                 <Link to="/" className="inline-flex items-start gap-2 group">
-                  <h1 className="text-5xl ">{logoText}</h1>
+                  <h1 className="text-5xl font-display">{logoText}</h1>
                   <ArrowUpRight
                     className="w-7 h-7 mt-3 opacity-80 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
                     strokeWidth={1.5}

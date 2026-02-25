@@ -35,8 +35,8 @@ export function ProductCarousel({
   return (
     <section className="w-full">
       <div className="mb-6">
-        <h5 className="text-4xl font-bold uppercase">{title}</h5>
-        <p className="text-lg py-3">{subtitle}</p>
+        <h5 className="text-4xl font-bold uppercase font-display">{title}</h5>
+        <p className="text-lg py-3 w-1/2">{subtitle}</p>
       </div>
 
       <div className="">
@@ -60,17 +60,19 @@ export function ProductCarousel({
           </CarouselContent>
         </Carousel>
 
-        {/* CTA Footer */}
-        <div className="pt-8 md:pt-12 flex justify-center">
-          <Button
-            to={ctaLink}
-            variant="primary"
-            size="md"
-            rightIcon={<ArrowUpRight className="w-4 h-4 md:w-5 md:h-5" />}
-          >
-            {ctaText}
-          </Button>
-        </div>
+        {/* CTA Footer - only show when ctaText is set */}
+        {ctaText && (
+          <div className="pt-8 md:pt-12 flex justify-center">
+            <Button
+              to={ctaLink}
+              variant="primary"
+              size="md"
+              rightIcon={<ArrowUpRight className="w-4 h-4 md:w-5 md:h-5" />}
+            >
+              {ctaText}
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );
