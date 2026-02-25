@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router";
+import { useHeaderBackground } from "~/contexts";
 
 /**
  * Hook to use useHeader in components
@@ -21,6 +22,7 @@ export function useHeader(): {
   variant: "light" | "dark";
 } {
   const location = useLocation();
+  const { isDarkBackground } = useHeaderBackground();
   const [isOverFooter, setIsOverFooter] = useState(false);
 
   // Routes where Header should NOT be displayed
@@ -78,7 +80,9 @@ export function useHeader(): {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const variant = isOverFooter ? "light" : routeVariant;
+  // On home, use light header (inverted logo + white menu) when hero is in view (black background)
+  const variant =
+    isOverFooter ? "light" : location.pathname === "/" && isDarkBackground ? "light" : routeVariant;
 
   return { shouldHideHeader, variant };
 }

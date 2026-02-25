@@ -1,10 +1,11 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { HomeHero } from "~/components/HomeHero";
 import { ProductCarousel } from "~/components/ProductCarousel";
 import CategoryCard from "~/components/Cards/CategoryCard";
 import CategoriesList from "~/components/CategoriesList/CategoriesList";
 import { SmallCTA } from "~/components/SmallCTA";
-import { useLanguage } from "~/contexts";
+import { useLanguage, useHeaderBackground } from "~/contexts";
 
 import type { Route } from "./+types/home";
 import { createPocketBase } from "~/lib/pocketbase";
@@ -175,31 +176,42 @@ export const Home = () => {
   const lastDataRef = useRef(data);
   const carouselRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  const [heroInView, setHeroInView] = useState(true);
+  const { setDarkBackground } = useHeaderBackground();
+
+  // Sync hero-in-view to header so it can show inverted logo + light menu on black background
+  useEffect(() => {
+    setDarkBackground(heroInView);
+    return () => setDarkBackground(false);
+  }, [heroInView, setDarkBackground]);
 
   // Reset scroll position on mount
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
   }, []);
 
-  // Body background: white when hero is in view, #f1f1f1 when leaving hero section
+  // Body background: black when hero is in view, #f1f1f1 when scrolled past hero
   useEffect(() => {
     const el = heroRef.current;
     if (!el) return;
 
     const setBodyBg = (color: string) => {
-      document.body.style.transition = "background-color 0.4s ease";
+      document.body.style.transition = "background-color 0.5s ease";
       document.body.style.backgroundColor = color;
     };
 
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        setBodyBg(entry?.isIntersecting ? HERO_BG : DEFAULT_BG);
+        const inView = !!entry?.isIntersecting;
+        setHeroInView(inView);
+        setBodyBg(inView ? HERO_BG : DEFAULT_BG);
       },
-      { threshold: 0.1, rootMargin: "0px" },
+      // Negative top rootMargin: switch to light bg earlier (when hero has scrolled up ~25% of viewport)
+      { threshold: 0.1, rootMargin: "-25% 0px 0px 0px" },
     );
 
-    setBodyBg(DEFAULT_BG);
+    setBodyBg(HERO_BG);
     observer.observe(el);
     return () => {
       observer.disconnect();
@@ -266,10 +278,17 @@ export const Home = () => {
             link: `/product/${heroSection.product.slug}`,
           }}
           categories={heroSection.categories}
+          dark={heroInView}
         />
       </div>
 
-      <article className="p-6 lg:p-20 w-full">
+      <motion.article
+        className="p-6 lg:p-20 w-full"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        viewport={{ amount: 0.5, once: true }}
+      >
         {featuredProducts?.length > 0 && (
           <div ref={carouselRef}>
             <ProductCarousel
@@ -289,9 +308,15 @@ export const Home = () => {
             />
           </div>
         )}
-      </article>
+      </motion.article>
 
-      <article className="w-full px-4 md:px-20 flex flex-col gap-6">
+      <motion.article
+        className="w-full px-4 md:px-20 flex flex-col gap-6"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        viewport={{ amount: 0.5, once: true }}
+      >
         {(categoriesSectionTitle || categoriesSectionSubtitle) && (
           <div className="text-center space-y-1">
             {categoriesSectionTitle && (
@@ -325,11 +350,17 @@ export const Home = () => {
             language={language}
           />
         )}
-      </article>
+      </motion.article>
 
-      <article className="w-full pt-8 md:px-20 rounded-xl">
+      <motion.article
+        className="w-full pt-8 md:px-20 rounded-xl"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        viewport={{ amount: 0.5, once: true }}
+      >
         <SmallCTA />
-      </article>
+      </motion.article>
     </section>
   );
 };

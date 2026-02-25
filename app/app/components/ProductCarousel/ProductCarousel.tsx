@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import { motion } from "motion/react";
 import Autoplay from "embla-carousel-autoplay";
 import {
   Carousel,
@@ -33,7 +34,13 @@ export function ProductCarousel({
   ctaLink = "#",
 }: Readonly<ProductCarouselProps>) {
   return (
-    <section className="w-full">
+    <motion.section
+      className="w-full"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ amount: 0.5, once: true }}
+    >
       <div className="mb-6">
         <h5 className="text-4xl font-bold uppercase font-display">{title}</h5>
         <p className="text-lg py-3 w-1/2">{subtitle}</p>
@@ -74,6 +81,6 @@ export function ProductCarousel({
           </div>
         )}
       </div>
-    </section>
+    </motion.section>
   );
 }

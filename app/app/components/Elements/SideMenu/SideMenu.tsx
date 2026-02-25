@@ -539,7 +539,7 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
 
           <button
             ref={toggleBtnRef}
-            className={`sm-toggle relative inline-flex items-center gap-[0.25rem] bg-transparent border-0 cursor-pointer font-medium text-sm leading-none overflow-visible pointer-events-auto ${invertLogo ? "text-black" : "text-white"}`}
+            className={`sm-toggle relative inline-flex items-center gap-[0.25rem] bg-transparent border-0 cursor-pointer font-medium text-sm leading-none overflow-visible pointer-events-auto ${invertLogo ? "text-white" : "text-black"}`}
             aria-label={open ? t.header.closeMenu : t.header.openMenu}
             aria-expanded={open}
             aria-controls="staggered-menu-panel"

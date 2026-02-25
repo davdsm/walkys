@@ -17,7 +17,7 @@ import { getLanguageFromRequest } from "./lib/utils";
 import { getLayoutData, type LayoutData } from "./lib/services/layout.service";
 import { Footer } from "./components/Layout/Footer";
 import { Header } from "./components/Layout/Header";
-import { LanguageProvider, LayoutProvider, CartProvider } from "./contexts";
+import { LanguageProvider, LayoutProvider, CartProvider, HeaderBackgroundProvider } from "./contexts";
 import { PageTransition } from "./components/Layout/PageTransition";
 import { CartSidebar } from "./components/Cart/CartSidebar";
 import { useFooter } from "./hooks/useFooter";
@@ -106,12 +106,14 @@ export default function App() {
 
   return (
     <CartProvider>
-      {!shouldHideHeader && <Header variant={headerVariant} />}
-      <PageTransition>
-        {outlet}
-        {!shouldHideFooter && <Footer variant={footerVariant} />}
-      </PageTransition>
-      <CartSidebar />
+      <HeaderBackgroundProvider>
+        {!shouldHideHeader && <Header variant={headerVariant} />}
+        <PageTransition>
+          {outlet}
+          {!shouldHideFooter && <Footer variant={footerVariant} />}
+        </PageTransition>
+        <CartSidebar />
+      </HeaderBackgroundProvider>
     </CartProvider>
   );
 }

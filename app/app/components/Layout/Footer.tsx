@@ -51,7 +51,7 @@ export const Footer = ({
       <div className="md:rounded-3xl bg-[#191C19] text-white px-6 py-16 md:px-20 md:py-16 font-sans relative overflow-hidden">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex flex-col">
-            <div className="flex justify-between items-start mb-32 flex-col md:flex-row">
+            <div className="gap-20 flex justify-between items-start mb-32 flex-col md:flex-row">
               <div className="w-1/2">
                 <Link to="/" className="inline-flex items-start gap-2 group">
                   <h1 className="text-5xl font-display">{logoText}</h1>
@@ -75,13 +75,13 @@ export const Footer = ({
                   ))}
                 </nav>
                 <img
-                  className="w-full h-12 my-12 object-contain object-left"
+                  className="w-full h-12 my-12 object-contain object-left invert"
                   src={layout?.footer?.imageUrl ?? "/images/2020.png"}
                   alt=""
                 />
               </div>
 
-              <div className="flex gap-32">
+              <div className="w-1/3 flex gap-32">
                 <div className="flex flex-col gap-12 min-w-[400px]">
                   <div>
                     <h4 className="text-sm font-bold uppercase tracking-[0.15em] text-white/50 mb-5">

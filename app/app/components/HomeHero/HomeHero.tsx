@@ -10,6 +10,7 @@ export const HomeHero = ({
   subtitle,
   product,
   categories,
+  dark = false,
 }: {
   title: string;
   subtitle: string;
@@ -22,6 +23,8 @@ export const HomeHero = ({
     name: string;
     link: string;
   }[];
+  /** When true (hero in view, black background), use light text and buttons */
+  dark?: boolean;
 }) => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -43,7 +46,7 @@ export const HomeHero = ({
             initial={{ opacity: 0, y: 30 }}
             animate={isMounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-2xl md:text-6xl font-bold text-black leading-none lg:uppercase font-display"
+            className={`text-2xl md:text-6xl font-bold leading-none lg:uppercase font-display ${dark ? "text-black" : "text-black"}`}
           >
             {title}
           </motion.h1>
@@ -52,7 +55,7 @@ export const HomeHero = ({
             initial={{ opacity: 0, y: 20 }}
             animate={isMounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="mt-3 md:mt-8 text-md md:text-xl text-black font-thin opacity-90 leading-tight"
+            className={`mt-3 md:mt-8 text-md md:text-xl font-thin opacity-90 leading-tight ${dark ? "text-black/90" : "text-black"}`}
           >
             {subtitle}
           </motion.p>
@@ -78,7 +81,11 @@ export const HomeHero = ({
                 <Button
                   to={category.link}
                   variant="outline"
-                  className="rounded-xl border-black text-black hover:bg-[#f1f1f1] hover:text-black transition-all duration-500 uppercase px-10 py-4 text-xs font-bold tracking-widest min-w-[160px]"
+                  className={`rounded-xl transition-all duration-500 uppercase px-10 py-4 text-xs font-bold tracking-widest min-w-[160px] ${
+                    dark
+                      ? "border-white text-white hover:bg-white hover:text-black"
+                      : "border-black text-black hover:bg-[#f1f1f1] hover:text-black"
+                  }`}
                 >
                   {category.name}
                 </Button>
@@ -143,7 +150,11 @@ export const HomeHero = ({
               key={category.name}
               variant="outline"
               to={category.link}
-              className="w-full rounded-xl border-black text-black hover:bg-black hover:text-white transition-all duration-300 uppercase py-6 text-sm font-bold tracking-widest"
+              className={`w-full rounded-xl transition-all duration-300 uppercase py-6 text-sm font-bold tracking-widest ${
+                dark
+                  ? "border-white text-white hover:bg-white hover:text-black"
+                  : "border-black text-black hover:bg-black hover:text-white"
+              }`}
             >
               {category.name}
             </Button>
