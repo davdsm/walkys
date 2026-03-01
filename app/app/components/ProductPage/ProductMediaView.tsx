@@ -93,69 +93,6 @@ export const ProductMediaView = ({
           )
         ) : null}
       </motion.div>
-
-      {/* Square thumbnails */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2.5 z-10 flex-wrap justify-center max-w-full px-4">
-        {slots.map((slot, index) => {
-          const thumbSrc = slotThumbSrc(slot);
-          const isVideo = slot.type === "image" && getMediaType(slot.url) === "video";
-          const selected = selectedIndex === index;
-          return (
-            <motion.button
-              key={index}
-              type="button"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 * index, duration: 0.3 }}
-              onClick={() => onSelectIndex(index)}
-              className={`relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all duration-200 bg-white shadow-sm hover:shadow-md ${
-                selected
-                  ? "border-black ring-2 ring-black/10 scale-105"
-                  : "border-slate-200 hover:border-slate-400"
-              }`}
-              aria-pressed={selected}
-              aria-label={
-                slot.type === "360"
-                  ? "Vista 360°"
-                  : `${productName} ${index + 1}`
-              }
-            >
-              {slot.type === "360" ? (
-                <>
-                  {thumbSrc ? (
-                    <img
-                      src={thumbSrc}
-                      alt="360°"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="absolute inset-0 w-full h-full flex items-center justify-center bg-slate-100 text-slate-600 text-xs font-medium" />
-                  )}
-                  <span className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg">
-                    <Icon360 className="size-6 text-white drop-shadow-sm" />
-                  </span>
-                </>
-              ) : thumbSrc ? (
-                isVideo ? (
-                  <video
-                    src={thumbSrc}
-                    className="w-full h-full object-cover"
-                    muted
-                    playsInline
-                    preload="metadata"
-                  />
-                ) : (
-                  <img
-                    src={thumbSrc}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                )
-              ) : null}
-            </motion.button>
-          );
-        })}
-      </div>
     </div>
   );
 };

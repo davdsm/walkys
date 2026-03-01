@@ -1,6 +1,6 @@
 import { redirect, Outlet, Link, useLocation, Form, useLoaderData } from "react-router";
 import type { Route } from "./+types/backoffice";
-import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
 import {
   LayoutDashboard,
   FileText,
@@ -58,8 +58,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!pb.authStore.isValid) {
     return redirect("/auth/login");
   }
-  const user = pb.authStore.model as { admin?: boolean; email?: string } | null;
+  const user = pb.authStore.model as { id?: string; admin?: boolean; email?: string } | null;
   if (!user?.admin) {
+    if (user?.id && (await getUserBlockedStatus(pb, user))) return redirect("/blocked");
+    if (user?.id && !(await canAccessUserBackoffice(pb, user))) return redirect("/pending-approval");
     return redirect("/dashboard");
   }
   let notifications: NotificationRecord[] = [];

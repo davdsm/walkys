@@ -54,8 +54,6 @@ export async function action({ request, params }: Route.ActionArgs) {
     name_en: (formData.get("name_en") as string) ?? "",
     description_pt: (formData.get("description_pt") as string) ?? "",
     description_en: (formData.get("description_en") as string) ?? "",
-    details_pt: (formData.get("details_pt") as string) ?? "",
-    details_en: (formData.get("details_en") as string) ?? "",
     slug: (formData.get("slug") as string) ?? "",
     enabled: formData.get("enabled") === "on",
   };
@@ -69,15 +67,13 @@ export async function action({ request, params }: Route.ActionArgs) {
   const hasMediaHoverFile = mediaHoverFile instanceof File && mediaHoverFile.size > 0;
   if (hasMediaHoverFile) data.media_hover = mediaHoverFile as File;
   const media360Files = formData.getAll("media_360").filter((f): f is File => f instanceof File && f.size > 0);
-  const mediaGalleryFiles = formData.getAll("media_gallery").filter((f): f is File => f instanceof File && f.size > 0);
 
   const removeMedia = formData.get("remove_media") === "1";
   const removeMediaHover = formData.get("remove_media_hover") === "1";
   const removeMedia360Filenames = formData.getAll("remove_media_360").filter((v): v is string => typeof v === "string" && v.length > 0);
-  const removeMediaGalleryFilenames = formData.getAll("remove_media_gallery").filter((v): v is string => typeof v === "string" && v.length > 0);
 
-  const hasAnyFiles = hasMediaFile || hasMediaHoverFile || media360Files.length > 0 || mediaGalleryFiles.length > 0;
-  const hasAnyRemovals = removeMedia || removeMediaHover || removeMedia360Filenames.length > 0 || removeMediaGalleryFilenames.length > 0;
+  const hasAnyFiles = hasMediaFile || hasMediaHoverFile || media360Files.length > 0;
+  const hasAnyRemovals = removeMedia || removeMediaHover || removeMedia360Filenames.length > 0;
 
   const buildPayload = (): Record<string, unknown> | FormData => {
     if (!hasAnyFiles && !hasAnyRemovals) return data as Record<string, unknown>;
@@ -86,8 +82,6 @@ export async function action({ request, params }: Route.ActionArgs) {
     fd.append("name_en", data.name_en as string);
     fd.append("description_pt", data.description_pt as string);
     fd.append("description_en", data.description_en as string);
-    fd.append("details_pt", data.details_pt as string);
-    fd.append("details_en", data.details_en as string);
     fd.append("slug", data.slug as string);
     fd.append("enabled", data.enabled ? "true" : "false");
     if (categoryId) fd.append("category", categoryId);
@@ -99,8 +93,6 @@ export async function action({ request, params }: Route.ActionArgs) {
     else if (hasMediaHoverFile) fd.append("media_hover", data.media_hover as File);
     removeMedia360Filenames.forEach((filename) => fd.append("media_360-", filename));
     media360Files.forEach((f) => fd.append("media_360", f));
-    removeMediaGalleryFilenames.forEach((filename) => fd.append("media_gallery-", filename));
-    mediaGalleryFiles.forEach((f) => fd.append("media_gallery", f));
     return fd;
   };
 
@@ -131,7 +123,7 @@ export default function BackofficeProductEdit() {
   const { product, categories, collections, sizesList, baseUrl, isNew } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const actionData = useActionData<typeof action>();
-  const p = product as { category?: string; collection?: string; media?: string | string[]; media_hover?: string; media_360?: string[]; media_gallery?: string[]; sizes?: string[] | { id: string; number?: string }[] } | null;
+  const p = product as { category?: string; collection?: string; media?: string | string[]; media_hover?: string; media_360?: string[]; sizes?: string[] | { id: string; number?: string }[] } | null;
   const categoryId = typeof p?.category === "string" ? p.category : (Array.isArray(p?.category) ? (p?.category as any)?.[0] : (p?.category as any)?.id) ?? "";
   const collectionId = typeof p?.collection === "string" ? p.collection : (Array.isArray(p?.collection) ? (p?.collection as any)?.[0] : (p?.collection as any)?.id) ?? "";
   const mediaFile = p?.media ? (Array.isArray(p.media) ? p.media[0] : p.media) : null;
@@ -140,8 +132,6 @@ export default function BackofficeProductEdit() {
   const mediaHoverUrl = baseUrl && product?.id && mediaHoverFile ? `${baseUrl}/api/files/products/${product.id}/${mediaHoverFile}` : null;
   const media360List = Array.isArray(p?.media_360) ? p.media_360 : [];
   const media360Urls = baseUrl && product?.id ? media360List.map((f: string) => `${baseUrl}/api/files/products/${product.id}/${f}`) : [];
-  const mediaGalleryList = Array.isArray(p?.media_gallery) ? p.media_gallery : [];
-  const mediaGalleryUrls = baseUrl && product?.id ? mediaGalleryList.map((f: string) => `${baseUrl}/api/files/products/${product.id}/${f}`) : [];
   const productSizeIds = Array.isArray(p?.sizes)
     ? (p.sizes as { id?: string }[]).map((s) => (typeof s === "string" ? s : s?.id)).filter(Boolean) as string[]
     : [];
@@ -340,37 +330,6 @@ export default function BackofficeProductEdit() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-          <h2 className="text-lg font-semibold text-slate-900">Galeria</h2>
-          <p className="text-sm text-slate-600">Imagens adicionais do produto (mostradas na página do produto após a imagem principal e o 360°). Enviar novos ficheiros substitui a galeria atual.</p>
-          {mediaGalleryUrls.length > 0 && (
-            <div className="rounded-lg bg-slate-50 border border-slate-100 p-4">
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3">Marque as imagens da galeria que deseja apagar</p>
-              <div className="flex flex-wrap gap-4">
-                {mediaGalleryList.map((filename, i) => (
-                  <label key={filename} className="relative flex flex-col items-center gap-1.5 cursor-pointer group">
-                    <img src={mediaGalleryUrls[i]} alt={`Galeria ${i + 1}`} className="w-20 h-20 rounded-md object-cover border-2 border-slate-200 shadow-sm group-hover:border-red-300 transition-colors" width={80} height={80} />
-                    <span className="text-xs text-slate-600">Imagem {i + 1}</span>
-                    <input type="checkbox" name="remove_media_gallery" value={filename} className="absolute top-0 right-0 w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500" title="Remover esta imagem" />
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-          <div>
-            <label htmlFor="media_gallery" className="block text-sm font-medium text-slate-700 mb-1">Ficheiros da galeria (múltiplos)</label>
-            <input
-              id="media_gallery"
-              name="media_gallery"
-              type="file"
-              accept="image/*,video/*"
-              multiple
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-800 file:text-white file:font-medium file:cursor-pointer hover:file:bg-slate-900 transition-colors"
-            />
-            <p className="mt-1.5 text-xs text-slate-500">Seleccione várias imagens (ou vídeos). A ordem de seleção define a ordem na página.</p>
-          </div>
-        </div>
-
         <div className="bg-white rounded-sm border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
           <h2 className="text-lg font-semibold text-slate-900">Descrições</h2>
           <div className="grid gap-4 md:grid-cols-2">
@@ -392,32 +351,6 @@ export default function BackofficeProductEdit() {
                 rows={4}
                 defaultValue={product?.description_en ?? ""}
                 className="w-full px-3 py-2 border border-slate-200 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-sm border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-          <h2 className="text-lg font-semibold text-slate-900">Detalhes (HTML)</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label htmlFor="details_pt" className="block text-sm font-medium text-slate-700 mb-1">Detalhes (PT)</label>
-              <textarea
-                id="details_pt"
-                name="details_pt"
-                rows={6}
-                defaultValue={product?.details_pt ?? ""}
-                className="w-full px-3 py-2 border border-slate-200 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50 font-mono text-sm"
-              />
-            </div>
-            <div>
-              <label htmlFor="details_en" className="block text-sm font-medium text-slate-700 mb-1">Detalhes (EN)</label>
-              <textarea
-                id="details_en"
-                name="details_en"
-                rows={6}
-                defaultValue={product?.details_en ?? ""}
-                className="w-full px-3 py-2 border border-slate-200 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50 font-mono text-sm"
               />
             </div>
           </div>

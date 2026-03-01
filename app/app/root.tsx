@@ -20,6 +20,7 @@ import { Header } from "./components/Layout/Header";
 import { LanguageProvider, LayoutProvider, CartProvider, HeaderBackgroundProvider } from "./contexts";
 import { PageTransition } from "./components/Layout/PageTransition";
 import { CartSidebar } from "./components/Cart/CartSidebar";
+import { LoginSuccessToast } from "./components/LoginSuccessToast";
 import { useFooter } from "./hooks/useFooter";
 import { useHeader } from "./hooks/useHeader";
 
@@ -113,6 +114,7 @@ export default function App() {
           {!shouldHideFooter && <Footer variant={footerVariant} />}
         </PageTransition>
         <CartSidebar />
+        <LoginSuccessToast />
       </HeaderBackgroundProvider>
     </CartProvider>
   );

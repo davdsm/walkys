@@ -1,14 +1,13 @@
-import { useState, useRef } from "react";
-import { useLoaderData, useNavigate, useRouteLoaderData } from "react-router";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState, useMemo } from "react";
+import { useLoaderData, useNavigate, useRouteLoaderData, redirect } from "react-router";
+import { motion } from "framer-motion";
 import { useLanguage, useCart } from "~/contexts";
 import type { ProductRecord, SizeRecord } from "~/hooks/useProducts";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, canAccessUserBackoffice, getUserBlockedStatus, getUserAllowedProductIds } from "~/lib/pocketbase";
 import { createProductService } from "~/lib/services";
 import {
   ProductMediaView,
   ProductInfo,
-  ProductDetails,
   MobileProductLayout,
   RelatedProducts,
 } from "~/components/ProductPage";
@@ -26,6 +25,14 @@ export async function loader({
   params: { product?: string };
 }): Promise<ProductLoaderData> {
   const pb = createPocketBase(request);
+  if (!pb.authStore.isValid) {
+    return redirect("/auth/login");
+  }
+  const user = pb.authStore.model as { id?: string; admin?: boolean } | null;
+  if (user?.id && (await getUserBlockedStatus(pb, user))) return redirect("/blocked");
+  if (user?.id && !(await canAccessUserBackoffice(pb, user))) return redirect("/pending-approval");
+
+  const allowedIds = await getUserAllowedProductIds(pb, user);
   const productService = createProductService(pb);
 
   const product = await productService.getBySlug(params.product || "", {
@@ -33,6 +40,10 @@ export async function loader({
   });
 
   if (!product) {
+    throw new Response("Product not found", { status: 404 });
+  }
+
+  if (allowedIds?.length && !allowedIds.includes(product.id)) {
     throw new Response("Product not found", { status: 404 });
   }
 
@@ -46,13 +57,13 @@ export async function loader({
 
   let relatedProducts: ProductRecord[] = [];
   if (collectionList.length > 0 && collectionList[0]?.id) {
-    const lrelatedProducts = (await productService.getByCollection(
+    let lrelatedProducts = (await productService.getByCollection(
       collectionList[0].id,
       {
         expand: "sizes,collection,category",
       },
     )) as ProductRecord[];
-    // Filter out current product and limit to 6
+    if (allowedIds?.length) lrelatedProducts = lrelatedProducts.filter((p) => allowedIds.includes(p.id));
     relatedProducts = lrelatedProducts
       .filter((p) => p.id !== product.id)
       .slice(0, 6);
@@ -80,25 +91,28 @@ export const ProductPage = () => {
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const langKey = language === "pt" ? "pt" : "en";
 
   // Extract product data
   const productName = (product as any)?.[`name_${langKey}`] ?? "";
   const productDescription = (product as any)?.[`description_${langKey}`] ?? "";
-  const productDetails = (product as any)?.[`details_${langKey}`] ?? "";
-  const mediaMain = product?.media ?? [];
-  const mediaGallery = (product as any)?.media_gallery ?? [];
-  const media = Array.isArray(mediaMain) && Array.isArray(mediaGallery)
-    ? [...mediaMain, ...mediaGallery]
-    : mediaMain;
-  const media360 = (product as any)?.media_360 ?? [];
+  const mediaMain = Array.isArray(product?.media) ? product.media : [];
+  const media360 = useMemo(
+    () => (Array.isArray((product as any)?.media_360) ? (product as any).media_360 : []),
+    [product]
+  );
+  // Inside the product page we only want to show the 360° viewer when available.
+  // If there is no 360° media, fall back to the main media array.
+  const mediaForViewer = useMemo(
+    () => (media360.length > 0 ? [] : mediaMain),
+    [media360.length, mediaMain]
+  );
   const expand = (product as any)?.expand || {};
   const productSlug = (product as any)?.slug ?? "";
   const productId = (product as any)?.id ?? "";
   const firstMediaUrl =
-    Array.isArray(media) && media.length > 0 ? media[0] : undefined;
+    Array.isArray(mediaMain) && mediaMain.length > 0 ? mediaMain[0] : undefined;
 
   // Get collection name
   const collectionList = expand.collection
@@ -138,20 +152,6 @@ export const ProductPage = () => {
     .map((s) => s.number)
     .sort((a, b) => Number.parseFloat(a) - Number.parseFloat(b));
 
-  // Scroll animation for right column
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
-
-  // Fade out product info, fade in details
-  const infoOpacity = useTransform(scrollYProgress, [0, 0.3, 0.5], [1, 0.5, 0]);
-  const detailsOpacity = useTransform(
-    scrollYProgress,
-    [0.3, 0.5, 0.7],
-    [0, 0.5, 1],
-  );
-
   const handleBack = () => {
     navigate(-1);
   };
@@ -171,38 +171,29 @@ export const ProductPage = () => {
     }
   };
 
-  // Calculate the amount to translate to "stick" the desktop layout
-  const translateY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-
   return (
     <>
-      <section
-        ref={containerRef}
-        className="bg-[#f1f1f1] md:min-h-[200vh] relative z-0 overflow-x-hidden w-screen"
-      >
+      <section className="bg-[#f1f1f1] md:min-h-screen relative z-0 overflow-x-hidden w-screen">
         {/* Desktop Layout */}
         <div className="hidden md:block">
           <motion.div
-            style={{ y: translateY }}
             className="h-screen flex w-full relative"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           >
             {/* Left Column - Full Screen Image with Thumbnails */}
-            <motion.div
-              className="w-1/2 relative h-full"
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            >
+            <motion.div className="w-1/2 relative h-full">
               <ProductMediaView
                 media360={media360}
-                media={media}
+                media={mediaForViewer}
                 selectedIndex={selectedImage}
                 onSelectIndex={setSelectedImage}
                 productName={productName}
               />
             </motion.div>
 
-            {/* Right Column - Product Info & Details Centered Vertically */}
+            {/* Right Column - Product Info */}
             <motion.div
               className="w-1/2 h-full flex flex-col justify-center px-12 lg:px-20 relative"
               initial={{ opacity: 0, y: 24 }}
@@ -210,7 +201,7 @@ export const ProductPage = () => {
               transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
             >
               <div className="relative w-full">
-                {/* Product Info - Fades Out */}
+                {/* Product Info (no scroll-based fade) */}
                 <ProductInfo
                   productName={productName}
                   productDescription={productDescription}
@@ -223,14 +214,6 @@ export const ProductPage = () => {
                   onBack={handleBack}
                   onOrder={handleOrder}
                   language={language}
-                  opacity={infoOpacity}
-                />
-
-                {/* Product Details - Fades In */}
-                <ProductDetails
-                  productDetails={productDetails}
-                  language={language}
-                  opacity={detailsOpacity}
                 />
               </div>
             </motion.div>
@@ -247,10 +230,9 @@ export const ProductPage = () => {
           <MobileProductLayout
             productName={productName}
             productDescription={productDescription}
-            productDetails={productDetails}
             collectionName={collectionName}
             media360={media360}
-            media={media}
+            media={mediaForViewer}
             selectedImage={selectedImage}
             onImageSelect={setSelectedImage}
             sizes={sortedSizes}

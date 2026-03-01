@@ -518,7 +518,7 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
           initial={{ x: "0%" }}
           animate={{ x: open ? "-30%" : "0%" }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
-          className={`border-solid border-1 border-white/10 bg-black/10 backdrop-blur-sm left-1/2 -translate-x-1/2 absolute px-6 py-3 md:px-12 md:py-6 z-20 top-5 ${scrolled ? "w-5/6" : "w-4/6"} rounded-full mx-auto flex items-center justify-between transition-[width] duration-800 ease-in-out`}
+          className={`border-solid border-1 border-white/10 bg-black/10 backdrop-blur-sm left-1/2 -translate-x-1/2 absolute px-6 py-3 md:px-12 md:py-3 z-20 top-5 ${scrolled ? "w-5/6" : "w-4/6"} rounded-full mx-auto flex items-center justify-between transition-[width] duration-800 ease-in-out`}
           aria-label="Main navigation header"
         >
           <div
@@ -529,9 +529,9 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
               <img
                 src={logoUrl || "/src/assets/logos/reactbits-gh-white.svg"}
                 alt="Logo"
-                className={`${invertLogo ? "invert " : ""}sm-logo-img block h-8 w-auto object-contain`}
+                className={`${invertLogo ? "invert " : ""}sm-logo-img block h-14 w-auto object-contain`}
                 draggable={false}
-                width={110}
+                width={210}
                 height={24}
               />
             </Link>
@@ -636,14 +636,16 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
               className="sm-socials mt-auto pt-8 flex flex-col gap-3"
               aria-label="Social links"
             >
-              <Link to={isAuthenticated ? "/dashboard" : "/auth/login"}>
-                <h3 className="flex items-center gap-2 font-sans sm-socials-title m-0 text-base font-medium [color:var(--sm-accent,#ff0000)]">
-                  <UserIcon className="w-5 h-5" />
-                  {isAuthenticated
-                    ? t.account.myAccount
-                    : t.account.loginRegister}
-                </h3>
-              </Link>
+              <span onClick={closeMenu} role="presentation">
+                <Link to={isAuthenticated ? "/dashboard" : "/auth/login"}>
+                  <h3 className="flex items-center gap-2 font-sans sm-socials-title m-0 text-base font-medium [color:var(--sm-accent,#ff0000)]">
+                    <UserIcon className="w-5 h-5" />
+                    {isAuthenticated
+                      ? t.account.myAccount
+                      : t.account.loginRegister}
+                  </h3>
+                </Link>
+              </span>
             </div>
           </div>
         </aside>
@@ -652,7 +654,6 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
       <style>{`
 .sm-scope .staggered-menu-wrapper { position: relative; width: 100%; height: 100%; z-index: 40; }
 .sm-scope .sm-logo { display: flex; align-items: center; user-select: none; }
-.sm-scope .sm-logo-img { display: block; height: 32px; width: auto; object-fit: contain; }
 .sm-scope .sm-toggle { position: relative; display: inline-flex; align-items: center; gap: 0.3rem; background: transparent; border: none; cursor: pointer; color: ${invertLogo ? "#e9e9ef" : "#111"}; font-weight: 500; line-height: 1; overflow: visible; }
 .sm-scope .sm-line:last-of-type { margin-top: 6px; }
 .sm-scope .sm-toggle-textWrap { position: relative; margin-right: 0.5em; display: inline-block; height: 1em; overflow: hidden; white-space: nowrap; width: var(--sm-toggle-width, auto); min-width: var(--sm-toggle-width, auto); }

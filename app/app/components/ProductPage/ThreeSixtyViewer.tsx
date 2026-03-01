@@ -77,11 +77,16 @@ export const ThreeSixtyViewer = ({
     };
   }, [count, currentFrame, goToFrame]);
 
-  const toImgSrc = (url: string) => {
+  const toImgSrc = useCallback((url: string) => {
     if (!url) return "";
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
     return url.startsWith("/") ? url : `/${url}`;
-  };
+  }, []);
+
+  // Stable key so effect only re-runs when the actual list of URLs changes (not on every parent re-render with new array ref)
+  const imagesKey = images.length > 0 ? images.map(toImgSrc).filter(Boolean).join("\0") : "";
+
+  const PRELOAD_TIMEOUT_MS = 12000; // Fallback: show viewer even if some images are still loading
 
   // Preload all 360° images and wait for decode so rotation has zero white flash
   useEffect(() => {
@@ -89,8 +94,16 @@ export const ThreeSixtyViewer = ({
       setIsReady(true);
       return;
     }
+    setIsReady(false);
     let cancelled = false;
     const urls = images.map((url) => toImgSrc(url)).filter(Boolean);
+    if (urls.length === 0) {
+      setIsReady(true);
+      return;
+    }
+    const applyReady = () => {
+      if (!cancelled) setIsReady(true);
+    };
     const loadPromises = urls.map(
       (url) =>
         new Promise<void>((resolve) => {
@@ -106,13 +119,13 @@ export const ThreeSixtyViewer = ({
           img.src = url;
         })
     );
-    Promise.all(loadPromises).then(() => {
-      if (!cancelled) setIsReady(true);
-    });
+    Promise.all(loadPromises).then(applyReady);
+    const timeoutId = window.setTimeout(applyReady, PRELOAD_TIMEOUT_MS);
     return () => {
       cancelled = true;
+      window.clearTimeout(timeoutId);
     };
-  }, [images]);
+  }, [imagesKey, images.length, toImgSrc]);
 
   if (count === 0) {
     return (

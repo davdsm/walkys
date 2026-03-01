@@ -7,7 +7,6 @@ import { NotificationBell, type NotificationItem } from "~/components/Backoffice
 
 interface BackofficePageProps {
     displayName: string;
-    catalogCount?: number;
     ordersCount?: number;
     notifications?: NotificationItem[];
     markReadAction?: string;
@@ -15,7 +14,6 @@ interface BackofficePageProps {
 
 export default function BackofficePage({
     displayName,
-    catalogCount = 0,
     ordersCount = 0,
     notifications = [],
     markReadAction,
@@ -79,35 +77,6 @@ export default function BackofficePage({
                                         d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
                                     />
                                 </svg>
-                            }
-                        />
-                    </div>
-                    <div className="w-full md:w-[calc(50%-12px)]">
-                        <BackofficeCard
-                            title={t.userBackoffice.catalog}
-                            info={`${catalogCount} ${catalogCount === 1 ? t.userBackoffice.product : t.userBackoffice.products}`}
-                            link="/catalog"
-                            icon={
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth="1.5"
-                                    stroke="currentColor"
-                                    className="group-hover:text-white w-full h-full"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z"
-                                    />
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z"
-                                    />
-                                </svg>
-
                             }
                         />
                     </div>

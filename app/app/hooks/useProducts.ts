@@ -37,8 +37,6 @@ export interface ProductRecord extends BaseRecord {
   media_hover?: string;
   /** 360° viewer frame filenames (order matters) */
   media_360?: string[];
-  /** Gallery images (shown after main image on product page) */
-  media_gallery?: string[];
   category?: string[] | CategoryRecord[];
   collection?: string[] | CollectionRecord[];
   sizes?: string[] | SizeRecord[];
@@ -57,7 +55,6 @@ export interface TranslatedProduct {
   media: string[];
   media_hover: string;
   media_360: string[];
-  media_gallery: string[];
   category: string[]; // Array of translated category names
   collection: string[]; // Array of translated collection names
   sizes: string[]; // Array of size numbers
@@ -170,7 +167,6 @@ export function useProducts() {
               media: buildFileUrls(record.id, record.media, pb),
               media_hover: buildFileUrl(record.id, record.media_hover, pb),
               media_360: buildFileUrls(record.id, record.media_360, pb),
-              media_gallery: buildFileUrls(record.id, record.media_gallery, pb),
               category: categories,
               collection: collections,
               sizes: sizes,

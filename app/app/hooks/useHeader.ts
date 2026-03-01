@@ -33,7 +33,6 @@ export function useHeader(): {
     "/forgot-password",
     "/logout",
     "/orders",
-    "/catalog",
     "/checkout",
   ];
 

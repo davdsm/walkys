@@ -1,7 +1,5 @@
 import { useState, type FormEvent, type ChangeEvent } from "react";
-import { Link, useSubmit, useActionData, useNavigation } from "react-router";
-import { Calendar } from "lucide-react";
-import { AnimatedEye } from "~/components/Elements/AnimatedEye/AnimatedEye";
+import { Link, Form, useActionData, useNavigation } from "react-router";
 import { Button } from "~/components/Elements/Button/Button";
 import { Input } from "~/components/Elements/Input/Input";
 import { useLanguage } from "~/contexts";
@@ -10,28 +8,25 @@ interface SignupFormData {
     fullName: string;
     email: string;
     password: string;
-    repeatPassword: string;
+    confirmPassword: string;
 }
 
 interface FormErrors {
     fullName?: string;
     email?: string;
     password?: string;
-    repeatPassword?: string;
+    confirmPassword?: string;
 }
 
 export const SignupForm = () => {
     const { t } = useLanguage();
-    const [showPassword, setShowPassword] = useState(false);
-    const [showRepeatPassword, setShowRepeatPassword] = useState(false);
     const [formData, setFormData] = useState<SignupFormData>({
         fullName: "",
         email: "",
         password: "",
-        repeatPassword: "",
+        confirmPassword: "",
     });
     const [errors, setErrors] = useState<FormErrors>({});
-    const submit = useSubmit();
     const actionData = useActionData();
     const navigation = useNavigation();
     const isSubmitting = navigation.state === "submitting";
@@ -55,14 +50,12 @@ export const SignupForm = () => {
             newErrors.password = t.errors.passwordRequired;
         } else if (formData.password.length < 8) {
             newErrors.password = t.errors.passwordMinLength8;
-        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-            newErrors.password = t.errors.passwordRequirements;
         }
 
-        if (!formData.repeatPassword) {
-            newErrors.repeatPassword = t.errors.confirmPasswordRequired;
-        } else if (formData.password !== formData.repeatPassword) {
-            newErrors.repeatPassword = t.errors.passwordsNotMatch;
+        if (!formData.confirmPassword) {
+            newErrors.confirmPassword = t.errors.confirmPasswordRequired;
+        } else if (formData.password !== formData.confirmPassword) {
+            newErrors.confirmPassword = t.errors.passwordsNotMatch;
         }
 
         setErrors(newErrors);
@@ -81,13 +74,9 @@ export const SignupForm = () => {
     };
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
         if (!validateForm()) {
-            return;
+            e.preventDefault();
         }
-
-        submit(formData as any, { method: "post" });
     };
 
     return (
@@ -102,7 +91,8 @@ export const SignupForm = () => {
                 )}
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <Form method="post" onSubmit={handleSubmit} className="flex flex-col gap-5">
+                <input type="hidden" name="mode" value="register" />
                 <Input
                     label={t.signup.fullName}
                     type="text"
@@ -127,26 +117,28 @@ export const SignupForm = () => {
 
                 <Input
                     label={t.signup.password}
-                    type={showPassword ? "text" : "password"}
+                    type="password"
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
                     placeholder={t.signup.passwordPlaceholder}
                     error={errors.password}
                     required
-                    rightIcon={<AnimatedEye isVisible={showPassword} onClick={() => setShowPassword(!showPassword)} />}
+                    minLength={8}
+                    autoComplete="new-password"
                 />
 
                 <Input
                     label={t.signup.confirmPassword}
-                    type={showRepeatPassword ? "text" : "password"}
-                    name="repeatPassword"
-                    value={formData.repeatPassword}
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
                     onChange={handleInputChange}
                     placeholder={t.signup.confirmPasswordPlaceholder}
-                    error={errors.repeatPassword}
+                    error={errors.confirmPassword}
                     required
-                    rightIcon={<AnimatedEye isVisible={showRepeatPassword} onClick={() => setShowRepeatPassword(!showRepeatPassword)} />}
+                    minLength={8}
+                    autoComplete="new-password"
                 />
 
                 <Button
@@ -159,7 +151,7 @@ export const SignupForm = () => {
                 >
                     {isSubmitting ? t.signup.signingUp : t.signup.signUp}
                 </Button>
-            </form>
+            </Form>
 
             <div className="text-center text-sm text-gray-500 mt-4">
                 {t.signup.haveAccount} <Link to="/auth/login" className="text-black font-bold hover:underline">{t.signup.signIn}</Link>

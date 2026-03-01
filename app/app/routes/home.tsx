@@ -8,7 +8,7 @@ import { SmallCTA } from "~/components/SmallCTA";
 import { useLanguage, useHeaderBackground } from "~/contexts";
 
 import type { Route } from "./+types/home";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, getUserAllowedProductIds } from "~/lib/pocketbase";
 import {
   createCategoryService,
   createPageService,
@@ -19,9 +19,12 @@ import { useLoaderData } from "react-router";
 import { getLanguageFromRequest } from "~/lib/utils";
 import HomepageCard from "~/components/Cards/HomepageCard";
 
-// Loader: Fetch data on the server/route level
+// Loader: Fetch data on the server/route level. Homepage is public; product filtering applies only when user is logged in and has products assigned.
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
+  const user = pb.authStore.isValid ? (pb.authStore.model as { id?: string; admin?: boolean } | null) : null;
+  const allowedIds = user?.id ? await getUserAllowedProductIds(pb, user) : null;
+
   const language = getLanguageFromRequest(request);
 
   const pageService = createPageService(pb, "Homepage", language);
@@ -47,9 +50,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 
       if (typeof firstProduct === "string") {
         // Products are just IDs, fetch them
-        const productIds = sliderProductsSection.products.filter(
+        let productIds = sliderProductsSection.products.filter(
           (id: any): id is string => typeof id === "string",
         );
+        if (allowedIds?.length) productIds = productIds.filter((id: string) => allowedIds.includes(id));
         if (productIds.length > 0) {
           homepageProducts = await productService.getByIds(productIds, {
             expand: "sizes,collection,category",
@@ -61,18 +65,25 @@ export async function loader({ request }: Route.LoaderArgs) {
         "id" in firstProduct
       ) {
         // Products are already expanded by PageService, use them directly
-        // They should already be transformed by PageService
         homepageProducts = sliderProductsSection.products;
+        if (allowedIds?.length) homepageProducts = homepageProducts.filter((p: any) => p?.id && allowedIds.includes(p.id));
       }
     }
 
     // Fallback to featured products if no products found in homepage
-    const featuredProducts =
-      homepageProducts.length > 0
-        ? homepageProducts
-        : await productService.getFeatured(6, {
-            expand: "sizes,collection,category",
-          });
+    let featuredProducts: any[];
+    if (homepageProducts.length > 0) {
+      featuredProducts = homepageProducts;
+    } else if (allowedIds?.length) {
+      featuredProducts = await productService.getByIds(allowedIds, {
+        expand: "sizes,collection,category",
+      });
+      featuredProducts = featuredProducts.slice(0, 6);
+    } else {
+      featuredProducts = await productService.getFeatured(6, {
+        expand: "sizes,collection,category",
+      });
+    }
 
     // Card categories: prefer "categories-section-highlighted"; fallback to "categories-section-list" (backward compat)
     const categoriesSectionHighlighted = homepageData.find(
@@ -133,10 +144,11 @@ export async function loader({ request }: Route.LoaderArgs) {
         )
           ? (listCategories as any[])
           : await categoryService.getByIds(listCategoryIds);
-        const products = await productService.getByCategoryIds(
+        let products = await productService.getByCategoryIds(
           listCategoryIds,
           { expand: "category,sizes" },
         );
+        if (allowedIds?.length) products = products.filter((p: any) => allowedIds.includes(p.id));
         listCategoriesWithProducts = mapCategoriesWithProducts(
           listCats,
           products,

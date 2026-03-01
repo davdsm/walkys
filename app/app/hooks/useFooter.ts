@@ -1,59 +1,40 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useLocation } from "react-router";
 
 /**
- * Hook to use useFooter in components
- * Automatically decides if footer appear based on route
- *
- * @returns boolean indicating if footer should be shown
- *
- * @example
- * ```tsx
- * function MyComponent() {
- *   const { shouldHideFooter, variant } = useFooter();
- *
- *  return <>{ shouldHideFooter && <Footer variant={variant} />}</>
- * }
- * ```
+ * Hook to determine footer visibility and variant from the current route.
+ * Uses current pathname synchronously so the footer always shows/hides correctly
+ * without depending on useEffect (avoids hydration or timing issues).
  */
 export function useFooter(): {
   shouldHideFooter: boolean;
   variant: "light" | "dark";
 } {
   const location = useLocation();
-  const [shouldHideFooter, setShouldHideFooter] = useState(false);
-  const [variant, setVariant] = useState<"light" | "dark">("light");
+  const pathname = location?.pathname ?? "/";
 
-  // Routes where Footer should NOT be displayed
-  const hideFooterRoutes = [
-    "/auth/login",
-    "/dashboard",
-    "/backoffice",
-    "/forgot-password",
-    "/logout",
-    "/catalog",
-    "/orders",
-    "/checkout",
-  ];
+  return useMemo(() => {
+    const hideFooterRoutes = [
+      "/auth",
+      "/dashboard",
+      "/backoffice",
+      "/forgot-password",
+      "/logout",
+      "/orders",
+      "/checkout",
+      "/pending-approval",
+      "/blocked",
+      "/registration-success",
+    ];
+    const darkVariantRoutes = ["/terms", "/privacy"];
 
-  // Routes with white backgrounds need dark variant
-  const darkVariantRoutes = ["/terms", "/privacy"];
-
-  useEffect(() => {
-    console.log("Current pathname: ", location?.pathname);
     const shouldHideFooter = hideFooterRoutes.some((route) =>
-      location?.pathname?.startsWith(route)
+      pathname.startsWith(route)
     );
-    console.log("shouldHideFooter: ", shouldHideFooter);
+    const variant = darkVariantRoutes.some((route) => pathname.startsWith(route))
+      ? "dark"
+      : "light";
 
-    const useWhiteVariant = darkVariantRoutes.some((route) =>
-      location?.pathname?.startsWith(route)
-    );
-    console.log("useWhiteVariant: ", useWhiteVariant);
-
-    setShouldHideFooter(shouldHideFooter);
-    setVariant(useWhiteVariant ? "dark" : "light");
-  }, [location.pathname]);
-
-  return { shouldHideFooter, variant };
+    return { shouldHideFooter, variant };
+  }, [pathname]);
 }

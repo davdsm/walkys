@@ -19,8 +19,6 @@ export interface ProductRecord extends BaseRecord {
   media_hover?: string;
   /** 360° viewer frame filenames (order matters) */
   media_360?: string[];
-  /** Gallery images (shown after main image on product page) */
-  media_gallery?: string[];
   category?: string[] | CategoryRecord[];
   collection?: string[] | CollectionRecord[];
   sizes?: string[] | SizeRecord[];
@@ -34,7 +32,6 @@ export interface TranslatedProduct extends Omit<ProductRecord, "name_en" | "name
   media: string[];
   media_hover: string;
   media_360: string[];
-  media_gallery: string[];
 }
 
 export interface ProductServiceOptions {
@@ -93,9 +90,6 @@ export class ProductService {
         : typeof (product as any).media_360 === "string" && (product as any).media_360
           ? this.buildFileUrls(product.id, [(product as any).media_360], collectionId)
           : [],
-      media_gallery: Array.isArray(product.media_gallery)
-        ? this.buildFileUrls(product.id, product.media_gallery, collectionId)
-        : [],
     };
   }
 

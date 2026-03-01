@@ -301,102 +301,6 @@ export async function action({ request, params }: Route.ActionArgs) {
     return { ok: true };
   }
 
-  if (page === "AboutPage" && collectionName === "AboutPage" && intent === "update_about_gallery") {
-    const galleryMediaFiles = formData.getAll("gallery_media").filter((f): f is File => f instanceof File && f.size > 0);
-    const idAboutGallery = (formData.get("id_about_gallery") as string) || "";
-    if (idAboutGallery && galleryMediaFiles.length > 0) {
-      const body = new FormData();
-      body.append("section_id", "about_gallery");
-      body.append("section_name", "Galeria About");
-      body.append("value_pt", "");
-      body.append("value_en", "");
-      galleryMediaFiles.forEach((f) => body.append("media", f));
-      await pb.collection(collectionName).update(idAboutGallery, body);
-    } else if (!idAboutGallery && galleryMediaFiles.length > 0) {
-      const body = new FormData();
-      body.append("section_id", "about_gallery");
-      body.append("section_name", "Galeria About");
-      body.append("value_pt", "");
-      body.append("value_en", "");
-      galleryMediaFiles.forEach((f) => body.append("media", f));
-      await pb.collection(collectionName).create(body);
-    }
-    const idGalleryTitle = (formData.get("id_gallery_section_title") as string) || "";
-    const galleryTitlePt = (formData.get("gallery_section_title_pt") as string) ?? "";
-    const galleryTitleEn = (formData.get("gallery_section_title_en") as string) ?? "";
-    if (idGalleryTitle) {
-      await pb.collection(collectionName).update(idGalleryTitle, { value_pt: galleryTitlePt, value_en: galleryTitleEn });
-    } else if (galleryTitlePt || galleryTitleEn) {
-      await pb.collection(collectionName).create({ section_id: "gallery_section_title", section_name: "Título da secção Processo (ex: Como tudo começa)", value_pt: galleryTitlePt, value_en: galleryTitleEn, media: [], categories: [], products: [] });
-    }
-    return { ok: true };
-  }
-
-  if (page === "AboutPage" && collectionName === "AboutPage" && intent === "update_about_passos") {
-    const updateOrCreateStep = async (
-      idKey: string,
-      sectionId: string,
-      sectionName: string,
-      valuePt: string,
-      valueEn: string,
-      mediaFile: File | null
-    ) => {
-      const id = (formData.get(idKey) as string) || "";
-      if (id && mediaFile?.size) {
-        const body = new FormData();
-        body.append("section_id", sectionId);
-        body.append("section_name", sectionName);
-        body.append("value_pt", valuePt);
-        body.append("value_en", valueEn);
-        body.append("media", mediaFile);
-        await pb.collection(collectionName).update(id, body);
-      } else if (id) {
-        await pb.collection(collectionName).update(id, { value_pt: valuePt, value_en: valueEn });
-      } else if (valuePt || valueEn || mediaFile?.size) {
-        if (mediaFile?.size) {
-          const body = new FormData();
-          body.append("section_id", sectionId);
-          body.append("section_name", sectionName);
-          body.append("value_pt", valuePt);
-          body.append("value_en", valueEn);
-          body.append("media", mediaFile);
-          await pb.collection(collectionName).create(body);
-        } else {
-          await pb.collection(collectionName).create({ section_id: sectionId, section_name: sectionName, value_pt: valuePt, value_en: valueEn, media: [], categories: [], products: [] });
-        }
-      }
-    };
-    const updateOrCreateTitle = async (idKey: string, sectionId: string, sectionName: string, valuePt: string, valueEn: string) => {
-      const id = (formData.get(idKey) as string) || "";
-      if (id) {
-        await pb.collection(collectionName).update(id, { value_pt: valuePt, value_en: valueEn });
-      } else if (valuePt || valueEn) {
-        await pb.collection(collectionName).create({ section_id: sectionId, section_name: sectionName, value_pt: valuePt, value_en: valueEn, media: [], categories: [], products: [] });
-      }
-    };
-    const moldPt = (formData.get("mold_pt") as string) ?? "";
-    const moldEn = (formData.get("mold_en") as string) ?? "";
-    const moldMedia = formData.get("mold_media") instanceof File ? (formData.get("mold_media") as File) : null;
-    const shappingPt = (formData.get("shapping_pt") as string) ?? "";
-    const shappingEn = (formData.get("shapping_en") as string) ?? "";
-    const shappingMedia = formData.get("shapping_media") instanceof File ? (formData.get("shapping_media") as File) : null;
-    const tabulatedPt = (formData.get("tabulated_pt") as string) ?? "";
-    const tabulatedEn = (formData.get("tabulated_en") as string) ?? "";
-    const tabulatedMedia = formData.get("tabulated_media") instanceof File ? (formData.get("tabulated_media") as File) : null;
-    const qualityPt = (formData.get("quality_pt") as string) ?? "";
-    const qualityEn = (formData.get("quality_en") as string) ?? "";
-    const qualityMedia = formData.get("quality_media") instanceof File ? (formData.get("quality_media") as File) : null;
-    await updateOrCreateStep("id_mold", "mold", "Passo 1 – Mold", moldPt, moldEn, moldMedia);
-    await updateOrCreateStep("id_shapping", "shapping", "Passo 2 – Shapping", shappingPt, shappingEn, shappingMedia);
-    await updateOrCreateStep("id_tabulated", "tabulated", "Passo 3 – Tabulated", tabulatedPt, tabulatedEn, tabulatedMedia);
-    await updateOrCreateStep("id_quality", "quality", "Passo 4 – Quality", qualityPt, qualityEn, qualityMedia);
-    await updateOrCreateTitle("id_mold_title", "mold_title", "Passo 1 – Título (Molde)", (formData.get("mold_title_pt") as string) ?? "", (formData.get("mold_title_en") as string) ?? "");
-    await updateOrCreateTitle("id_shapping_title", "shapping_title", "Passo 2 – Título (Forma)", (formData.get("shapping_title_pt") as string) ?? "", (formData.get("shapping_title_en") as string) ?? "");
-    await updateOrCreateTitle("id_tabulated_title", "tabulated_title", "Passo 3 – Título (Tabelado)", (formData.get("tabulated_title_pt") as string) ?? "", (formData.get("tabulated_title_en") as string) ?? "");
-    await updateOrCreateTitle("id_quality_title", "quality_title", "Passo 4 – Título (Qualidade)", (formData.get("quality_title_pt") as string) ?? "", (formData.get("quality_title_en") as string) ?? "");
-    return { ok: true };
-  }
-
   if (intent === "update" && id) {
     const value_pt = (formData.get("value_pt") as string) ?? "";
     const value_en = (formData.get("value_en") as string) ?? "";
@@ -713,16 +617,16 @@ export default function BackofficePagesPage() {
   const card2Text = isAboutPage ? getRecordBySectionId(records, "what_about_card_2_text") : null;
   const card2Image = isAboutPage ? getRecordBySectionId(records, "what_about_card_2_image") : null;
   const whatAboutSectionTitle = isAboutPage ? getRecordBySectionId(records, "what_about_section_title") : null;
-  const aboutGallery = isAboutPage ? getRecordBySectionId(records, "about_gallery") : null;
-  const gallerySectionTitle = isAboutPage ? getRecordBySectionId(records, "gallery_section_title") : null;
-  const moldRecord = isAboutPage ? getRecordBySectionId(records, "mold") : null;
-  const shappingRecord = isAboutPage ? getRecordBySectionId(records, "shapping") : null;
-  const tabulatedRecord = isAboutPage ? getRecordBySectionId(records, "tabulated") : null;
-  const qualityRecord = isAboutPage ? getRecordBySectionId(records, "quality") : null;
-  const moldTitleRecord = isAboutPage ? getRecordBySectionId(records, "mold_title") : null;
-  const shappingTitleRecord = isAboutPage ? getRecordBySectionId(records, "shapping_title") : null;
-  const tabulatedTitleRecord = isAboutPage ? getRecordBySectionId(records, "tabulated_title") : null;
-  const qualityTitleRecord = isAboutPage ? getRecordBySectionId(records, "quality_title") : null;
+  const aboutGallery = null;
+  const gallerySectionTitle = null;
+  const moldRecord = null;
+  const shappingRecord = null;
+  const tabulatedRecord = null;
+  const qualityRecord = null;
+  const moldTitleRecord = null;
+  const shappingTitleRecord = null;
+  const tabulatedTitleRecord = null;
+  const qualityTitleRecord = null;
   const recordsToShow = isAboutPage ? [] : records;
 
   return (
@@ -899,96 +803,7 @@ export default function BackofficePagesPage() {
               </Form>
             </section>
 
-            <section className="bg-white rounded-sm border border-slate-200 shadow-sm p-6 sm:p-8" aria-labelledby="about-gallery-heading">
-              <h2 id="about-gallery-heading" className="text-lg font-bold text-slate-900 mb-4">Processo (título e galeria)</h2>
-              <Form method="post" encType="multipart/form-data" className="space-y-6">
-                <input type="hidden" name="intent" value="update_about_gallery" />
-                {gallerySectionTitle && <input type="hidden" name="id_gallery_section_title" value={gallerySectionTitle.id} />}
-                {aboutGallery && <input type="hidden" name="id_about_gallery" value={aboutGallery.id} />}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Título da secção (PT)</label>
-                    <input type="text" name="gallery_section_title_pt" defaultValue={gallerySectionTitle?.value_pt ?? ""} className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50 text-slate-900" placeholder="ex: Como tudo começa" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Título da secção (EN)</label>
-                    <input type="text" name="gallery_section_title_en" defaultValue={gallerySectionTitle?.value_en ?? ""} className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50 text-slate-900" placeholder="ex: How it all starts" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Imagens da galeria</label>
-                  {aboutGallery?.media && Array.isArray(aboutGallery.media) && aboutGallery.media.length > 0 && baseUrl && (
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {aboutGallery.media.slice(0, 6).map((f: string) => (
-                        <img key={f} src={`${baseUrl}/api/files/${collectionName}/${aboutGallery.id}/${f}`} alt="" className="w-16 h-16 rounded-sm object-cover border border-slate-200" width={64} height={64} />
-                      ))}
-                    </div>
-                  )}
-                  <input type="file" name="gallery_media" accept="image/*" multiple className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-slate-50 file:mr-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:bg-slate-700 file:text-slate-100 file:font-medium text-sm" />
-                  <p className="text-xs text-slate-500 mt-1">Pode selecionar vários ficheiros. Novas imagens substituem as existentes.</p>
-                </div>
-                <button type="submit" disabled={navigation.state === "submitting"} className="px-4 py-2.5 bg-slate-800 text-white rounded-sm hover:bg-slate-900 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-50 font-medium text-sm">
-                  {navigation.state === "submitting" ? "A guardar…" : "Guardar Processo"}
-                </button>
-              </Form>
-            </section>
-
-            <section className="bg-white rounded-sm border border-slate-200 shadow-sm p-6 sm:p-8" aria-labelledby="about-passos-heading">
-              <h2 id="about-passos-heading" className="text-lg font-bold text-slate-900 mb-1">Passos</h2>
-              <p className="text-sm text-slate-600 mb-6">Os 4 passos exibidos na página Sobre (Molde, Forma, Tabelado, Qualidade). Edite título, descrição e imagem de cada passo.</p>
-              <Form method="post" encType="multipart/form-data" className="space-y-6">
-                <input type="hidden" name="intent" value="update_about_passos" />
-                {moldRecord && <input type="hidden" name="id_mold" value={moldRecord.id} />}
-                {shappingRecord && <input type="hidden" name="id_shapping" value={shappingRecord.id} />}
-                {tabulatedRecord && <input type="hidden" name="id_tabulated" value={tabulatedRecord.id} />}
-                {qualityRecord && <input type="hidden" name="id_quality" value={qualityRecord.id} />}
-                {moldTitleRecord && <input type="hidden" name="id_mold_title" value={moldTitleRecord.id} />}
-                {shappingTitleRecord && <input type="hidden" name="id_shapping_title" value={shappingTitleRecord.id} />}
-                {tabulatedTitleRecord && <input type="hidden" name="id_tabulated_title" value={tabulatedTitleRecord.id} />}
-                {qualityTitleRecord && <input type="hidden" name="id_quality_title" value={qualityTitleRecord.id} />}
-                {[
-                  { key: "mold", label: "Passo 1 – Mold", record: moldRecord, titleRecord: moldTitleRecord },
-                  { key: "shapping", label: "Passo 2 – Shapping (Forma)", record: shappingRecord, titleRecord: shappingTitleRecord },
-                  { key: "tabulated", label: "Passo 3 – Tabulated (Tabelado)", record: tabulatedRecord, titleRecord: tabulatedTitleRecord },
-                  { key: "quality", label: "Passo 4 – Quality (Qualidade)", record: qualityRecord, titleRecord: qualityTitleRecord },
-                ].map(({ key, label, record, titleRecord }) => (
-                  <div key={key} className="grid gap-4 sm:grid-cols-2 border border-slate-200 rounded-sm p-4 bg-slate-50/50">
-                    <div className="sm:col-span-2 font-medium text-slate-800">{label}</div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Título (PT)</label>
-                      <input type="text" name={`${key}_title_pt`} defaultValue={titleRecord?.value_pt ?? ""} className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-white text-slate-900" placeholder="ex: Molde" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Título (EN)</label>
-                      <input type="text" name={`${key}_title_en`} defaultValue={titleRecord?.value_en ?? ""} className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-white text-slate-900" placeholder="ex: Mold" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Descrição (PT)</label>
-                      <textarea name={`${key}_pt`} rows={3} defaultValue={record?.value_pt ?? ""} className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-white text-slate-900" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Descrição (EN)</label>
-                      <textarea name={`${key}_en`} rows={3} defaultValue={record?.value_en ?? ""} className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-white text-slate-900" />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Imagem</label>
-                      {record?.media && Array.isArray(record.media) && record.media.length > 0 && baseUrl && (
-                        <div className="flex gap-2 mb-2">
-                          {record.media.slice(0, 1).map((f: string) => (
-                            <img key={f} src={`${baseUrl}/api/files/${collectionName}/${record.id}/${f}`} alt="" className="w-20 h-20 rounded-sm object-cover border border-slate-200" width={80} height={80} />
-                          ))}
-                        </div>
-                      )}
-                      <input type="file" name={`${key}_media`} accept="image/*" className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-slate-400 focus:border-slate-500 bg-white file:mr-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:bg-slate-700 file:text-slate-100 file:font-medium text-sm" />
-                      <p className="text-xs text-slate-500 mt-1">Enviar novo ficheiro substitui a imagem atual.</p>
-                    </div>
-                  </div>
-                ))}
-                <button type="submit" disabled={navigation.state === "submitting"} className="px-4 py-2.5 bg-slate-800 text-white rounded-sm hover:bg-slate-900 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-50 font-medium text-sm">
-                  {navigation.state === "submitting" ? "A guardar…" : "Guardar Passos"}
-                </button>
-              </Form>
-            </section>
+            {/* Processo / gallery and steps sections removed */}
           </>
         )}
         {recordsToShow.map((record: any) => {

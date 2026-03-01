@@ -88,7 +88,8 @@ The backoffice expects the following PocketBase collections and fields. Configur
 
 | Collection   | Required fields |
 | ------------ | ---------------- |
-| **products** | `media_hover` (file, single, image or video); `media_360` (file, multiple, images for 360° viewer); `media_gallery` (file, multiple, gallery images/videos); `sizes` (relation, multiple, to `sizes` collection). |
+| **users**    | For **registration** to work: in PocketBase Admin go to Settings → Auth (or the auth collection) → API rules → **Create** must allow new signups (e.g. leave empty or use a rule that allows the request). Set `API_PB_ADMIN_EMAIL` and `API_PB_ADMIN_PASSWORD` in `.env` so the app can create users as admin if needed. Optional: `approved` (bool, default `false`) for approval flow. |
+| **products** | `media_hover` (file, single, image or video); `media_360` (file, multiple, images for 360° viewer); `sizes` (relation, multiple, to `sizes` collection). |
 | **category** | `hover` (file, single, image or video) — shown on category hover. |
 | **sizes**    | Must exist with at least `number`; products link to it via the `sizes` relation. |
 | **Homepage** | For page editor: relation field(s) for `products` (single or multiple) and `categories` (multiple) on section records. |

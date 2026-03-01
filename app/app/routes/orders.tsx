@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, redirect, useLoaderData, useSearchParams } from "react-router";
 import type { Route } from "../+types/root";
-import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
 import { getOrdersByUser } from "~/lib/services";
 import { useCart } from "~/contexts/CartContext";
 import { useLanguage } from "~/contexts";
@@ -12,7 +12,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     if (!pb.authStore.isValid) {
         return redirect("/auth/login");
     }
-    const user = pb.authStore.model as { id?: string } | null;
+    const user = pb.authStore.model as { id?: string; admin?: boolean } | null;
+    if (user?.id && (await getUserBlockedStatus(pb, user))) return redirect("/blocked");
+    if (user?.id && !(await canAccessUserBackoffice(pb, user))) return redirect("/pending-approval");
     if (!user?.id) return { user: null, orders: [] };
 
     try {

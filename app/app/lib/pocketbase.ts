@@ -56,3 +56,70 @@ export async function createPocketBaseAsAdmin(): Promise<PocketBase | null> {
         return null;
     }
 }
+
+/**
+ * Returns true if the user can access the user backoffice (dashboard). Admins always can.
+ * Non-admins need approved === true and blocked !== true. Fetches from API since auth model may not include custom fields.
+ */
+export async function canAccessUserBackoffice(
+    pb: PocketBase,
+    user: { id?: string; admin?: boolean } | null
+): Promise<boolean> {
+    if (!user?.id) return false;
+    if (user.admin === true) return true;
+    try {
+        const adminPb = await createPocketBaseAsAdmin();
+        const client = adminPb ?? pb;
+        const rec = await client.collection("users").getOne(user.id, { fields: "approved,blocked" });
+        const r = rec as { approved?: boolean; blocked?: boolean };
+        if (r.blocked === true) return false;
+        return r.approved === true;
+    } catch {
+        return false;
+    }
+}
+
+/** Returns "blocked" if user is blocked, for redirect to blocked page. */
+export async function getUserBlockedStatus(
+    pb: PocketBase,
+    user: { id?: string; admin?: boolean } | null
+): Promise<boolean> {
+    if (!user?.id || user.admin === true) return false;
+    try {
+        const adminPb = await createPocketBaseAsAdmin();
+        const client = adminPb ?? pb;
+        const rec = await client.collection("users").getOne(user.id, { fields: "blocked" });
+        return (rec as { blocked?: boolean }).blocked === true;
+    } catch {
+        return false;
+    }
+}
+function normalizeCatalogProductIds(raw: unknown): string[] {
+    if (raw == null) return [];
+    if (Array.isArray(raw)) {
+        return raw
+            .map((item) => (typeof item === "string" ? item : (item as { id?: string })?.id))
+            .filter((id): id is string => typeof id === "string" && id.length > 0);
+    }
+    return [];
+}
+/**
+ * Returns the list of product IDs this user is restricted to, or null if they can see all products.
+ * When non-null and non-empty, the whole site (home, collection, category, product) should only show those products.
+ */
+export async function getUserAllowedProductIds(
+    pb: PocketBase,
+    user: { id?: string; admin?: boolean } | null
+): Promise<string[] | null> {
+    if (!user?.id) return null;
+    try {
+        const adminPb = await createPocketBaseAsAdmin();
+        const client = adminPb ?? pb;
+        const rec = await client.collection("users").getOne(user.id, { fields: "catalog_products" });
+        const raw = (rec as { catalog_products?: unknown }).catalog_products;
+        const ids = normalizeCatalogProductIds(raw);
+        return ids.length === 0 ? null : ids;
+    } catch {
+        return null;
+    }
+}

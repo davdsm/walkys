@@ -19,7 +19,6 @@ function buildSlots(media360: string[], media: string[]): MediaSlot[] {
 interface MobileProductLayoutProps {
   productName: string;
   productDescription: string;
-  productDetails: string;
   collectionName: string;
   media360: string[];
   media: string[];
@@ -36,7 +35,6 @@ interface MobileProductLayoutProps {
 export const MobileProductLayout = ({
   productName,
   productDescription,
-  productDetails,
   collectionName,
   media360,
   media,
@@ -149,49 +147,6 @@ export const MobileProductLayout = ({
           {productName}
         </motion.h1>
 
-        {/* Thumbnail Gallery - same slots as desktop (360 + media) */}
-        <motion.div
-          className="flex gap-3 mb-10 overflow-x-auto pb-2 scrollbar-hide"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.14, ease: "easeOut" }}
-        >
-          {slots.map((slot, index) => {
-            const thumbSrc = slot.type === "360" ? slot.frames[0] : slot.url;
-            const isVideo = slot.type === "image" && getMediaType(slot.url) === "video";
-            const selected = selectedImage === index;
-            return (
-              <button
-                key={`mobile-thumb-${index}`}
-                type="button"
-                onClick={() => onImageSelect(index)}
-                className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all bg-[#f9f9f9] ${
-                  selected ? "border-black ring-2 ring-black/10" : "border-transparent"
-                }`}
-              >
-                {slot.type === "360" ? (
-                  <>
-                    {thumbSrc ? (
-                      <img src={thumbSrc} alt="360°" className="absolute inset-0 w-full h-full object-cover" />
-                    ) : (
-                      <span className="absolute inset-0 w-full h-full flex items-center justify-center bg-[#f9f9f9] text-slate-500 text-xs font-medium" />
-                    )}
-                    <span className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-white drop-shadow-sm">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-                      </svg>
-                    </span>
-                  </>
-                ) : isVideo ? (
-                  <video src={thumbSrc} className="w-full h-full object-cover" muted playsInline preload="metadata" />
-                ) : (
-                  <img src={thumbSrc} alt="" className="w-full h-full object-cover" />
-                )}
-              </button>
-            );
-          })}
-        </motion.div>
-
         {/* Action Buttons Row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -223,23 +178,6 @@ export const MobileProductLayout = ({
           </p>
         </motion.div>
 
-        {/* Details Section */}
-        {productDetails && (
-          <motion.div
-            className="space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.26, ease: "easeOut" }}
-          >
-            <h2 className="text-lg font-bold text-black border-none">
-              {language === "pt" ? "Detalhes do Produto" : "Product Details"}
-            </h2>
-            <div
-              className="text-neutral-600 text-sm leading-relaxed prose prose-neutral prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: productDetails }}
-            />
-          </motion.div>
-        )}
       </div>
     </div>
   );
