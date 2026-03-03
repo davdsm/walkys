@@ -51,6 +51,7 @@ export const translations = {
             noAccount: "Não tem conta?",
             signUp: "Registar",
             backToHome: "Voltar ao início",
+            successMessage: "Iniciou sessão com sucesso.",
         },
         // Signup
         signup: {
@@ -116,6 +117,27 @@ export const translations = {
             passwordsNotMatch: "As passwords não coincidem",
             fullNameRequired: "Nome completo é obrigatório",
             birthDateRequired: "Data de nascimento é obrigatória",
+        },
+        // Pending approval
+        pendingApproval: {
+            title: "Conta pendente de aprovação",
+            message: "A sua conta está a aguardar aprovação por um administrador. Será notificado quando tiver acesso ao dashboard.",
+            goToHome: "Ir ao início",
+            logout: "Terminar sessão",
+        },
+        blocked: {
+            title: "Conta bloqueada",
+            message: "O acesso à sua conta foi bloqueado. Contacte o suporte se achar que isto é um erro.",
+            goToHome: "Ir ao início",
+            logout: "Terminar sessão",
+        },
+        // Registration success (post-signup)
+        registrationSuccess: {
+            title: "Conta criada com sucesso",
+            intro: "Obrigado por se registar.",
+            review: "A sua conta será analisada pela nossa equipa e será aceite em breve.",
+            access: "Só após aprovação poderá aceder ao backoffice (área reservada) para gerir o seu perfil e pedidos.",
+            goToLogin: "Ir para o login",
         },
         // Terms
         terms: {
@@ -498,6 +520,7 @@ export const translations = {
             noAccount: "Don't have an account?",
             signUp: "Sign Up",
             backToHome: "Back to Home",
+            successMessage: "You have logged in successfully.",
         },
         // Signup
         signup: {
@@ -563,6 +586,27 @@ export const translations = {
             passwordsNotMatch: "Passwords do not match",
             fullNameRequired: "Full name is required",
             birthDateRequired: "Birth date is required",
+        },
+        // Pending approval
+        pendingApproval: {
+            title: "Account pending approval",
+            message: "Your account is waiting for approval by an administrator. You will be notified when you have access to the dashboard.",
+            goToHome: "Go to home",
+            logout: "Sign out",
+        },
+        blocked: {
+            title: "Account blocked",
+            message: "Access to your account has been blocked. Contact support if you believe this is an error.",
+            goToHome: "Go to home",
+            logout: "Sign out",
+        },
+        // Registration success (post-signup)
+        registrationSuccess: {
+            title: "Account created successfully",
+            intro: "Thank you for registering.",
+            review: "Your account will be reviewed by our team and will be accepted soon.",
+            access: "Only after approval will you be able to access the backoffice (members area) to manage your profile and orders.",
+            goToLogin: "Go to login",
         },
         // Terms
         terms: {

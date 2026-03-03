@@ -1,14 +1,26 @@
+import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { ProductActions } from "./ProductActions";
+import { ThreeSixtyViewer } from "./ThreeSixtyViewer";
 import { getMediaType } from "~/lib/utils";
+
+type MediaSlot =
+  | { type: "360"; frames: string[] }
+  | { type: "image"; url: string };
+
+function buildSlots(media360: string[], media: string[]): MediaSlot[] {
+  const slots: MediaSlot[] = [];
+  if (media360.length > 0) slots.push({ type: "360", frames: media360 });
+  media.forEach((url) => slots.push({ type: "image", url }));
+  return slots;
+}
 
 interface MobileProductLayoutProps {
   productName: string;
   productDescription: string;
-  productDetails: string;
   collectionName: string;
+  media360: string[];
   media: string[];
   selectedImage: number;
   onImageSelect: (index: number) => void;
@@ -23,8 +35,8 @@ interface MobileProductLayoutProps {
 export const MobileProductLayout = ({
   productName,
   productDescription,
-  productDetails,
   collectionName,
+  media360,
   media,
   selectedImage,
   onImageSelect,
@@ -35,19 +47,35 @@ export const MobileProductLayout = ({
   breadcrumbs,
   language,
 }: MobileProductLayoutProps) => {
+  const slots = useMemo(() => buildSlots(media360, media), [media360, media]);
+  const current = slots[selectedImage];
+  const is360 = current?.type === "360";
+  const showUrl = current?.type === "image" ? current.url : null;
+  const showIsVideo = showUrl ? getMediaType(showUrl) === "video" : false;
+
   return (
     <div className="md:hidden min-h-screen bg-[#f1f1f1]">
       {/* Full Screen Image Section (70% height) */}
       <div className="h-[70vh] w-full relative bg-[#f1f1f1] flex items-center justify-center p-6">
-        {media[selectedImage] &&
-          (getMediaType(media[selectedImage]) === "video" ? (
+        {is360 && current.type === "360" ? (
+          <motion.div
+            key="360"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.35 }}
+            className="w-full h-full"
+          >
+            <ThreeSixtyViewer images={current.frames} productName={productName} />
+          </motion.div>
+        ) : showUrl ? (
+          showIsVideo ? (
             <motion.video
               key={selectedImage}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              src={media[selectedImage]}
-              className="w-full h-full object-contain"
+              src={showUrl}
+              className="w-full h-full object-cover"
               controls
               loop
               muted
@@ -59,11 +87,12 @@ export const MobileProductLayout = ({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              src={media[selectedImage]}
+              src={showUrl}
               alt={productName}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
             />
-          ))}
+          )
+        ) : null}
 
         {/* Size Selector - Square Buttons Overlaid at Bottom */}
         {sizes.length > 0 && (
@@ -118,46 +147,6 @@ export const MobileProductLayout = ({
           {productName}
         </motion.h1>
 
-        {/* Thumbnail Gallery */}
-        <motion.div
-          className="flex gap-4 mb-10 overflow-x-auto pb-2 scrollbar-hide"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.14, ease: "easeOut" }}
-        >
-          {media.map((url, index) => {
-            const isVideo = getMediaType(url) === "video";
-            return (
-              <button
-                key={`mobile-thumb-${index}`}
-                type="button"
-                onClick={() => onImageSelect(index)}
-                className={`flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden border-2 transition-all bg-[#f9f9f9] ${
-                  selectedImage === index
-                    ? "border-black"
-                    : "border-transparent"
-                }`}
-              >
-                {isVideo ? (
-                  <video
-                    src={url}
-                    className="w-full h-full object-contain"
-                    muted
-                    playsInline
-                    preload="metadata"
-                  />
-                ) : (
-                  <img
-                    src={url}
-                    alt={`${productName} thumbnail ${index + 1}`}
-                    className="w-full h-full object-contain"
-                  />
-                )}
-              </button>
-            );
-          })}
-        </motion.div>
-
         {/* Action Buttons Row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -189,23 +178,6 @@ export const MobileProductLayout = ({
           </p>
         </motion.div>
 
-        {/* Details Section */}
-        {productDetails && (
-          <motion.div
-            className="space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.26, ease: "easeOut" }}
-          >
-            <h2 className="text-lg font-bold text-black border-none">
-              {language === "pt" ? "Detalhes do Produto" : "Product Details"}
-            </h2>
-            <div
-              className="text-neutral-600 text-sm leading-relaxed prose prose-neutral prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: productDetails }}
-            />
-          </motion.div>
-        )}
       </div>
     </div>
   );

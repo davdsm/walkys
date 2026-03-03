@@ -26,6 +26,15 @@ export function Header({ variant = "light" }: HeaderProps) {
   const { layout } = useLayout();
   const { lock, unlock } = useScrollLock();
 
+  // Ensure logo + menu are light/inverted whenever the body background is black
+  let effectiveVariant: "light" | "dark" = variant;
+  if (typeof document !== "undefined") {
+    const bodyBg = document.body.style.backgroundColor;
+    if (bodyBg === "black") {
+      effectiveVariant = "light";
+    }
+  }
+
   useEffect(() => {
     return () => unlock();
   }, [unlock]);
@@ -59,13 +68,13 @@ export function Header({ variant = "light" }: HeaderProps) {
           socialItems={socialItems}
           displaySocials={true}
           displayItemNumbering={true}
-          menuButtonColor={variant === "light" ? "#ffffff" : "#000000"}
-          openMenuButtonColor={variant === "light" ? "#ffffff" : "#000000"}
+          menuButtonColor={effectiveVariant === "light" ? "#ffffff" : "#000000"}
+          openMenuButtonColor={effectiveVariant === "light" ? "#ffffff" : "#000000"}
           changeMenuColorOnOpen={true}
           colors={["#811568ff", "#d1d5db"]}
           logoUrl={logoUrl}
           accentColor="#000000"
-          invertLogo={variant === "light"}
+          invertLogo={effectiveVariant === "light"}
           position="right"
           closeOnClickAway={true}
           onMenuOpen={lock}

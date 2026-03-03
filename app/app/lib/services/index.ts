@@ -43,3 +43,6 @@ export { ORDER_STATUSES } from "./order.service";
 export type { NotificationRecord, NotificationType, CreateNotificationData } from "./notification.service";
 export { getAdminNotifications, getUserNotifications, createNotification, markNotificationsAsRead } from "./notification.service";
 
+// Export size service
+export { ensureSizesRange } from "./size.service";
+

@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
-import { useLoaderData } from "react-router";
+import { useLoaderData, redirect } from "react-router";
 import { motion } from "framer-motion";
 
 import { useLanguage } from "~/contexts";
 import type { ProductRecord } from "~/hooks/useProducts";
 import type { CategoryRecord } from "~/hooks/useCategories";
 import ProductCard from "~/components/Cards/ProductCard";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, canAccessUserBackoffice, getUserBlockedStatus, getUserAllowedProductIds } from "~/lib/pocketbase";
 import {
   createCategoryService,
   createProductService,
@@ -27,8 +27,17 @@ export async function loader({
 }: {
   request: Request;
   params: { category?: string };
-}): Promise<CategoryLoaderData> {
+}): Promise<CategoryLoaderData | Response> {
   const pb = createPocketBase(request);
+  if (!pb.authStore.isValid) {
+    return redirect("/auth/login");
+  }
+  const user = pb.authStore.model as { id?: string; admin?: boolean } | null;
+  if (user?.id && (await getUserBlockedStatus(pb, user))) return redirect("/blocked");
+  if (user?.id && !(await canAccessUserBackoffice(pb, user))) return redirect("/pending-approval");
+
+  const allowedIds = await getUserAllowedProductIds(pb, user);
+
   const categoryService = createCategoryService(pb);
   const productService = createProductService(pb);
 
@@ -37,11 +46,10 @@ export async function loader({
     throw new Response("Category not found", { status: 404 });
   }
 
-  const productOptions: Omit<CategoryServiceOptions, "filter"> = {};
-
-  const products = await productService.getByCategory(category.id, {
+  let products = await productService.getByCategory(category.id, {
     expand: "sizes,collection,category",
   });
+  if (allowedIds?.length) products = products.filter((p: any) => allowedIds.includes(p.id));
 
   // Ensure 'products' are returned as ProductRecord[]
   return { category, products: products as ProductRecord[] };
@@ -135,18 +143,27 @@ export const CategoryPage = () => {
 
   const title =
     (category as any)[`name_${langKey}`] ?? (category as any)?.slug ?? "";
+  const description =
+    (category as any)[`description_${langKey}`] ?? (category as any)?.description ?? "";
 
   return (
     <section className="bg-[#f1f1f1] min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-20 md:py-34">
-        <motion.h1
+        <motion.div
           initial={{ opacity: 0, y: -60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="text-3xl md:text-5xl font-semibold tracking-tight text-black mb-8"
+          className="mb-8"
         >
-          {title}
-        </motion.h1>
+          <h1 className="text-3xl md:text-5xl font-semibold text-black font-display">
+            {title}
+          </h1>
+          {description ? (
+            <p className="mt-3 md:mt-4 text-base md:text-lg text-neutral-600 leading-relaxed max-w-3xl">
+              {description}
+            </p>
+          ) : null}
+        </motion.div>
 
         <div className="flex flex-col md:flex-row gap-10 items-start">
           <motion.aside

@@ -6,6 +6,10 @@ export interface UserRecord {
   email?: string;
   name?: string;
   admin?: boolean;
+  /** When false, user cannot access dashboard until admin approves. */
+  approved?: boolean;
+  /** When true, user is blocked and cannot access the app. */
+  blocked?: boolean;
   created?: string;
   updated?: string;
   catalog_products?: string[] | { id: string }[];
@@ -24,6 +28,8 @@ export interface CreateUserData {
   passwordConfirm: string;
   name?: string;
   admin?: boolean;
+  approved?: boolean;
+  blocked?: boolean;
 }
 
 /** Payload to update an existing user. */
@@ -31,6 +37,8 @@ export interface UpdateUserData {
   email?: string;
   name?: string;
   admin?: boolean;
+  approved?: boolean;
+  blocked?: boolean;
   password?: string;
   passwordConfirm?: string;
   catalog_products?: string[];
@@ -42,9 +50,9 @@ export interface UpdateUserData {
 }
 
 const USERS_COLLECTION = "users";
-const DEFAULT_FIELDS = "id,email,name,admin,created";
-const LIST_FIELDS = "id,email,name,admin,created";
-const EDIT_FIELDS = "id,email,name,admin,catalog_products,address,postal_code,nif,city,country";
+const DEFAULT_FIELDS = "id,email,name,admin,approved,created";
+const LIST_FIELDS = "id,email,name,admin,approved,blocked,created";
+const EDIT_FIELDS = "id,email,name,admin,approved,blocked,catalog_products,address,postal_code,nif,city,country";
 
 /**
  * User service: CRUD for PocketBase users collection.
@@ -78,17 +86,20 @@ export class UserService {
       passwordConfirm: data.passwordConfirm,
       name: data.name ?? "",
       admin: data.admin ?? false,
+      approved: data.approved ?? true,
+      blocked: data.blocked ?? false,
     });
     return record;
   }
 
-  /** Update an existing user. */
+  /** Update an existing user. Only sends fields that are present in data to avoid overwriting with empty values (e.g. partial approve/block). */
   async update(id: string, data: UpdateUserData): Promise<UserRecord> {
-    const payload: Record<string, unknown> = {
-      email: data.email ?? "",
-      name: data.name ?? "",
-      admin: data.admin ?? false,
-    };
+    const payload: Record<string, unknown> = {};
+    if (data.email !== undefined) payload.email = data.email;
+    if (data.name !== undefined) payload.name = data.name;
+    if (data.admin !== undefined) payload.admin = data.admin;
+    if (data.approved !== undefined) payload.approved = data.approved;
+    if (data.blocked !== undefined) payload.blocked = data.blocked;
     if (data.catalog_products !== undefined) {
       payload.catalog_products = data.catalog_products;
     }

@@ -31,7 +31,7 @@ export const HomepageCard = ({
 
     return (
         <Link to={link} className="no-underline cursor-pointer">
-            <motion.article className={`w-full h-full relative overflow-hidden ${variant === "dark" ? "bg-black" : "bg-white"} md:p-9 rounded-4xl flex flex-col md:flex-row`}>
+            <motion.article className={`w-full h-[40rem] relative overflow-hidden ${variant === "dark" ? "bg-black" : "bg-white"} md:p-9 rounded-4xl flex flex-col md:flex-row`}>
                 <div className="w-full h-full md:w-2/3 md:h-full">
                     {cardImage.video ? (
                         <video
@@ -52,9 +52,9 @@ export const HomepageCard = ({
                         />
                     ) : null}
                 </div>
-                <div className="absolute md:relative md:flex md:flex-col md:justify-end bottom-0 z-10 px-10 pb-10 md:pb-28 md:pl-28 md:w-full">
-                    <h2 className={`uppercase text-2xl font-bold md:text-7xl ${variant === "dark" ? "text-white" : "text-black"}`}>{title}</h2>
-                    <p className={`text-sm mt-5 max-w-2xs md:max-w-3xl md:text-3xl ${variant === "dark" ? "text-white" : "text-black"}`}>{subtitle}</p>
+                <div className="absolute md:relative md:flex md:flex-col md:justify-end bottom-0 z-10 px-10 md:pb-20 md:pl-20 md:w-full">
+                    <h2 className={`uppercase text-2xl font-bold md:text-7xl font-display ${variant === "dark" ? "text-white" : "text-black"}`}>{title}</h2>
+                    <p className={`text-sm mt-5 max-w-2xs md:max-w-3xl md:text-3xl whitespace-pre-line ${variant === "dark" ? "text-white" : "text-black"}`}>{subtitle}</p>
                 </div>
             </motion.article>
         </Link>

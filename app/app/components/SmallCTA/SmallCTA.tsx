@@ -61,7 +61,7 @@ export const SmallCTA = ({
       viewport={{ once: true, margin: "-100px", amount: 0.2 }}
     >
       {/* Heading */}
-      <motion.h2 className="text-3xl md:text-4xl font-bold text-black text-center tracking-tight">
+      <motion.h2 className="text-3xl md:text-4xl font-bold text-black text-center font-display">
         {displayHeading}
       </motion.h2>
 

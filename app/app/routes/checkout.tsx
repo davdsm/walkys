@@ -1,7 +1,7 @@
 import { redirect, useLoaderData, useNavigation, Form, useSearchParams } from "react-router";
 import { Link } from "react-router";
 import type { Route } from "./+types/checkout";
-import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
 import { createUserService, createOrder, createNotification, type OrderItem } from "~/lib/services";
 import {
   getAdminEmail,
@@ -20,8 +20,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!pb.authStore.isValid) {
     return redirect("/auth/login");
   }
-  const user = pb.authStore.model as { id?: string } | null;
+  const user = pb.authStore.model as { id?: string; admin?: boolean } | null;
   if (!user?.id) return redirect("/auth/login");
+  if (await getUserBlockedStatus(pb, user)) return redirect("/blocked");
+  if (!(await canAccessUserBackoffice(pb, user))) return redirect("/pending-approval");
 
   try {
     const adminPb = await createPocketBaseAsAdmin();
@@ -40,8 +42,10 @@ export async function action({ request }: Route.ActionArgs) {
   if (!pb.authStore.isValid) {
     return redirect("/auth/login");
   }
-  const authUser = pb.authStore.model as { id?: string } | null;
+  const authUser = pb.authStore.model as { id?: string; admin?: boolean } | null;
   if (!authUser?.id) return redirect("/auth/login");
+  if (await getUserBlockedStatus(pb, authUser)) return redirect("/blocked");
+  if (!(await canAccessUserBackoffice(pb, authUser))) return redirect("/pending-approval");
 
   const formData = await request.formData();
   const name = (formData.get("name") as string)?.trim() ?? "";
@@ -152,10 +156,10 @@ export default function Checkout() {
           {checkoutT.cartEmpty ?? "Your cart is empty."}
         </p>
         <Link
-          to="/catalog"
+          to="/"
           className="text-slate-900 font-medium underline hover:no-underline"
         >
-          {checkoutT.backToCatalog ?? "Back to catalog"}
+          {checkoutT.backToCatalog ?? "Continue shopping"}
         </Link>
       </div>
     );
@@ -300,7 +304,7 @@ export default function Checkout() {
                 : (checkoutT.placeOrder ?? "Place order")}
             </button>
             <Link
-              to="/catalog"
+              to="/"
               className="py-3 px-4 border border-slate-300 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 text-center"
             >
               {checkoutT.cancel ?? "Cancelar"}

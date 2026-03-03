@@ -56,13 +56,28 @@ export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
   const intent = formData.get("intent");
 
-  // Use PocketBase dashboard admin when available so updating other users
-  // (including their password) works reliably, falling back to current user auth.
+  // Approve/block must use server-side admin client so PocketBase actually updates the record
+  // (collection rules often prevent one user from updating another user's approved/blocked).
   const adminPb = await createPocketBaseAsAdmin();
+  if ((intent === "setApproved" || intent === "setBlocked") && !adminPb) {
+    return {
+      ok: false,
+      error: "Aprovar/bloquear requer o admin do PocketBase. Configure API_PB_ADMIN_EMAIL e API_PB_ADMIN_PASSWORD no .env (credenciais do painel /_/).",
+    };
+  }
+
   const client = adminPb ?? pb;
   const userService = createUserService(client);
 
   try {
+    if (intent === "setApproved" && id && id !== "new") {
+      await userService.update(id, { approved: true, blocked: false });
+      return redirect(`/backoffice/users/${id}?success=approved`);
+    }
+    if (intent === "setBlocked" && id && id !== "new") {
+      await userService.update(id, { blocked: true, approved: false });
+      return redirect(`/backoffice/users/${id}?success=blocked`);
+    }
     if (intent === "delete" && id && id !== "new") {
       if (id === currentUser.id) {
         return { ok: false, error: "Não pode remover a sua própria conta." };
@@ -74,6 +89,8 @@ export async function action({ request, params }: Route.ActionArgs) {
     const email = (formData.get("email") as string)?.trim() ?? "";
     const name = (formData.get("name") as string)?.trim() ?? "";
     const admin = formData.get("admin") === "on";
+    const approved = formData.get("approved") === "on";
+    const blocked = formData.get("blocked") === "on";
     const password = formData.get("password") as string;
     const passwordConfirm = formData.get("passwordConfirm") as string;
 
@@ -87,6 +104,8 @@ export async function action({ request, params }: Route.ActionArgs) {
         passwordConfirm,
         name: name || undefined,
         admin,
+        approved,
+        blocked,
       });
       return redirect("/backoffice/users?success=1");
     }
@@ -97,6 +116,8 @@ export async function action({ request, params }: Route.ActionArgs) {
         email,
         name: name || "",
         admin,
+        approved,
+        blocked,
         catalog_products: catalogProductIds,
         ...(password && password.length >= 8 && passwordConfirm
           ? { password, passwordConfirm }
@@ -127,6 +148,15 @@ export default function BackofficeUserEdit() {
   const email = record?.email ?? "";
   const name = record?.name ?? "";
   const isAdmin = record?.admin ?? false;
+  const isApproved = record?.approved ?? false;
+  const isBlocked = record?.blocked ?? false;
+
+  const statusLabel = isBlocked ? "Bloqueado" : isApproved ? "Aprovado" : "Pendente";
+  const statusStyle = isBlocked
+    ? "bg-red-100 text-red-800 border-red-200"
+    : isApproved
+      ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+      : "bg-amber-100 text-amber-800 border-amber-200";
 
   return (
     <div>
@@ -142,6 +172,42 @@ export default function BackofficeUserEdit() {
           {isNew ? "Crie um novo utilizador (email e palavra-passe obrigatórios)." : "Altere email, nome, palavra-passe ou função. Deixe a palavra-passe em branco para manter a atual."}
         </p>
       </div>
+
+      {!isNew && id && id !== "new" && (
+        <div className="mb-8 p-6 rounded-lg border border-slate-200 bg-white shadow-sm">
+          <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">Estado da conta</h2>
+          <div className="flex flex-wrap items-center gap-4">
+            <span className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium border ${statusStyle}`}>
+              {statusLabel}
+            </span>
+            <div className="flex items-center gap-2">
+              <Form method="post" action={`/backoffice/users/${id}`} className="inline">
+                <input type="hidden" name="intent" value="setApproved" />
+                <button
+                  type="submit"
+                  disabled={isApproved && !isBlocked}
+                  className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Aprovar conta
+                </button>
+              </Form>
+              <Form method="post" action={`/backoffice/users/${id}`} className="inline">
+                <input type="hidden" name="intent" value="setBlocked" />
+                <button
+                  type="submit"
+                  disabled={isBlocked}
+                  className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Bloquear acesso
+                </button>
+              </Form>
+            </div>
+          </div>
+          <p className="text-slate-500 text-sm mt-3">
+            Aprovar permite acesso ao dashboard. Bloquear impede o utilizador de aceder à aplicação.
+          </p>
+        </div>
+      )}
 
       <Form method="post" className="space-y-8 max-w-xl" key={record?.id ?? "new"}>
         <input type="hidden" name="intent" value={isNew ? "create" : "update"} />
@@ -218,25 +284,51 @@ export default function BackofficeUserEdit() {
               />
             </div>
           )}
-          <div className="flex items-center gap-3">
-            <input
-              id="admin"
-              name="admin"
-              type="checkbox"
-              defaultChecked={isAdmin}
-              className="w-4 h-4 rounded border-slate-300 text-slate-800 focus:ring-slate-500"
-            />
-            <label htmlFor="admin" className="text-sm font-medium text-slate-700">
-              Administrador (acesso ao backoffice)
-            </label>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <input
+                id="admin"
+                name="admin"
+                type="checkbox"
+                defaultChecked={isAdmin}
+                className="w-4 h-4 rounded border-slate-300 text-slate-800 focus:ring-slate-500"
+              />
+              <label htmlFor="admin" className="text-sm font-medium text-slate-700">
+                Administrador (acesso ao backoffice)
+              </label>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                id="approved"
+                name="approved"
+                type="checkbox"
+                defaultChecked={isNew ? true : isApproved}
+                className="w-4 h-4 rounded border-slate-300 text-slate-800 focus:ring-slate-500"
+              />
+              <label htmlFor="approved" className="text-sm font-medium text-slate-700">
+                Aprovado (acesso ao dashboard)
+              </label>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                id="blocked"
+                name="blocked"
+                type="checkbox"
+                defaultChecked={isBlocked}
+                className="w-4 h-4 rounded border-slate-300 text-slate-800 focus:ring-slate-500"
+              />
+              <label htmlFor="blocked" className="text-sm font-medium text-slate-700">
+                Bloqueado (sem acesso à aplicação)
+              </label>
+            </div>
           </div>
         </div>
 
         {!isNew && products.length > 0 && (
           <div className="bg-white rounded-sm border border-slate-200 shadow-sm p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-slate-900 mb-2">Produtos no catálogo</h2>
+            <h2 className="text-lg font-semibold text-slate-900 mb-2">Produtos visíveis para este utilizador</h2>
             <p className="text-sm text-slate-600 mb-4">
-              Escolha quais produtos este utilizador vê na página Catálogo (/catalog). Se não selecionar nenhum, será mostrada a mensagem &quot;Nenhum produto atribuído&quot;.
+              Se não selecionar nenhum produto, o utilizador vê todos os produtos no site. Se selecionar um ou mais, o site inteiro (página inicial, coleções, categorias, produto) mostrará apenas esses produtos.
             </p>
             <div className="max-h-60 overflow-y-auto p-2 border border-slate-200 rounded-sm bg-slate-50 space-y-2">
               {products.map((p: { id: string; name_pt?: string; name_en?: string }) => (

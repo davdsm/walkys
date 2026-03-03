@@ -14,7 +14,25 @@ export async function action({ request }: Route.ActionArgs) {
   if (!currentUser?.admin) return redirect("/dashboard");
 
   const formData = await request.formData();
-  if (formData.get("intent") !== "bulkDelete") return null;
+  const intent = formData.get("intent");
+
+  if (intent === "delete") {
+    const id = (formData.get("id") as string)?.trim();
+    if (!id || id === currentUser.id) {
+      return redirect("/backoffice/users?error=" + encodeURIComponent("Não pode remover a sua própria conta."));
+    }
+    try {
+      const adminPb = await createPocketBaseAsAdmin();
+      const client = adminPb ?? pb;
+      const userService = createUserService(client);
+      await userService.delete(id);
+      return redirect("/backoffice/users?success=deleted");
+    } catch (e) {
+      return redirect("/backoffice/users?error=" + encodeURIComponent((e as Error)?.message ?? "Erro ao eliminar utilizador"));
+    }
+  }
+
+  if (intent !== "bulkDelete") return null;
 
   const ids = formData.getAll("ids").filter((v): v is string => typeof v === "string" && v.length > 0);
   const filteredIds = ids.filter((id) => id !== currentUser.id);
@@ -94,7 +112,13 @@ export default function BackofficeUsers() {
       <BackofficeToast
         successParam={successParam}
         errorParam={errorParam}
-        successMessage={successParam === "bulkDeleted" ? "Utilizadores eliminados" : "Utilizador guardado com sucesso"}
+        successMessage={
+          successParam === "bulkDeleted"
+            ? "Utilizadores eliminados"
+            : successParam === "deleted"
+              ? "Utilizador eliminado"
+              : "Utilizador guardado com sucesso"
+        }
       />
       {!adminConfigured && (
         <div className="mb-6 rounded-sm border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -160,6 +184,9 @@ export default function BackofficeUsers() {
                 Função
               </th>
               <th scope="col" className="px-6 py-4 text-sm font-semibold text-slate-900">
+                Estado
+              </th>
+              <th scope="col" className="px-6 py-4 text-sm font-semibold text-slate-900">
                 <span className="sr-only">Ações</span>
               </th>
             </tr>
@@ -167,7 +194,7 @@ export default function BackofficeUsers() {
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
                   Ainda não há utilizadores. Crie um novo utilizador.
                 </td>
               </tr>
@@ -199,6 +226,21 @@ export default function BackofficeUsers() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
+                    <span
+                      className={`inline-flex px-2.5 py-1 rounded-sm text-xs font-medium ${
+                        u.admin
+                          ? "text-slate-400"
+                          : u.blocked
+                            ? "bg-red-100 text-red-800"
+                            : u.approved
+                              ? "bg-emerald-100 text-emerald-800"
+                              : "bg-amber-100 text-amber-800"
+                      }`}
+                    >
+                      {u.admin ? "—" : u.blocked ? "Bloqueado" : u.approved ? "Aprovado" : "Pendente"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-1">
                       <Link
                         to={`/backoffice/users/${u.id}`}
@@ -207,13 +249,27 @@ export default function BackofficeUsers() {
                       >
                         <Pencil className="w-4 h-4" aria-hidden />
                       </Link>
-                      <Link
-                        to={`/backoffice/users/${u.id}?delete=1`}
-                        className="inline-flex items-center justify-center w-9 h-9 rounded-sm text-slate-500 hover:text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-500/50"
-                        aria-label="Remover utilizador"
-                      >
-                        <Trash2 className="w-4 h-4" aria-hidden />
-                      </Link>
+                      {u.id !== currentUserId && (
+                        <Form
+                          method="post"
+                          action="/backoffice/users"
+                          className="inline"
+                          onSubmit={(e) => {
+                            const email = (u.email ?? u.id) as string;
+                            if (!confirm(`Eliminar o utilizador ${email}? Esta ação é irreversível.`)) e.preventDefault();
+                          }}
+                        >
+                          <input type="hidden" name="intent" value="delete" />
+                          <input type="hidden" name="id" value={u.id} />
+                          <button
+                            type="submit"
+                            className="inline-flex items-center justify-center w-9 h-9 rounded-sm text-slate-500 hover:text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-500/50"
+                            aria-label={`Remover utilizador ${u.email ?? u.id}`}
+                          >
+                            <Trash2 className="w-4 h-4" aria-hidden />
+                          </button>
+                        </Form>
+                      )}
                     </div>
                   </td>
                 </tr>

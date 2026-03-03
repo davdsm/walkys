@@ -9,6 +9,9 @@ export default [
   route("forgot-password", "routes/forgot-password.tsx"),
   route("reset-password/:token", "routes/reset-password.$token.tsx"),
   route("dashboard", "routes/dashboard.tsx"),
+  route("pending-approval", "routes/pending-approval.tsx"),
+  route("blocked", "routes/blocked.tsx"),
+  route("registration-success", "routes/registration-success.tsx"),
   route("backoffice", "routes/backoffice.tsx", [
     index("routes/backoffice.index.tsx"),
     route("pages/:page", "routes/backoffice.pages.$page.tsx"),
@@ -34,5 +37,4 @@ export default [
   route("checkout", "routes/checkout.tsx"),
   route("logout", "routes/logout.tsx"),
   route("orders", "routes/orders.tsx"),
-  route("catalog", "routes/catalog.tsx"),
 ] satisfies RouteConfig;

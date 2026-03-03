@@ -1,20 +1,26 @@
 import type { Route } from "../+types/root";
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { useParams } from "react-router";
 import { LoginForm } from "~/components/Forms/LoginForm";
+import { SignupForm } from "~/components/Forms/SignupForm";
 
 import { redirect, data } from "react-router";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
 
   if (pb.authStore.isValid) {
-    const user = pb.authStore.model as { admin?: boolean } | null;
-    return redirect(user?.admin === true ? "/backoffice" : "/dashboard");
+    const user = pb.authStore.model as { id?: string; admin?: boolean } | null;
+    if (user?.admin === true) return redirect("/backoffice");
+    if (user?.id && (await getUserBlockedStatus(pb, user))) return redirect("/blocked");
+    if (user?.id && !(await canAccessUserBackoffice(pb, user))) return redirect("/pending-approval");
+    return redirect("/");
   }
 
-  if (params.mode && params.mode !== "login") {
+  const mode = params.mode || "login";
+  if (!["login", "register"].includes(mode)) {
     return redirect("/auth/login");
   }
 
@@ -25,17 +31,86 @@ export async function action({ request }: Route.ActionArgs) {
   const pb = createPocketBase(request);
   const formData = await request.formData();
 
+  const mode = (formData.get("mode") as string) || "login";
+
   try {
+    if (mode === "register") {
+      const email = (formData.get("email") as string)?.trim();
+      const fullName = (formData.get("fullName") as string)?.trim();
+      const password = formData.get("password") as string;
+      const passwordConfirm = (formData.get("confirmPassword") ?? formData.get("passwordConfirm")) as string;
+
+      if (!email || !fullName) {
+        return data(
+          { error: "Name and email are required" },
+          { status: 400 }
+        );
+      }
+      if (!password || password.length < 8) {
+        return data(
+          { error: "Password must be at least 8 characters" },
+          { status: 400 }
+        );
+      }
+      if (password !== passwordConfirm) {
+        return data(
+          { error: "Passwords do not match" },
+          { status: 400 }
+        );
+      }
+
+      // Use admin client so creation is not blocked by users collection API rules.
+      const client = (await createPocketBaseAsAdmin()) ?? pb;
+      const payload: Record<string, unknown> = {
+        email,
+        password,
+        passwordConfirm,
+        name: fullName,
+        admin: false,
+      };
+      try {
+        payload.approved = false;
+        await client.collection("users").create(payload);
+      } catch (firstErr: unknown) {
+        delete payload.approved;
+        try {
+          await client.collection("users").create(payload);
+        } catch (createErr: unknown) {
+          const err = createErr as { response?: { data?: Record<string, unknown>; message?: string }; message?: string };
+          const msg =
+            (err?.response?.message ??
+              (typeof (createErr as { message?: string }).message === "string" ? (createErr as { message: string }).message : "")) ||
+            "Failed to create record.";
+          const dataFields = err?.response?.data && typeof err.response.data === "object" && Object.keys(err.response.data).length > 0
+            ? " " + JSON.stringify(err.response.data)
+            : "";
+          console.error("Register create error:", createErr);
+          return data(
+            { error: msg + dataFields + " (Check PocketBase: users collection → API rules → Create must allow new signups, or set API_PB_ADMIN_EMAIL/PASSWORD so the app creates as admin.)" },
+            { status: 400 }
+          );
+        }
+      }
+
+      return redirect("/registration-success");
+    }
+
+    // Default: login
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     await pb.collection("users").authWithPassword(email, password);
 
-    const user = pb.authStore.model as { admin?: boolean } | null;
+    const user = pb.authStore.model as { id?: string; admin?: boolean } | null;
     const isAdmin = user?.admin === true;
-    const redirectTo = isAdmin ? "/backoffice" : "/dashboard";
+    const isBlocked = await getUserBlockedStatus(pb, user);
+    const canAccess = !isBlocked && (await canAccessUserBackoffice(pb, user));
+    const redirectTo = isAdmin ? "/backoffice" : isBlocked ? "/blocked" : canAccess ? "/?success=login" : "/pending-approval";
     return redirect(redirectTo, {
       headers: {
-        "set-cookie": pb.authStore.exportToCookie({ httpOnly: true, secure: import.meta.env.PROD }),
+        "set-cookie": pb.authStore.exportToCookie({
+          httpOnly: true,
+          secure: import.meta.env.PROD,
+        }),
       },
     });
   } catch (error: any) {
@@ -55,12 +130,14 @@ export async function action({ request }: Route.ActionArgs) {
 export function meta() {
   return [
     { title: "Walkys - Login" },
-    { name: "description", content: "Login to your Walkys account" },
+    { name: "description", content: "Login or register for your Walkys account" },
   ];
 }
 
 export const Auth = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const { mode } = useParams();
+  const isRegister = mode === "register";
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -119,7 +196,7 @@ export const Auth = () => {
             </div>
 
             <div className="absolute bottom-20 left-12 z-20 max-w-md text-white">
-              <h1 className="text-6xl font-serif mb-6 leading-tight">
+              <h1 className="text-6xl font-display mb-6 leading-tight">
                 Get
                 <br />
                 Everything
@@ -151,7 +228,7 @@ export const Auth = () => {
               transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="w-full max-w-md bg-white rounded-[20px] p-12 md:p-0"
             >
-              <LoginForm />
+              {isRegister ? <SignupForm /> : <LoginForm />}
             </motion.div>
           </motion.div>
         </div>

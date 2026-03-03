@@ -54,7 +54,7 @@ export const ContactForm = () => {
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
         className="mb-16 md:mb-0 md:col-start-1 md:row-start-1"
       >
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 uppercase">
+        <h1 className="text-4xl md:text-6xl font-bold mb-4 uppercase font-display">
           {t.contact.title}
         </h1>
         <a
@@ -128,13 +128,14 @@ export const ContactForm = () => {
             id="contact-submit-btn"
             type="submit"
             variant={submitStatus === "success" ? "secondary" : "primary"}
+            size="sm"
             className={`transition-all md:w-1/2 duration-500 ${submitStatus === "success" ? "!bg-green-500 !text-white !border-green-500 hover:!bg-green-600" : ""}`}
             disabled={isSubmitting}
             rightIcon={
               isSubmitting ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : submitStatus === "success" ? undefined : (
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4" />
               )
             }
           >

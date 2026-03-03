@@ -30,7 +30,7 @@ export const CategoriesList = ({
             transition={{ delay: 0.5 + indexC / 8, duration: 1.2 }}
             className="flex justify-start w-full py-8"
           >
-            <h1 className="text-4xl">
+            <h1 className="text-4xl font-display">
               {category.name}
               <hr className="border-2 w-1/2 my-2 rounded" />
             </h1>

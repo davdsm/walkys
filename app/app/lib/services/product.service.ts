@@ -17,6 +17,8 @@ export interface ProductRecord extends BaseRecord {
   slug: string;
   media?: string[];
   media_hover?: string;
+  /** 360° viewer frame filenames (order matters) */
+  media_360?: string[];
   category?: string[] | CategoryRecord[];
   collection?: string[] | CollectionRecord[];
   sizes?: string[] | SizeRecord[];
@@ -29,6 +31,7 @@ export interface TranslatedProduct extends Omit<ProductRecord, "name_en" | "name
   details: string;
   media: string[];
   media_hover: string;
+  media_360: string[];
 }
 
 export interface ProductServiceOptions {
@@ -78,8 +81,15 @@ export class ProductService {
       details: (lang === "pt" ? product.details_pt : product.details_en) || "",
       media: Array.isArray(product.media)
         ? this.buildFileUrls(product.id, product.media, collectionId)
-        : [],
+        : typeof product.media === "string" && product.media
+          ? this.buildFileUrls(product.id, [product.media], collectionId)
+          : [],
       media_hover: this.buildFileUrl(product.id, product.media_hover, collectionId),
+      media_360: Array.isArray(product.media_360)
+        ? this.buildFileUrls(product.id, product.media_360, collectionId)
+        : typeof (product as any).media_360 === "string" && (product as any).media_360
+          ? this.buildFileUrls(product.id, [(product as any).media_360], collectionId)
+          : [],
     };
   }
 

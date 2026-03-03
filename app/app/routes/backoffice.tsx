@@ -1,6 +1,6 @@
 import { redirect, Outlet, Link, useLocation, Form, useLoaderData } from "react-router";
 import type { Route } from "./+types/backoffice";
-import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
 import {
   LayoutDashboard,
   FileText,
@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { NotificationBell, type NotificationItem } from "~/components/Backoffice/NotificationBell";
-import { getAdminNotifications, markNotificationsAsRead, type NotificationRecord } from "~/lib/services";
+import { getAdminNotifications, markNotificationsAsRead, ensureSizesRange, type NotificationRecord } from "~/lib/services";
 
 export async function action({ request }: Route.ActionArgs) {
   const pb = createPocketBase(request);
@@ -28,7 +28,18 @@ export async function action({ request }: Route.ActionArgs) {
   if (!user?.admin) return null;
 
   const formData = await request.formData();
-  if (formData.get("intent") !== "markRead") return null;
+  const intent = formData.get("intent");
+
+  if (intent === "seedSizes") {
+    try {
+      const created = await ensureSizesRange(pb, 35, 47);
+      return { seedSizes: true, created };
+    } catch {
+      return { seedSizes: false, created: 0 };
+    }
+  }
+
+  if (intent !== "markRead") return null;
   const ids = formData.getAll("ids").filter((v): v is string => typeof v === "string" && v.length > 0);
   if (ids.length === 0) return null;
 
@@ -47,8 +58,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!pb.authStore.isValid) {
     return redirect("/auth/login");
   }
-  const user = pb.authStore.model as { admin?: boolean; email?: string } | null;
+  const user = pb.authStore.model as { id?: string; admin?: boolean; email?: string } | null;
   if (!user?.admin) {
+    if (user?.id && (await getUserBlockedStatus(pb, user))) return redirect("/blocked");
+    if (user?.id && !(await canAccessUserBackoffice(pb, user))) return redirect("/pending-approval");
     return redirect("/dashboard");
   }
   let notifications: NotificationRecord[] = [];
@@ -168,7 +181,7 @@ export default function BackofficeLayout() {
 
   return (
     <div
-      className="min-h-screen bg-slate-100 flex"
+      className="backoffice-layout min-h-screen bg-slate-100 flex"
       role="application"
       aria-label="Backoffice"
     >

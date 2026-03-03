@@ -9,7 +9,7 @@ import { useLoaderData } from "react-router";
 import { useTranslatedContent } from "~/hooks";
 import { useLanguage } from "~/contexts";
 import { SmallCTA } from "~/components/SmallCTA";
-import { AboutHero, AboutValues, AboutProcess } from "~/components/AboutPage";
+import { AboutHero, AboutValues } from "~/components/AboutPage";
 
 const ABOUT_COLLECTION = "AboutPage";
 
@@ -64,9 +64,6 @@ export default function About() {
   const heroImage = images?.entryImg?.[0] ?? "/cover.jpg";
   const heroTitle = getContent("intro_title");
   const heroSubtitle = getContent("intro_text");
-  const heroEyebrow = getContent("intro_eyebrow") || t.about.our_story;
-  const valuesSectionTitle = getContent("what_about_section_title") || t.about.what_about_title;
-  const processSectionTitle = getContent("gallery_section_title") || t.about.gallery_title;
 
   const values = [
     {
@@ -81,57 +78,23 @@ export default function About() {
     },
   ].filter((v) => v.image);
 
-  const processStepsWithTitles = [
-    {
-      number: "01",
-      title: getContent("mold_title") || t.about.mold_title,
-      description: getContent("mold"),
-      image: images?.MoldImage?.[0] ?? "",
-    },
-    {
-      number: "02",
-      title: getContent("shapping_title") || t.about.shapping_title,
-      description: getContent("shapping"),
-      image: images?.ShapeImage?.[0] ?? "",
-    },
-    {
-      number: "03",
-      title: getContent("tabulated_title") || t.about.tabulated_title,
-      description: getContent("tabulated"),
-      image: images?.TabulatedImage?.[0] ?? "",
-    },
-    {
-      number: "04",
-      title: getContent("quality_title") || t.about.quality_title,
-      description: getContent("quality"),
-      image: images?.QualityImage?.[0] ?? "",
-    },
-  ].filter((s) => s.image);
-
   return (
     <main className="w-full min-h-screen flex flex-col bg-[#f1f1f1]">
       <AboutHero
         image={heroImage}
-        eyebrow={heroEyebrow}
+        eyebrow={t.about.our_story}
         title={heroTitle}
         subtitle={heroSubtitle}
       />
 
       {values.length > 0 && (
         <AboutValues
-          sectionTitle={valuesSectionTitle}
+          sectionTitle={t.about.what_about_title}
           values={values}
         />
       )}
 
-      {processStepsWithTitles.length > 0 && (
-        <AboutProcess
-          sectionTitle={processSectionTitle}
-          steps={processStepsWithTitles}
-        />
-      )}
-
-      <section className="w-full px-6 md:px-16">
+      <section className="w-full px-6 md:px-16 pt-16">
         <SmallCTA />
       </section>
     </main>

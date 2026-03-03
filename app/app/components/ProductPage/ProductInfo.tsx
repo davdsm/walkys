@@ -17,7 +17,6 @@ interface ProductInfoProps {
   onBack: () => void;
   onOrder: () => void;
   language: string;
-  opacity: any; // MotionValue from framer-motion
 }
 
 export const ProductInfo = ({
@@ -32,7 +31,6 @@ export const ProductInfo = ({
   onBack,
   onOrder,
   language,
-  opacity,
 }: ProductInfoProps) => {
   const { t } = useLanguage();
   const fadeUp = {
@@ -41,7 +39,7 @@ export const ProductInfo = ({
     transition: { duration: 0.45, ease: "easeOut" as const },
   };
   return (
-    <motion.div style={{ opacity }} className="space-y-6">
+    <motion.div className="space-y-6">
       {/* Breadcrumbs */}
       <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0 }}>
         <Breadcrumbs breadcrumbs={breadcrumbs} />
@@ -60,7 +58,7 @@ export const ProductInfo = ({
 
       {/* Product Name */}
       <motion.h1
-        className="text-4xl lg:text-5xl font-bold text-black"
+        className="text-4xl lg:text-5xl font-bold text-black font-display"
         {...fadeUp}
         transition={{ ...fadeUp.transition, delay: 0.1 }}
       >

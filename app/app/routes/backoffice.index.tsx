@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from "react-router";
+import { Link, useLoaderData, useFetcher } from "react-router";
 import {
   FileText,
   Package,
@@ -9,6 +9,7 @@ import {
   Edit3,
   Globe,
   MessageSquare,
+  Ruler,
 } from "lucide-react";
 import type { Route } from "./+types/backoffice.index";
 import { createPocketBase } from "~/lib/pocketbase";
@@ -52,6 +53,8 @@ const sections = [
 
 export default function BackofficeIndex() {
   const { productsCount, categoriesCount, collectionsCount, contactRepliesCount } = useLoaderData<typeof loader>();
+  const fetcher = useFetcher<{ seedSizes?: boolean; created?: number }>();
+  const actionData = fetcher.data;
 
   return (
     <div className="space-y-8">
@@ -191,6 +194,39 @@ export default function BackofficeIndex() {
                 ))}
               </ul>
             </nav>
+          </section>
+
+          {/* Shoe sizes card - seed sizes 35 to 47 */}
+          <section
+            className="bg-white rounded-sm border border-slate-200 shadow-sm p-6"
+            aria-labelledby="sizes-title"
+          >
+            <span className="flex items-center justify-center w-10 h-10 rounded-sm bg-slate-200 text-slate-800 mb-4">
+              <Ruler className="w-5 h-5" aria-hidden />
+            </span>
+            <h2 id="sizes-title" className="text-lg font-bold text-slate-900">
+              Tamanhos de calçado
+            </h2>
+            <p className="text-sm text-slate-500 mt-1.5 leading-relaxed">
+              Crie os tamanhos de produto (35 a 47) na base de dados. Só são criados os que faltam.
+            </p>
+            <fetcher.Form method="post" className="mt-4">
+              <input type="hidden" name="intent" value="seedSizes" />
+              <button
+                type="submit"
+                disabled={fetcher.state !== "idle"}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-sm bg-slate-800 text-white text-sm font-medium hover:bg-slate-900 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+              >
+                {fetcher.state !== "idle" ? "A criar…" : "Criar tamanhos 35–47"}
+              </button>
+            </fetcher.Form>
+            {actionData?.seedSizes === true && (
+              <p className="mt-3 text-sm text-slate-600">
+                {actionData.created === 0
+                  ? "Todos os tamanhos 35–47 já existem."
+                  : `${actionData.created} tamanho(s) criado(s).`}
+              </p>
+            )}
           </section>
 
           {/* CTA / Tips card - like Unlock Premium */}

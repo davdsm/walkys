@@ -1,6 +1,6 @@
 import { redirect, useLoaderData } from "react-router";
 import type { Route } from "../+types/root";
-import { createPocketBase, createPocketBaseAsAdmin } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
 import { getOrderCountByUser, getUserNotifications, markNotificationsAsRead, type NotificationRecord } from "~/lib/services";
 import BackofficePage from "~/components/Backoffice/BackofficePage";
 
@@ -25,39 +25,20 @@ export async function action({ request }: Route.ActionArgs) {
     }
 }
 
-function normalizeCatalogProductIds(raw: unknown): string[] {
-    if (raw == null) return [];
-    if (Array.isArray(raw)) {
-        return raw
-            .map((item) => (typeof item === "string" ? item : (item as { id?: string })?.id))
-            .filter((id): id is string => typeof id === "string" && id.length > 0);
-    }
-    return [];
-}
-
 export async function loader({ request }: Route.LoaderArgs) {
     const pb = createPocketBase(request);
     if (!pb.authStore.isValid) {
         return redirect("/auth/login");
     }
 
-    const user = pb.authStore.model as { id?: string } | null;
-    let catalogCount = 0;
-    let ordersCount = 0;
+    const user = pb.authStore.model as { id?: string; admin?: boolean } | null;
+    if (user?.id && (await getUserBlockedStatus(pb, user))) return redirect("/blocked");
+    if (user?.id && !(await canAccessUserBackoffice(pb, user))) return redirect("/pending-approval");
 
+    let ordersCount = 0;
     let userNotifications: NotificationRecord[] = [];
 
     if (user?.id) {
-        try {
-            const adminPb = await createPocketBaseAsAdmin();
-            const client = adminPb ?? pb;
-            const userRecord = await client.collection("users").getOne(user.id, { fields: "catalog_products" });
-            const raw = (userRecord as { catalog_products?: unknown }).catalog_products;
-            const ids = normalizeCatalogProductIds(raw);
-            catalogCount = ids.length;
-        } catch {
-            catalogCount = 0;
-        }
         try {
             const adminPb = await createPocketBaseAsAdmin();
             ordersCount = await getOrderCountByUser(adminPb ?? pb, user.id);
@@ -73,7 +54,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         }
     }
 
-    return { user, catalogCount, ordersCount, userNotifications };
+    return { user, ordersCount, userNotifications };
 }
 
 export function meta({ }: Route.MetaArgs) {
@@ -83,7 +64,7 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export default function Dashboard() {
-    const { user, catalogCount, ordersCount, userNotifications } = useLoaderData<typeof loader>();
+    const { user, ordersCount, userNotifications } = useLoaderData<typeof loader>();
     const displayName = user?.name || user?.username || "User";
 
     const statusLabels: Record<string, string> = {
@@ -121,10 +102,9 @@ export default function Dashboard() {
     });
 
     return (
-        <div className="w-full h-screen bg-white flex flex-col items-center justify-center gap-8">
+        <div className="backoffice-layout w-full h-screen bg-white flex flex-col items-center justify-center gap-8">
             <BackofficePage
                 displayName={displayName}
-                catalogCount={catalogCount}
                 ordersCount={ordersCount}
                 notifications={notifications}
                 markReadAction="/dashboard"

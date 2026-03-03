@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useLoaderData } from "react-router";
+import { useLoaderData, redirect } from "react-router";
 import { motion } from "framer-motion";
 
 import { useLanguage } from "~/contexts";
@@ -13,7 +13,7 @@ import CategoriesList from "~/components/CategoriesList";
 import { useScrollSpy } from "~/hooks/useScrollSpy";
 import { getCategoryFilters } from "~/utils/filters";
 import { mapCategoriesWithProducts } from "~/utils/categories";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, canAccessUserBackoffice, getUserBlockedStatus, getUserAllowedProductIds } from "~/lib/pocketbase";
 import {
   createCollectionService,
   createProductService,
@@ -30,7 +30,15 @@ export async function loader({
   params: { collection?: string };
 }) {
   const pb = createPocketBase(request);
+  if (!pb.authStore.isValid) {
+    return redirect("/auth/login");
+  }
+  const user = pb.authStore.model as { id?: string; admin?: boolean } | null;
+  if (user?.id && (await getUserBlockedStatus(pb, user))) return redirect("/blocked");
+  if (user?.id && !(await canAccessUserBackoffice(pb, user))) return redirect("/pending-approval");
+
   const language = getLanguageFromRequest(request);
+  const allowedIds = await getUserAllowedProductIds(pb, user);
 
   const collectionService = createCollectionService(pb, language);
   const productService = createProductService(pb, language);
@@ -43,9 +51,10 @@ export async function loader({
   }
 
   // Get products for this collection
-  const products = await productService.getByCollection(collection.id, {
+  let products = await productService.getByCollection(collection.id, {
     expand: "category,sizes",
   });
+  if (allowedIds?.length) products = products.filter((p: any) => allowedIds.includes(p.id));
 
   // Extract categories from products
   const categories = categoryService.getCategoriesFromProducts(products);
@@ -93,10 +102,10 @@ export const CollectionPage = () => {
     if (!Array.isArray(categories)) return [];
     return getCategoryFilters({
       categories,
-      allLabel: t.common.all,
+      allLabel: t?.common?.all ?? "All",
       setActiveCategory,
     });
-  }, [categories, t.common.all, setActiveCategory]);
+  }, [categories, t]);
 
   // Scrollspy - only if we have categories
   useScrollSpy({

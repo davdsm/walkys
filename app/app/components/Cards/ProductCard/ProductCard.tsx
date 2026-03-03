@@ -115,7 +115,7 @@ export const ProductCard = ({
             ))}
         </div>
         <div className="flex justify-between items-start w-full">
-          <p className="text-black group-hover:text-white leading-[1.5] text-xs max-w-[79px]">
+          <p className="text-black group-hover:text-white leading-[1.5] text-xs">
             {name}
           </p>
         </div>
