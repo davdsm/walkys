@@ -10,6 +10,7 @@ import { useTranslatedContent } from "~/hooks";
 import { useLanguage } from "~/contexts";
 import { SmallCTA } from "~/components/SmallCTA";
 import { AboutHero, AboutValues } from "~/components/AboutPage";
+import AboutVideoSection from "~/components/AboutPage/AboutVideoSection";
 
 const ABOUT_COLLECTION = "AboutPage";
 
@@ -94,9 +95,11 @@ export default function About() {
         />
       )}
 
+      <AboutVideoSection src="/videos/about.mp4" />
+
       <section className="w-full px-6 md:px-16 pt-16">
         <SmallCTA />
       </section>
-    </main>
+    </main >
   );
 }
