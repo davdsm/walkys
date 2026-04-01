@@ -3,6 +3,7 @@ import { BackofficeToast } from "~/components/Backoffice/BackofficeToast";
 import { createPocketBase } from "~/lib/pocketbase";
 import { ensureLayoutDefaults, type LayoutData, type LayoutMenuItem, type LayoutSocialItem, type LayoutFooterContent, type LayoutSmallCtaContent } from "~/lib/services/layout.service";
 import type { Route } from "./+types/backoffice.layout";
+import { buildSeoMeta } from "~/lib/seo";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
@@ -167,7 +168,12 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export function meta() {
-  return [{ title: "Layout – Walkys Backoffice" }];
+  return buildSeoMeta({
+    title: "Backoffice Layout",
+    description: "Manage layout settings in the Walkys backoffice.",
+    pathname: "/backoffice/layout",
+    noIndex: true,
+  });
 }
 
 const defaultMenuItems: LayoutMenuItem[] = [

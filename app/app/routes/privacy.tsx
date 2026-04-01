@@ -1,10 +1,12 @@
 import { useLanguage } from "../contexts/LanguageContext";
+import { buildSeoMeta } from "~/lib/seo";
 
 export function meta() {
-  return [
-    { title: "Política de Privacidade - Walkys" },
-    { name: "description", content: "Política de Privacidade da Walkys" },
-  ];
+  return buildSeoMeta({
+    title: "Privacy Policy",
+    description: "Read how Walkys collects, uses, protects, and stores your personal data.",
+    pathname: "/privacy",
+  });
 }
 
 export async function loader() {

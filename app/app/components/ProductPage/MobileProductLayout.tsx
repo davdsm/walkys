@@ -75,7 +75,7 @@ export const MobileProductLayout = ({
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
               src={showUrl}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               controls
               loop
               muted
@@ -89,7 +89,7 @@ export const MobileProductLayout = ({
               transition={{ duration: 0.5 }}
               src={showUrl}
               alt={productName}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           )
         ) : null}

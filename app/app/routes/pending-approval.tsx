@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { createPocketBase, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
 import type { Route } from "./+types/pending-approval";
 import { useLanguage } from "~/contexts";
+import { buildSeoMeta } from "~/lib/seo";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
@@ -17,7 +18,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta() {
-  return [{ title: "Conta pendente – Walkys" }];
+  return buildSeoMeta({
+    title: "Pending Approval",
+    description: "Your Walkys account is waiting for approval before access is granted.",
+    pathname: "/pending-approval",
+    noIndex: true,
+  });
 }
 
 const fadeInUp = {

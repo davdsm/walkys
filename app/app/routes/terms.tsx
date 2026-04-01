@@ -1,10 +1,12 @@
 import { useLanguage } from "../contexts/LanguageContext";
+import { buildSeoMeta } from "~/lib/seo";
 
 export function meta() {
-  return [
-    { title: "Termos e Condições - Walkys" },
-    { name: "description", content: "Learn more about Walkys" },
-  ];
+  return buildSeoMeta({
+    title: "Terms and Conditions",
+    description: "Read the Walkys terms and conditions for website use, orders, and customer responsibilities.",
+    pathname: "/terms",
+  });
 }
 
 export async function loader() {

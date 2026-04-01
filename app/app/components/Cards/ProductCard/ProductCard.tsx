@@ -78,12 +78,12 @@ export const ProductCard = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="w-full md:w-full h-[270px] rounded-xl bg-[#f3f3f3] relative overflow-hidden mb-2.5">
+        <div className="w-full aspect-square rounded-xl bg-[#f3f3f3] relative overflow-hidden mb-2.5">
           {defaultMediaType === "video" ? (
             <video
               ref={defaultVideoRef}
               src={media.image}
-              className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
+              className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
               loop
               muted
               playsInline
@@ -92,7 +92,7 @@ export const ProductCard = ({
           ) : (
             <img
               src={media.image}
-              className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
+              className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover ${isHovered && isMediaLoaded ? "opacity-0" : "opacity-100"}`}
               alt={name}
             />
           )}
@@ -101,7 +101,7 @@ export const ProductCard = ({
               <video
                 ref={hoverVideoRef}
                 src={media.hover}
-                className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
+                className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover ${isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
                 loop
                 muted
                 playsInline
@@ -109,7 +109,7 @@ export const ProductCard = ({
             ) : (
               <img
                 src={media.hover}
-                className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover transition-opacity duration-300 ease-in ${isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
+                className={`absolute inset-0 h-full w-full border-none rounded-xl object-cover ${isHovered && isMediaLoaded ? "opacity-100" : "opacity-0"}`}
                 alt={name}
               />
             ))}

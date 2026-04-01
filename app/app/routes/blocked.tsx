@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { createPocketBase, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
 import type { Route } from "./+types/blocked";
 import { useLanguage } from "~/contexts";
+import { buildSeoMeta } from "~/lib/seo";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
@@ -19,7 +20,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta() {
-  return [{ title: "Conta bloqueada – Walkys" }];
+  return buildSeoMeta({
+    title: "Account Blocked",
+    description: "This Walkys account is currently blocked.",
+    pathname: "/blocked",
+    noIndex: true,
+  });
 }
 
 const fadeInUp = {

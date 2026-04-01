@@ -3,6 +3,7 @@ import type { Route } from "../+types/root";
 import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
 import { getOrderCountByUser, getUserNotifications, markNotificationsAsRead, type NotificationRecord } from "~/lib/services";
 import BackofficePage from "~/components/Backoffice/BackofficePage";
+import { buildSeoMeta } from "~/lib/seo";
 
 export async function action({ request }: Route.ActionArgs) {
     const pb = createPocketBase(request);
@@ -58,9 +59,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta({ }: Route.MetaArgs) {
-    return [
-        { title: "Walkys - Dashboard" },
-    ];
+    return buildSeoMeta({
+        title: "Dashboard",
+        description: "Manage your Walkys account, notifications, and recent activity.",
+        pathname: "/dashboard",
+        noIndex: true,
+    });
 }
 
 export default function Dashboard() {

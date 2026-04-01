@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useLoaderData, redirect } from "react-router";
 import { motion } from "framer-motion";
 
+import type { Route } from "./+types/category.$category";
 import { useLanguage } from "~/contexts";
 import type { ProductRecord } from "~/hooks/useProducts";
 import type { CategoryRecord } from "~/hooks/useCategories";
@@ -13,6 +14,8 @@ import {
   type CategoryServiceOptions,
 } from "~/lib/services";
 import { translations } from "~/lib/translations";
+import { buildSeoMeta } from "~/lib/seo";
+import { resolveProductCardMedia } from "~/lib/product-media";
 
 type LoaderCategory = CategoryRecord;
 
@@ -53,6 +56,26 @@ export async function loader({
 
   // Ensure 'products' are returned as ProductRecord[]
   return { category, products: products as ProductRecord[] };
+}
+
+export function meta({ data, params }: Route.MetaArgs) {
+  const category = data?.category as
+    | (CategoryRecord & {
+        name?: string;
+        description?: string;
+        media?: string;
+      })
+    | undefined;
+  const categoryName = category?.name || params.category || "Category";
+  const categoryDescription =
+    category?.description || `Browse the ${categoryName} selection from Walkys.`;
+
+  return buildSeoMeta({
+    title: categoryName,
+    description: categoryDescription,
+    pathname: params.category ? `/category/${params.category}` : "/category",
+    image: category?.media,
+  });
 }
 
 export const CategoryPage = () => {
@@ -278,10 +301,7 @@ export const CategoryPage = () => {
                           `name_${langKey}` as keyof ProductRecord
                         ] as string) ?? ""
                       }
-                      media={{
-                        image: product.media?.[0] ?? "",
-                        hover: product.media_hover ?? "",
-                      }}
+                      media={resolveProductCardMedia(product)}
                       link={`/product/${product.slug}`}
                     />
                   </motion.div>

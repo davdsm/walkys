@@ -19,7 +19,9 @@ export const Filters = ({
   delay?: number;
 }) => {
   return (
-    <ul className={`flex row gap-8 justify-center items-center ${className}`}>
+    <ul
+      className={`flex flex-row flex-wrap gap-3 sm:gap-4 md:gap-8 justify-center items-center max-w-full px-2 sm:px-4 ${className ?? ""}`}
+    >
       {items &&
         items.map((item, index: number) => (
           <motion.li

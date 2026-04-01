@@ -7,6 +7,7 @@ import { SignupForm } from "~/components/Forms/SignupForm";
 
 import { redirect, data } from "react-router";
 import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
+import { buildSeoMeta } from "~/lib/seo";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
@@ -127,11 +128,17 @@ export async function action({ request }: Route.ActionArgs) {
   }
 }
 
-export function meta() {
-  return [
-    { title: "Walkys - Login" },
-    { name: "description", content: "Login or register for your Walkys account" },
-  ];
+export function meta({ params }: Route.MetaArgs) {
+  const isRegister = params.mode === "register";
+
+  return buildSeoMeta({
+    title: isRegister ? "Create Account" : "Login",
+    description: isRegister
+      ? "Create your Walkys account to access collections, orders, and your customer area."
+      : "Sign in to your Walkys account to manage orders and access your customer area.",
+    pathname: isRegister ? "/auth/register" : "/auth/login",
+    noIndex: true,
+  });
 }
 
 export const Auth = () => {
@@ -148,7 +155,7 @@ export const Auth = () => {
   }, []);
 
   return (
-    <div className="w-full bg-white h-screen relative flex items-center justify-center font-sans overflow-hidden">
+    <div className="w-full max-w-full bg-white min-h-[100dvh] md:h-screen md:min-h-0 relative flex items-center justify-center font-sans overflow-x-hidden md:overflow-hidden">
       {/* Mobile Background */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -157,7 +164,7 @@ export const Auth = () => {
         className="absolute top-0 left-0 w-full h-full md:hidden z-0"
       >
         <video
-          src="/videos/login.mp4"
+          src="/videos/about.mp4"
           autoPlay
           loop
           muted
@@ -178,7 +185,7 @@ export const Auth = () => {
             className="w-full md:w-1/2 h-full relative overflow-hidden hidden md:block rounded-3xl"
           >
             <video
-              src="/videos/login.mp4"
+              src="/videos/about.mp4"
               autoPlay
               loop
               muted
@@ -226,7 +233,7 @@ export const Auth = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full max-w-md bg-white rounded-[20px] p-12 md:p-0"
+              className="w-full max-w-md bg-white rounded-[20px] p-6 sm:p-8 md:p-0 mx-auto"
             >
               {isRegister ? <SignupForm /> : <LoginForm />}
             </motion.div>

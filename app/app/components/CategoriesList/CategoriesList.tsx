@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import type { TranslatedProduct, TranslatedCategory } from "~/lib/services";
 import ProductCard from "~/components/Cards/ProductCard";
+import { resolveProductCardMedia } from "~/lib/product-media";
 
 interface CategoryWithProducts extends TranslatedCategory {
   products: TranslatedProduct[];
@@ -30,12 +31,17 @@ export const CategoriesList = ({
             transition={{ delay: 0.5 + indexC / 8, duration: 1.2 }}
             className="flex justify-start w-full py-8"
           >
-            <h1 className="text-4xl font-display">
-              {category.name}
-              <hr className="border-2 w-1/2 my-2 rounded" />
-            </h1>
+            <div>
+              <h1 className="text-4xl font-display">
+                {category.name}
+                <hr className="border-2 w-1/2 my-2 rounded" />
+              </h1>
+              {category.description && (
+                <p className="text-sm text-slate-500 mt-1 max-w-xl">{category.description}</p>
+              )}
+            </div>
           </motion.div>
-          <ul className="w-full flex flex-row gap-3 justify-start items-center flex-wrap md:flex-nowrap">
+          <ul className="w-full flex flex-row gap-3 justify-start items-start flex-wrap">
             {category.products.map(
               (product: TranslatedProduct, indexP: number) => (
                 <motion.li
@@ -47,14 +53,11 @@ export const CategoriesList = ({
                     delay: 0.5 + indexP / 8,
                     duration: 1.2,
                   }}
-                  className="md:w-1/4 w-[calc(50%-10px)]"
+                  className="w-[calc(50%-6px)] md:w-[calc(25%-9px)]"
                 >
                   <ProductCard
                     name={product.name}
-                    media={{
-                      image: product.media?.[0] ?? "",
-                      hover: product.media_hover ?? "",
-                    }}
+                    media={resolveProductCardMedia(product)}
                     link={`/product/${product.slug}`}
                   />
                 </motion.li>

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useLoaderData, redirect } from "react-router";
 import { motion } from "framer-motion";
 
+import type { Route } from "./+types/collection.$collection";
 import { useLanguage } from "~/contexts";
 import type { TranslatedProduct } from "~/lib/services/product.service";
 import type { TranslatedCategory } from "~/lib/services/category.service";
@@ -21,6 +22,8 @@ import {
 } from "~/lib/services";
 import { SmallCTA } from "~/components/SmallCTA";
 import { getLanguageFromRequest } from "~/lib/utils";
+import { buildSeoMeta } from "~/lib/seo";
+import { resolveProductCardMedia } from "~/lib/product-media";
 
 export async function loader({
   request,
@@ -60,6 +63,20 @@ export async function loader({
   const categories = categoryService.getCategoriesFromProducts(products);
 
   return { products, categories, collection, language };
+}
+
+export function meta({ data, params }: Route.MetaArgs) {
+  const collectionName = data?.collection?.name || params.collection || "Collection";
+  const description = data?.products?.length
+    ? `Explore ${data.products.length} styles from the ${collectionName} collection by Walkys.`
+    : `Explore the ${collectionName} collection by Walkys.`;
+
+  return buildSeoMeta({
+    title: collectionName,
+    description,
+    pathname: params.collection ? `/collection/${params.collection}` : "/collection",
+    image: data?.collection?.image,
+  });
 }
 
 export const CollectionPage = () => {
@@ -138,7 +155,7 @@ export const CollectionPage = () => {
           initial={{ opacity: 0, y: -60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="fixed top-22 md:top-28 left-1/2 w-auto bg-black/40 transform -translate-x-1/2 py-2 px-4 md:py-4 md:px-8 rounded-xl z-10 backdrop-blur-sm"
+          className="fixed top-22 md:top-28 left-1/2 w-[calc(100%-1rem)] max-w-lg md:max-w-none md:w-auto bg-black/40 transform -translate-x-1/2 py-2 px-3 md:py-4 md:px-8 rounded-xl z-10 backdrop-blur-sm"
         >
           <Filters
             items={filters}
@@ -148,7 +165,7 @@ export const CollectionPage = () => {
           />
         </motion.div>
       )}
-      <article className="relative -mt-40 mb-10">
+      <article className="relative -mt-24 sm:-mt-32 md:-mt-40 mb-10 px-0">
         <Filters
           items={filters}
           activeFilter={activeCategory}
@@ -168,10 +185,7 @@ export const CollectionPage = () => {
                 >
                   <ProductCard
                     name={product.name}
-                    media={{
-                      image: product.media?.[0] ?? "",
-                      hover: product.media_hover ?? "",
-                    }}
+                    media={resolveProductCardMedia(product)}
                     link={`/product/${product.slug}`}
                   />
                 </motion.div>
@@ -191,7 +205,7 @@ export const CollectionPage = () => {
                 >
                   <CategoryCard
                     name={category.name}
-                    description={category.description}
+                    //description={category.description}
                     media={{
                       image: category.media,
                       hover: category.hover,

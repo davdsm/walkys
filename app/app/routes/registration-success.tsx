@@ -1,9 +1,15 @@
 import { Link } from "react-router";
 import type { Route } from "./+types/registration-success";
 import { useLanguage } from "~/contexts";
+import { buildSeoMeta } from "~/lib/seo";
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "Conta criada – Walkys" }];
+  return buildSeoMeta({
+    title: "Account Created",
+    description: "Your Walkys account has been created and is awaiting approval.",
+    pathname: "/registration-success",
+    noIndex: true,
+  });
 }
 
 export default function RegistrationSuccess() {

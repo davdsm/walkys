@@ -20,6 +20,7 @@ import {
 import { useState } from "react";
 import { NotificationBell, type NotificationItem } from "~/components/Backoffice/NotificationBell";
 import { getAdminNotifications, markNotificationsAsRead, ensureSizesRange, type NotificationRecord } from "~/lib/services";
+import { buildSeoMeta } from "~/lib/seo";
 
 export async function action({ request }: Route.ActionArgs) {
   const pb = createPocketBase(request);
@@ -76,7 +77,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta() {
-  return [{ title: "Walkys – Backoffice" }];
+  return buildSeoMeta({
+    title: "Backoffice",
+    description: "Walkys administration area for products, pages, orders, and settings.",
+    pathname: "/backoffice",
+    noIndex: true,
+  });
 }
 
 const navItems = [

@@ -3,6 +3,7 @@ import { useLoaderData, useNavigate, useRouteLoaderData, redirect } from "react-
 import { motion } from "framer-motion";
 import { useLanguage, useCart } from "~/contexts";
 import type { ProductRecord, SizeRecord } from "~/hooks/useProducts";
+import type { Route } from "./+types/product.$product";
 import { createPocketBase, canAccessUserBackoffice, getUserBlockedStatus, getUserAllowedProductIds } from "~/lib/pocketbase";
 import { createProductService } from "~/lib/services";
 import {
@@ -11,6 +12,7 @@ import {
   MobileProductLayout,
   RelatedProducts,
 } from "~/components/ProductPage";
+import { buildSeoMeta } from "~/lib/seo";
 
 interface ProductLoaderData {
   product: ProductRecord;
@@ -77,6 +79,27 @@ export async function loader({
 
   // Ensure the returned 'product' conforms exactly to 'ProductRecord' type
   return { product: product as ProductRecord, relatedProducts };
+}
+
+export function meta({ data, params }: Route.MetaArgs) {
+  const product = data?.product as
+    | (ProductRecord & {
+        name_en?: string;
+        name_pt?: string;
+        description_en?: string;
+        description_pt?: string;
+      })
+    | undefined;
+  const productName = product?.name_en || product?.name_pt || params.product || "Product";
+  const productDescription =
+    product?.description_en || product?.description_pt || `Discover ${productName} from Walkys.`;
+
+  return buildSeoMeta({
+    title: productName,
+    description: productDescription,
+    pathname: params.product ? `/product/${params.product}` : "/product",
+    image: Array.isArray(product?.media) ? product.media[0] : undefined,
+  });
 }
 
 export const ProductPage = () => {
@@ -173,7 +196,7 @@ export const ProductPage = () => {
 
   return (
     <>
-      <section className="bg-[#f1f1f1] md:min-h-screen relative z-0 overflow-x-hidden w-screen">
+      <section className="bg-[#f1f1f1] md:min-h-screen relative z-0 overflow-x-hidden w-full max-w-full">
         {/* Desktop Layout */}
         <div className="hidden md:block">
           <motion.div

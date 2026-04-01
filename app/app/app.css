@@ -40,18 +40,32 @@ body {
   color: var(--color-foreground);
   background-color: var(--color-background);
   font-weight: 100;
-  font-size: 20px;
+  font-size: 16px;
   font-style: normal;
   overflow-x: hidden;
   overflow-y: visible;
 }
 
-/* Texts and descriptions: 20px, font-weight 100 (frontoffice only) */
+@media (min-width: 768px) {
+  body {
+    font-size: 20px;
+  }
+}
+
+/* Texts and descriptions: readable on mobile, 20px on md+ (frontoffice) */
 p,
 .prose,
 .prose p {
   font-weight: 100;
-  font-size: 20px;
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  p,
+  .prose,
+  .prose p {
+    font-size: 20px;
+  }
 }
 
 /* Backoffice: normal font weight and size (override frontoffice body/p rules) */

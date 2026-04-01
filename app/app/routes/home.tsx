@@ -18,6 +18,8 @@ import { mapCategoriesWithProducts } from "~/utils/categories";
 import { useLoaderData } from "react-router";
 import { getLanguageFromRequest } from "~/lib/utils";
 import HomepageCard from "~/components/Cards/HomepageCard";
+import { buildSeoMeta, DEFAULT_DESCRIPTION } from "~/lib/seo";
+import { resolveProductCardMedia } from "~/lib/product-media";
 
 // Loader: Fetch data on the server/route level. Homepage is public; product filtering applies only when user is logged in and has products assigned.
 export async function loader({ request }: Route.LoaderArgs) {
@@ -179,6 +181,19 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 }
 
+export function meta({ data }: Route.MetaArgs) {
+  const heroTitle =
+    data?.homepageData?.find((section) => section.section_id === "intro-title")?.value;
+  const heroSubtitle =
+    data?.homepageData?.find((section) => section.section_id === "intro-text")?.value;
+
+  return buildSeoMeta({
+    title: heroTitle || "Portuguese Shoes",
+    description: heroSubtitle || DEFAULT_DESCRIPTION,
+    pathname: "/",
+  });
+}
+
 const HERO_BG = "#ffffff";
 const DEFAULT_BG = "#f1f1f1";
 
@@ -252,43 +267,41 @@ export const Home = () => {
     language,
   } = effectiveData;
 
+  const introProductSection = homepageData.find((p) => p.section_id === "intro-product");
+  const introCategoriesSection = homepageData.find((p) => p.section_id === "intro-categories");
+
   const heroSection = {
-    title: homepageData.find((p) => p.section_id === "intro-title").value,
-    subtitle: homepageData.find((p) => p.section_id === "intro-text").value,
-    product: homepageData.find((p) => p.section_id === "intro-product")
-      .products[0],
+    title: homepageData.find((p) => p.section_id === "intro-title")?.value ?? "",
+    subtitle: homepageData.find((p) => p.section_id === "intro-text")?.value ?? "",
+    product: introProductSection?.products?.[0] ?? null,
     categories:
-      homepageData
-        .find((p) => p.section_id === "intro-categories")
-        .categories.map((c: any) => ({
-          name: c.name,
-          link: `/category/${c.slug}`,
-        })) || [],
+      introCategoriesSection?.categories?.map((c: any) => ({
+        name: c.name,
+        link: `/category/${c.slug}`,
+      })) ?? [],
   };
 
+  const sliderListSection = homepageData.find((p) => p.section_id === "slider-products-list");
+
   const productSliderSection = {
-    title: homepageData.find((p) => p.section_id === "slider-products-title")
-      .value,
-    subtitle: homepageData.find(
-      (p) => p.section_id === "slider-products-subtitle",
-    ).value,
-    products: homepageData.find((p) => p.section_id === "slider-products-list")
-      .products,
+    title: homepageData.find((p) => p.section_id === "slider-products-title")?.value ?? "",
+    subtitle: homepageData.find((p) => p.section_id === "slider-products-subtitle")?.value ?? "",
+    products: sliderListSection?.products ?? [],
     ctaText: homepageData.find((p) => p.section_id === "slider-products-cta-text")?.value ?? undefined,
     ctaLink: homepageData.find((p) => p.section_id === "slider-products-cta-link")?.value ?? undefined,
   };
 
   return (
-    <section className="w-full flex flex-col items-start justify-start relative transition-colors duration-500">
+    <section className="w-full max-w-full overflow-x-hidden flex flex-col items-start justify-start relative transition-colors duration-500">
       <div ref={heroRef} className="w-full">
         <HomeHero
           title={heroSection.title}
           subtitle={heroSection.subtitle}
-          product={{
-            image: heroSection.product.media[0],
-            name: heroSection.product.name,
+          product={heroSection.product ? {
+            image: heroSection.product.media?.[0] ?? "",
+            name: heroSection.product.name ?? "",
             link: `/product/${heroSection.product.slug}`,
-          }}
+          } : { image: "", name: "", link: "/" }}
           categories={heroSection.categories}
           dark={heroInView}
         />
@@ -309,10 +322,7 @@ export const Home = () => {
               cards={featuredProducts.map((p) => ({
                 id: p.id,
                 name: p.name,
-                media: {
-                  image: p.media[0] || "",
-                  hover: p.media_hover || p.media[1] || p.media[0] || "",
-                },
+                media: resolveProductCardMedia(p),
                 link: `/product/${p.slug}`,
               }))}
               ctaText={productSliderSection.ctaText ?? t.home.exploreMore}
@@ -337,7 +347,7 @@ export const Home = () => {
               </h2>
             )}
             {categoriesSectionSubtitle && (
-              <p className="text-slate-600 w-full px-30 pt-2 mx-auto">{categoriesSectionSubtitle}</p>
+              <p className="text-slate-600 w-full max-w-2xl mx-auto px-4 sm:px-6 md:px-12 pt-2 text-center">{categoriesSectionSubtitle}</p>
             )}
           </div>
         )}

@@ -38,15 +38,15 @@ export const HomeHero = ({
   }, []);
 
   return (
-    <article className="h-screen w-full py-30 md:py-12 flex flex-col justify-center items-center px-6 lg:px-20 relative">
+    <article className="min-h-[100dvh] w-full max-w-full pt-24 pb-8 md:pt-12 md:pb-12 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-20 relative">
       <div className="w-full max-w-[1400px] flex flex-col lg:flex-row items-center justify-center gap-4 md:gap-12">
         {/* Text Content - Desktop: Left, Mobile: Top */}
-        <div className="flex flex-col items-start w-full lg:w-1/2 order-1 pr-30">
+        <div className="flex flex-col items-start w-full lg:w-1/2 order-1 pr-0 md:pr-8 lg:pr-16 xl:pr-24">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={isMounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className={`text-2xl md:text-6xl font-bold leading-none lg:uppercase font-display ${dark ? "text-black" : "text-black"}`}
+            className="text-[1.65rem] leading-tight sm:text-3xl md:text-6xl font-bold md:leading-none lg:uppercase font-display text-black"
           >
             {title}
           </motion.h1>
@@ -55,7 +55,7 @@ export const HomeHero = ({
             initial={{ opacity: 0, y: 20 }}
             animate={isMounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className={`mt-3 md:mt-8 text-md md:text-xl font-thin opacity-90 leading-tight ${dark ? "text-black/90" : "text-black"}`}
+            className="mt-3 md:mt-8 text-sm sm:text-base md:text-xl font-thin opacity-90 leading-snug md:leading-tight text-black/90 max-w-full"
           >
             {subtitle}
           </motion.p>
@@ -81,11 +81,7 @@ export const HomeHero = ({
                 <Button
                   to={category.link}
                   variant="outline"
-                  className={`rounded-xl transition-all duration-500 uppercase px-10 py-4 text-xs font-bold tracking-widest min-w-[160px] ${
-                    dark
-                      ? "border-white text-white hover:bg-white hover:text-black"
-                      : "border-black text-black hover:bg-[#f1f1f1] hover:text-black"
-                  }`}
+                  className="rounded-xl transition-all duration-500 uppercase px-10 py-4 text-xs font-bold tracking-widest min-w-[160px] border-black text-black hover:bg-black hover:text-white"
                 >
                   {category.name}
                 </Button>
@@ -99,7 +95,7 @@ export const HomeHero = ({
           initial={{ opacity: 0, x: 90 }}
           animate={isMounted ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 1 }}
-          className="w-full lg:w-[45%] order-2 lg:order-2 h-screen py-15"
+          className="w-full max-w-full lg:w-[45%] order-2 lg:order-2 h-[42vh] min-h-[220px] max-h-[520px] sm:h-[48vh] sm:max-h-[560px] lg:h-[min(100dvh,920px)] lg:max-h-none lg:min-h-[320px] py-4 md:py-15 shrink-0"
         >
           <div className="relative h-full rounded-[20px] md:rounded-[40px] overflow-hidden group">
             {getMediaType(product.image) === "video" ? (
@@ -143,18 +139,14 @@ export const HomeHero = ({
           initial={{ opacity: 0, y: 20 }}
           animate={isMounted ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="flex sm:flex-row w-full lg:hidden gap-4 order-3 mt-4 overflow-x-auto scrollbar-hide"
+          className="flex flex-col sm:flex-row w-full max-w-full lg:hidden gap-3 sm:gap-4 order-3 mt-2 sm:mt-4"
         >
           {categories.map((category) => (
             <Button
               key={category.name}
               variant="outline"
               to={category.link}
-              className={`w-full rounded-xl transition-all duration-300 uppercase py-6 text-sm font-bold tracking-widest ${
-                dark
-                  ? "border-white text-white hover:bg-white hover:text-black"
-                  : "border-black text-black hover:bg-black hover:text-white"
-              }`}
+              className="w-full shrink-0 rounded-xl transition-all duration-300 uppercase py-4 sm:py-6 text-xs sm:text-sm font-bold tracking-widest border-black text-black hover:bg-black hover:text-white"
             >
               {category.name}
             </Button>

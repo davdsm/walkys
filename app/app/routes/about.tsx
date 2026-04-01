@@ -11,6 +11,7 @@ import { useLanguage } from "~/contexts";
 import { SmallCTA } from "~/components/SmallCTA";
 import { AboutHero, AboutValues } from "~/components/AboutPage";
 import AboutVideoSection from "~/components/AboutPage/AboutVideoSection";
+import { buildSeoMeta } from "~/lib/seo";
 
 const ABOUT_COLLECTION = "AboutPage";
 
@@ -48,6 +49,15 @@ export async function loader({ request }: Route.LoaderArgs) {
     };
     return { aboutPageData: [], images: emptyImages };
   }
+}
+
+export function meta() {
+  return buildSeoMeta({
+    title: "About Walkys",
+    description:
+      "Discover the Walkys story, our Portuguese craftsmanship, and the values behind our elegant and comfortable footwear.",
+    pathname: "/about",
+  });
 }
 
 export default function About() {

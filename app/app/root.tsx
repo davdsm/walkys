@@ -23,8 +23,13 @@ import { CartSidebar } from "./components/Cart/CartSidebar";
 import { LoginSuccessToast } from "./components/LoginSuccessToast";
 import { useFooter } from "./hooks/useFooter";
 import { useHeader } from "./hooks/useHeader";
+import { buildSeoMeta } from "./lib/seo";
 
 export const links: Route.LinksFunction = () => [];
+
+export function meta() {
+  return buildSeoMeta();
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
@@ -55,31 +60,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
           href="https://fonts.googleapis.com/css2?family=Italiana&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
           crossOrigin="anonymous"
         />
-        <title>Walkys - By Shoe Me</title>
-        <meta name="title" content="Walkys - By Shoe Me" />
-        <meta
-          name="description"
-          content=" Walkys is a Portuguese brand that is described by the creation of elegant and comfortable shoes. Our primary purpose is to combine design and comfort as a way to achieve a product that stands out for its quality and excellence. We are a community brand produced 100% in Portugal. "
-        />
-
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://walkys.com/" />
-        <meta property="og:title" content="Walkys - By Shoe Me" />
-        <meta
-          property="og:description"
-          content=" Walkys is a Portuguese brand that is described by the creation of elegant and comfortable shoes. Our primary purpose is to combine design and comfort as a way to achieve a product that stands out for its quality and excellence. We are a community brand produced 100% in Portugal. "
-        />
-        <meta property="og:image" content="/cover.png" />
-
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content="https://walkys.com/" />
-        <meta property="twitter:title" content="Walkys - By Shoe Me" />
-        <meta
-          property="twitter:description"
-          content=" Walkys is a Portuguese brand that is described by the creation of elegant and comfortable shoes. Our primary purpose is to combine design and comfort as a way to achieve a product that stands out for its quality and excellence. We are a community brand produced 100% in Portugal. "
-        />
-        <meta property="twitter:image" content="/cover.png" />
-
         <Meta />
         <Links />
       </head>

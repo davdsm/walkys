@@ -1,6 +1,7 @@
 import { ProductCarousel } from "~/components/ProductCarousel";
 import { useLanguage } from "~/contexts";
 import type { ProductRecord } from "~/hooks/useProducts";
+import { resolveProductCardMedia } from "~/lib/product-media";
 
 interface RelatedProductsProps {
   relatedProducts: ProductRecord[];
@@ -25,10 +26,7 @@ export const RelatedProducts = ({
         cards={relatedProducts.map((p) => ({
           id: p.id,
           name: (p as any)[`name_${langKey}`] || "",
-          media: {
-            image: p.media?.[0] || "",
-            hover: p.media_hover || p.media?.[1] || p.media?.[0] || "",
-          },
+          media: resolveProductCardMedia(p),
           link: `/product/${p.slug}`,
         }))}
         ctaText={t.product.viewCollection}

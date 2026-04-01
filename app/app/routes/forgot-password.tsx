@@ -9,6 +9,7 @@ import { useLanguage } from "~/contexts";
 
 import { data, redirect } from "react-router";
 import { createPocketBase } from "~/lib/pocketbase";
+import { buildSeoMeta } from "~/lib/seo";
 
 export async function loader({ request }: Route.LoaderArgs) {
     const pb = createPocketBase(request);
@@ -38,10 +39,12 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export function meta({ }: Route.MetaArgs) {
-    return [
-        { title: "Walkys - Forgot Password" },
-        { name: "description", content: "Reset your Walkys account password" },
-    ];
+    return buildSeoMeta({
+        title: "Forgot Password",
+        description: "Request a secure password reset link for your Walkys account.",
+        pathname: "/forgot-password",
+        noIndex: true,
+    });
 }
 
 interface ForgotPasswordFormData {

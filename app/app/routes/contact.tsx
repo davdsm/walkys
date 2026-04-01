@@ -5,6 +5,7 @@ import { createNotification } from "~/lib/services";
 import { getAdminEmail, getLanguageFromRequest, sendEmail, buildNewMessageAdmin } from "~/lib/email";
 import { ContactForm } from "~/components/Forms/ContactForm";
 import { SmallCTA } from "~/components/SmallCTA";
+import { buildSeoMeta } from "~/lib/seo";
 
 export async function action({ request }: Route.ActionArgs) {
   if (request.method !== "POST") return data({ ok: false, error: "Method not allowed" }, { status: 405 });
@@ -50,6 +51,15 @@ export async function action({ request }: Route.ActionArgs) {
     console.error("Contact form error:", err);
     return data({ ok: false, error: "Failed to send message" }, { status: 500 });
   }
+}
+
+export function meta() {
+  return buildSeoMeta({
+    title: "Contact Walkys",
+    description:
+      "Get in touch with Walkys for product questions, wholesale enquiries, order support, or brand partnerships.",
+    pathname: "/contact",
+  });
 }
 
 export const Contacts = () => {

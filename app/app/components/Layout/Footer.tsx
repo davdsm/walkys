@@ -51,8 +51,8 @@ export const Footer = ({
       <div className="md:rounded-3xl bg-[#191C19] text-white px-6 py-16 md:px-20 md:py-16 font-sans relative overflow-hidden">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex flex-col">
-            <div className="gap-20 flex justify-between items-start mb-32 flex-col md:flex-row">
-              <div className="w-1/2">
+            <div className="gap-10 md:gap-20 flex justify-between items-start mb-16 md:mb-32 flex-col md:flex-row">
+              <div className="w-full md:w-1/2 min-w-0">
                 <Link to="/" className="inline-flex items-start gap-2 group">
                   <h1 className="text-5xl font-display">{logoText}</h1>
                   <ArrowUpRight
@@ -81,8 +81,8 @@ export const Footer = ({
                 />
               </div>
 
-              <div className="w-1/3 flex gap-32">
-                <div className="flex flex-col gap-12 min-w-[400px]">
+              <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-10 md:gap-16 lg:gap-32 min-w-0">
+                <div className="flex flex-col gap-8 md:gap-12 w-full min-w-0 md:max-w-none">
                   <div>
                     <h4 className="text-sm font-bold uppercase tracking-[0.15em] text-white/50 mb-5">
                       {t.footer.contact}
@@ -141,19 +141,19 @@ export const Footer = ({
 
               <Link to={ctaLink} className="flex-grow group w-full">
                 <div
-                  className="relative before:content-[''] before:absolute before:inset-0 before:bg-black before:opacity-50 bg-cover bg-center hover:bg-[left_center] rounded-xl px-16 py-12 flex items-center justify-between relative overflow-hidden backdrop-blur-sm"
+                  className="relative before:content-[''] before:absolute before:inset-0 before:bg-black before:opacity-50 bg-cover bg-center hover:bg-[left_center] rounded-xl px-6 py-8 sm:px-10 sm:py-10 md:px-16 md:py-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden backdrop-blur-sm min-h-0"
                   style={{ backgroundImage: `url(${footerImageUrl})` }}
                 >
-                  <div className="relative z-10">
-                    <span className="block text-white/70 text-[16px] font-light mb-2">
+                  <div className="relative z-10 min-w-0 pr-2">
+                    <span className="block text-white/70 text-sm sm:text-[16px] font-light mb-2">
                       {explore}
                     </span>
-                    <span className="block text-[32px] text-white ">
+                    <span className="block text-xl sm:text-2xl md:text-[32px] text-white leading-tight">
                       {newCollection}
                     </span>
                   </div>
                   <ArrowUpRight
-                    className="w-12 h-12 text-white group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform"
+                    className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white shrink-0 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform"
                     strokeWidth={1.5}
                   />
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />

@@ -11,6 +11,7 @@ import { useLanguage } from "~/contexts";
 
 import { data, redirect } from "react-router";
 import { createPocketBase } from "~/lib/pocketbase";
+import { buildSeoMeta } from "~/lib/seo";
 
 export async function loader({ request }: Route.LoaderArgs) {
     const pb = createPocketBase(request);
@@ -46,10 +47,12 @@ export async function action({ request, params }: Route.ActionArgs) {
 }
 
 export function meta({ }: Route.MetaArgs) {
-    return [
-        { title: "Walkys - Reset Password" },
-        { name: "description", content: "Set a new password for your account" },
-    ];
+    return buildSeoMeta({
+        title: "Reset Password",
+        description: "Set a new password to restore access to your Walkys account.",
+        pathname: "/reset-password",
+        noIndex: true,
+    });
 }
 
 interface ResetPasswordFormData {

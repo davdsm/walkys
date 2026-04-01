@@ -41,9 +41,9 @@ export function ProductCarousel({
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       viewport={{ amount: 0.5, once: true }}
     >
-      <div className="mb-6">
-        <h5 className="text-4xl font-bold uppercase font-display">{title}</h5>
-        <p className="text-lg py-3 w-1/2">{subtitle}</p>
+      <div className="mb-6 max-w-full">
+        <h5 className="text-2xl sm:text-3xl md:text-4xl font-bold uppercase font-display break-words">{title}</h5>
+        <p className="text-base md:text-lg py-3 w-full max-w-full md:max-w-[50%] leading-snug">{subtitle}</p>
       </div>
 
       <div className="">

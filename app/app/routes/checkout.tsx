@@ -12,6 +12,7 @@ import {
 } from "~/lib/email";
 import { useCart } from "~/contexts/CartContext";
 import { useLanguage } from "~/contexts";
+import { buildSeoMeta } from "~/lib/seo";
 
 const PROFILE_FIELDS = "id,email,name,address,postal_code,nif,city,country";
 
@@ -127,7 +128,12 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export function meta() {
-  return [{ title: "Walkys - Checkout" }];
+  return buildSeoMeta({
+    title: "Checkout",
+    description: "Complete your Walkys order and confirm your delivery details.",
+    pathname: "/checkout",
+    noIndex: true,
+  });
 }
 
 export default function Checkout() {

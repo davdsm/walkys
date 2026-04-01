@@ -6,6 +6,7 @@ import { getOrdersByUser } from "~/lib/services";
 import { useCart } from "~/contexts/CartContext";
 import { useLanguage } from "~/contexts";
 import OrdersPage from "~/components/Backoffice/OrdersPage/OrdersPage";
+import { buildSeoMeta } from "~/lib/seo";
 
 export async function loader({ request }: Route.LoaderArgs) {
     const pb = createPocketBase(request);
@@ -28,7 +29,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta() {
-    return [{ title: "Walkys - Orders" }];
+    return buildSeoMeta({
+        title: "Orders",
+        description: "Review and track your Walkys orders from your account area.",
+        pathname: "/orders",
+        noIndex: true,
+    });
 }
 
 export default function Orders() {
