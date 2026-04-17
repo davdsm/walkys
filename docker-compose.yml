@@ -3,7 +3,7 @@ services:
     container_name: walkys-app
     hostname: walkys-app
     build:
-      context: ./
+      context: ./app
       dockerfile: Dockerfile
     networks:
       - walkys
