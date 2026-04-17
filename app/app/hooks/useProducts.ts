@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import type PocketBase from "pocketbase";
 import { useLanguage, type Language } from "~/contexts";
 import { usePageService } from "./usePageService";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, getBrowserPocketBaseFileUrl } from "~/lib/pocketbase";
 import type { BaseRecord } from "~/lib/services/page.service";
 import type { CategoryRecord } from "./useCategories";
 
@@ -81,36 +82,34 @@ function getTranslatedField(
  * Helper function to build file URL for a single PocketBase file
  * @param recordId - The record ID
  * @param filename - Single filename
- * @param pb - PocketBase instance
  * @returns Full URL to the file or empty string if no filename
  */
 function buildFileUrl(
+  pb: PocketBase,
   recordId: string,
   filename: string | undefined,
-  pb: any
+  collectionId: string,
+  fileToken?: string
 ): string {
   if (!filename) return "";
-  const baseUrl = pb.baseUrl.replace(/\/$/, ""); // Remove trailing slash if present
-  return `${baseUrl}/api/files/products/${recordId}/${filename}`;
+  return getBrowserPocketBaseFileUrl(pb, { id: recordId, collectionId, collectionName: "products" }, filename, fileToken);
 }
 
 /**
  * Helper function to build file URLs for PocketBase files
  * @param recordId - The record ID
  * @param filenames - Array of filenames
- * @param pb - PocketBase instance
  * @returns Array of full URLs to the files
  */
 function buildFileUrls(
+  pb: PocketBase,
   recordId: string,
   filenames: string[] | undefined,
-  pb: any
+  collectionId: string,
+  fileToken?: string
 ): string[] {
   if (!filenames || filenames.length === 0) return [];
-  const baseUrl = pb.baseUrl.replace(/\/$/, ""); // Remove trailing slash if present
-  return filenames.map(
-    (filename) => `${baseUrl}/api/files/products/${recordId}/${filename}`
-  );
+  return filenames.map((filename) => buildFileUrl(pb, recordId, filename, collectionId, fileToken));
 }
 
 /**
@@ -120,7 +119,6 @@ function buildFileUrls(
 export function useProducts() {
   const { language } = useLanguage();
   const productService = usePageService<ProductRecord>("products");
-  const pb = createPocketBase();
 
   const [products, setProducts] = useState<TranslatedProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,6 +134,17 @@ export function useProducts() {
           sort: "created", // You can change this to sort by name or other field
           expand: "sizes,category,collection", // Expand all relations to get full data
         });
+
+        const pb = createPocketBase();
+        let fileToken: string | undefined;
+        if (pb.authStore.isValid) {
+          try {
+            const t = await pb.files.getToken();
+            if (typeof t === "string" && t.length > 0) fileToken = t;
+          } catch {
+            /* protected files need token; public fields still load */
+          }
+        }
 
         // Transform records to include translated content and file URLs
         const translatedProducts: TranslatedProduct[] = records.map(
@@ -158,15 +167,17 @@ export function useProducts() {
               .map((size: any) => size.number || "")
               .sort((a: string, b: string) => parseFloat(a) - parseFloat(b));
 
+            const collectionId = record.collectionId ?? "products";
+
             return {
               id: record.id,
               name: getTranslatedField(record, "name", language),
               description: getTranslatedField(record, "description", language),
               details: getTranslatedField(record, "details", language),
               slug: record.slug,
-              media: buildFileUrls(record.id, record.media, pb),
-              media_hover: buildFileUrl(record.id, record.media_hover, pb),
-              media_360: buildFileUrls(record.id, record.media_360, pb),
+              media: buildFileUrls(pb, record.id, record.media, collectionId, fileToken),
+              media_hover: buildFileUrl(pb, record.id, record.media_hover, collectionId, fileToken),
+              media_360: buildFileUrls(pb, record.id, record.media_360, collectionId, fileToken),
               category: categories,
               collection: collections,
               sizes: sizes,

@@ -1,4 +1,5 @@
 import type PocketBase from "pocketbase";
+import { getBrowserPocketBaseFileUrl } from "../pocketbase";
 import { createCategoryService } from "./category.service";
 import { createProductService } from "./product.service";
 import { createCollectionService } from "./collection.service";
@@ -51,10 +52,11 @@ export class PageService<T extends BaseRecord = BaseRecord> {
     /**
      * Build file URLs for media array
      */
-    protected buildFileUrls(recordId: string, filenames: string[] | undefined, collectionId: string): string[] {
+    protected buildFileUrls(recordId: string, filenames: string[] | undefined, collectionId: string, fileToken?: string): string[] {
         if (!filenames || filenames.length === 0) return [];
-        const baseUrl = this.pb.baseUrl.replace(/\/$/, "");
-        return filenames.map((filename) => `${baseUrl}/api/files/${collectionId}/${recordId}/${filename}`);
+        return filenames.map((filename) =>
+            getBrowserPocketBaseFileUrl(this.pb, { id: recordId, collectionId }, filename, fileToken)
+        );
     }
 
     /**
@@ -66,7 +68,7 @@ export class PageService<T extends BaseRecord = BaseRecord> {
     /**
      * Transform record (can be overridden by subclasses)
      */
-    protected transform(record: T): any {
+    protected transform(record: T, fileToken?: string): any {
         let transformed: any = { ...record };
 
         // If it's a PageRecord, transform it
@@ -75,7 +77,7 @@ export class PageService<T extends BaseRecord = BaseRecord> {
             transformed = {
                 ...transformed,
                 value: (this.language === "pt" ? pageRecord.value_pt : pageRecord.value_en) || "",
-                media: this.buildFileUrls(pageRecord.id, pageRecord.media, pageRecord.collectionId),
+                media: this.buildFileUrls(pageRecord.id, pageRecord.media, pageRecord.collectionId, fileToken),
             };
         }
 
@@ -106,7 +108,7 @@ export class PageService<T extends BaseRecord = BaseRecord> {
                 // If we found a match, transform and replace
                 if (record[targetKey as keyof T] || transformed[targetKey]) {
                     if (key.includes("product")) {
-                        transformed[targetKey] = items.map((i: any) => productService.transform(i));
+                        transformed[targetKey] = items.map((i: any) => productService.transform(i, fileToken));
                     } else if (key.includes("categor")) {
                         transformed[targetKey] = items.map((i: any) => categoryService.transform(i));
                     } else if (key.includes("collection")) {
@@ -135,7 +137,8 @@ export class PageService<T extends BaseRecord = BaseRecord> {
                 expand: options?.expand || "categories,products,collection,product,category,collections,*",
                 ...options,
             });
-            return records.map(record => this.transform(record));
+            const fileToken = await createProductService(this.pb, this.language).getProductFileAccessToken();
+            return records.map((record) => this.transform(record, fileToken));
         } catch (error) {
             console.error(`Error fetching ${this.collectionName} records:`, error);
             throw error;
@@ -157,7 +160,8 @@ export class PageService<T extends BaseRecord = BaseRecord> {
                 expand: options?.expand || "categories,products,collection,product,category,collections,*",
                 ...options,
             });
-            return this.transform(record);
+            const fileToken = await createProductService(this.pb, this.language).getProductFileAccessToken();
+            return this.transform(record, fileToken);
         } catch (error) {
             console.error(`Error fetching ${this.collectionName} record ${id}:`, error);
             throw error;
@@ -179,7 +183,8 @@ export class PageService<T extends BaseRecord = BaseRecord> {
                 expand: options?.expand || "categories,products,collection,product,category,collections,*",
                 ...options,
             });
-            return this.transform(record);
+            const fileToken = await createProductService(this.pb, this.language).getProductFileAccessToken();
+            return this.transform(record, fileToken);
         } catch (error) {
             // Return null if no record found
             if ((error as any)?.status === 404) {
@@ -212,9 +217,10 @@ export class PageService<T extends BaseRecord = BaseRecord> {
                 expand: options?.expand || "categories,products,collection,product,category,collections,*",
                 ...options,
             });
+            const fileToken = await createProductService(this.pb, this.language).getProductFileAccessToken();
             return {
                 ...result,
-                items: result.items.map(item => this.transform(item))
+                items: result.items.map((item) => this.transform(item, fileToken)),
             };
         } catch (error) {
             console.error(`Error fetching ${this.collectionName} list:`, error);
@@ -230,7 +236,8 @@ export class PageService<T extends BaseRecord = BaseRecord> {
     async create(data: Partial<T>): Promise<any> {
         try {
             const record = await this.pb.collection(this.collectionName).create<T>(data);
-            return this.transform(record);
+            const fileToken = await createProductService(this.pb, this.language).getProductFileAccessToken();
+            return this.transform(record, fileToken);
         } catch (error) {
             console.error(`Error creating ${this.collectionName} record:`, error);
             throw error;
@@ -246,7 +253,8 @@ export class PageService<T extends BaseRecord = BaseRecord> {
     async update(id: string, data: Partial<T>): Promise<any> {
         try {
             const record = await this.pb.collection(this.collectionName).update<T>(id, data);
-            return this.transform(record);
+            const fileToken = await createProductService(this.pb, this.language).getProductFileAccessToken();
+            return this.transform(record, fileToken);
         } catch (error) {
             console.error(`Error updating ${this.collectionName} record ${id}:`, error);
             throw error;

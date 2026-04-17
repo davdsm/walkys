@@ -42,17 +42,13 @@ export const CategoriesList = ({
             </div>
           </motion.div>
           <ul className="w-full flex flex-row gap-3 justify-start items-start flex-wrap">
-            {category.products.map(
-              (product: TranslatedProduct, indexP: number) => (
+            {category.products.map((product: TranslatedProduct) => (
                 <motion.li
                   key={product.id}
                   initial={{ opacity: 0, y: 60 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ amount: 0.2, once: true }}
-                  transition={{
-                    delay: 0.5 + indexP / 8,
-                    duration: 1.2,
-                  }}
+                  transition={{ duration: 1.2 }}
                   className="w-[calc(50%-6px)] md:w-[calc(25%-9px)]"
                 >
                   <ProductCard
@@ -61,8 +57,7 @@ export const CategoriesList = ({
                     link={`/product/${product.slug}`}
                   />
                 </motion.li>
-              )
-            )}
+            ))}
           </ul>
         </div>
       ))}

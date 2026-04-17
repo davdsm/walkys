@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLanguage, type Language } from "~/contexts";
 import { usePageService } from "./usePageService";
-import { createPocketBase } from "~/lib/pocketbase";
+import { getPocketBasePublicBaseUrl } from "~/lib/pocketbase";
 import type { BaseRecord } from "~/lib/services/page.service";
 
 /**
@@ -55,12 +55,11 @@ function getTranslatedDescription(record: CategoryRecord, language: Language): s
  * Helper function to build file URL for PocketBase files
  * @param recordId - The record ID
  * @param filename - The filename
- * @param pb - PocketBase instance
  * @returns The full URL to the file or empty string if no filename
  */
-function buildFileUrl(recordId: string, filename: string | undefined, pb: any): string {
+function buildFileUrl(recordId: string, filename: string | undefined): string {
     if (!filename) return "";
-    const baseUrl = pb.baseUrl.replace(/\/$/, ""); // Remove trailing slash if present
+    const baseUrl = getPocketBasePublicBaseUrl();
     return `${baseUrl}/api/files/category/${recordId}/${filename}`;
 }
 
@@ -71,8 +70,6 @@ function buildFileUrl(recordId: string, filename: string | undefined, pb: any): 
 export function useCategories() {
     const { language } = useLanguage();
     const categoryService = usePageService<CategoryRecord>("category");
-    const pb = createPocketBase();
-
     const [categories, setCategories] = useState<TranslatedCategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -94,8 +91,8 @@ export function useCategories() {
                     name: getTranslatedName(record, language),
                     description: getTranslatedDescription(record, language),
                     link: record.slug,
-                    media: buildFileUrl(record.id, record.media, pb),
-                    hover: buildFileUrl(record.id, record.hover, pb),
+                    media: buildFileUrl(record.id, record.media),
+                    hover: buildFileUrl(record.id, record.hover),
                 }));
 
                 setCategories(translatedCategories);

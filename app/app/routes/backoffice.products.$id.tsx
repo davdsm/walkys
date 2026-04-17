@@ -1,6 +1,6 @@
 import { useLoaderData, useParams, Form, useNavigation, redirect, useActionData } from "react-router";
 import { BackofficeToast } from "~/components/Backoffice/BackofficeToast";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, buildPocketBasePublicFileUrl, getBrowserPocketBaseFileUrl } from "~/lib/pocketbase";
 import type { Route } from "./+types/backoffice.products.$id";
 import { Link } from "react-router";
 
@@ -21,15 +21,39 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     const n = parseInt(String(s?.number ?? ""), 10);
     return !Number.isNaN(n) && n >= 35 && n <= 47;
   });
-  const baseUrl = pb.baseUrl.replace(/\/$/, "");
-
   if (!id || id === "new") {
-    return { product: null, categories, collections, sizesList, baseUrl, isNew: true };
+    return { product: null, categories, collections, sizesList, isNew: true, filePreviews: null };
   }
 
   try {
     const product = await pb.collection("products").getOne(id, { expand: "category,collection,sizes" });
-    return { product, categories, collections, sizesList, baseUrl, isNew: false };
+    let fileToken: string | undefined;
+    if (pb.authStore.isValid) {
+      try {
+        const t = await pb.files.getToken();
+        if (typeof t === "string" && t.length > 0) fileToken = t;
+      } catch {
+        /* optional */
+      }
+    }
+    const cid = (product as { collectionId?: string }).collectionId ?? "products";
+    const rec = { id: product.id, collectionId: cid, collectionName: "products" as const };
+    const p = product as {
+      media?: string | string[];
+      media_hover?: string;
+      media_360?: string[];
+    };
+    const mainFile = p.media ? (Array.isArray(p.media) ? p.media[0] : p.media) : null;
+    const filePreviews = {
+      mediaUrl: mainFile ? getBrowserPocketBaseFileUrl(pb, rec, String(mainFile), fileToken) : null,
+      mediaHoverUrl: p.media_hover
+        ? getBrowserPocketBaseFileUrl(pb, rec, String(p.media_hover), fileToken)
+        : null,
+      media360Urls: Array.isArray(p.media_360)
+        ? p.media_360.map((f) => getBrowserPocketBaseFileUrl(pb, rec, String(f), fileToken))
+        : [],
+    };
+    return { product, categories, collections, sizesList, isNew: false, filePreviews };
   } catch {
     return redirect("/backoffice/products");
   }
@@ -120,18 +144,30 @@ export function meta({ params }: Route.MetaArgs) {
 }
 
 export default function BackofficeProductEdit() {
-  const { product, categories, collections, sizesList, baseUrl, isNew } = useLoaderData<typeof loader>();
+  const { product, categories, collections, sizesList, isNew, filePreviews } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const actionData = useActionData<typeof action>();
   const p = product as { category?: string; collection?: string; media?: string | string[]; media_hover?: string; media_360?: string[]; sizes?: string[] | { id: string; number?: string }[] } | null;
   const categoryId = typeof p?.category === "string" ? p.category : (Array.isArray(p?.category) ? (p?.category as any)?.[0] : (p?.category as any)?.id) ?? "";
   const collectionId = typeof p?.collection === "string" ? p.collection : (Array.isArray(p?.collection) ? (p?.collection as any)?.[0] : (p?.collection as any)?.id) ?? "";
+  const pbFileCollectionId = (product as { collectionId?: string } | null)?.collectionId ?? "products";
   const mediaFile = p?.media ? (Array.isArray(p.media) ? p.media[0] : p.media) : null;
-  const mediaUrl = baseUrl && product?.id && mediaFile ? `${baseUrl}/api/files/products/${product.id}/${mediaFile}` : null;
+  const mediaUrl =
+    filePreviews?.mediaUrl ??
+    (product?.id && mediaFile ? buildPocketBasePublicFileUrl(pbFileCollectionId, product.id, String(mediaFile)) : null);
   const mediaHoverFile = p?.media_hover ?? null;
-  const mediaHoverUrl = baseUrl && product?.id && mediaHoverFile ? `${baseUrl}/api/files/products/${product.id}/${mediaHoverFile}` : null;
+  const mediaHoverUrl =
+    filePreviews?.mediaHoverUrl ??
+    (product?.id && mediaHoverFile
+      ? buildPocketBasePublicFileUrl(pbFileCollectionId, product.id, String(mediaHoverFile))
+      : null);
   const media360List = Array.isArray(p?.media_360) ? p.media_360 : [];
-  const media360Urls = baseUrl && product?.id ? media360List.map((f: string) => `${baseUrl}/api/files/products/${product.id}/${f}`) : [];
+  const media360Urls =
+    filePreviews?.media360Urls?.length
+      ? filePreviews.media360Urls
+      : product?.id
+        ? media360List.map((f: string) => buildPocketBasePublicFileUrl(pbFileCollectionId, product.id, f))
+        : [];
   const productSizeIds = Array.isArray(p?.sizes)
     ? (p.sizes as { id?: string }[]).map((s) => (typeof s === "string" ? s : s?.id)).filter(Boolean) as string[]
     : [];

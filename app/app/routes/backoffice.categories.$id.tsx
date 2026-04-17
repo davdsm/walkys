@@ -1,6 +1,6 @@
 import { useLoaderData, useParams, Form, useNavigation, redirect, useActionData } from "react-router";
 import { BackofficeToast } from "~/components/Backoffice/BackofficeToast";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, getPocketBasePublicBaseUrl } from "~/lib/pocketbase";
 import type { Route } from "./+types/backoffice.categories.$id";
 import { Link } from "react-router";
 
@@ -13,12 +13,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const id = params.id;
   if (!id) return redirect("/backoffice/categories");
   if (id === "new") {
-    return { category: null, baseUrl: pb.baseUrl.replace(/\/$/, ""), isNew: true };
+    return { category: null, baseUrl: getPocketBasePublicBaseUrl(), isNew: true };
   }
 
   const category = await pb.collection("category").getOne(id).catch(() => null);
   if (!category) return redirect("/backoffice/categories");
-  return { category, baseUrl: pb.baseUrl.replace(/\/$/, ""), isNew: false };
+  return { category, baseUrl: getPocketBasePublicBaseUrl(), isNew: false };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {

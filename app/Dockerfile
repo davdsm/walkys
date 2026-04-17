@@ -11,6 +11,10 @@ WORKDIR /workspace
 RUN npm ci --omit=dev
 
 FROM node:20-alpine AS build-env
+ARG VITE_API_ENDPOINT=http://localhost:8090
+ARG VITE_PUBLIC_POCKETBASE_URL=http://localhost:8090
+ENV VITE_API_ENDPOINT=$VITE_API_ENDPOINT
+ENV VITE_PUBLIC_POCKETBASE_URL=$VITE_PUBLIC_POCKETBASE_URL
 COPY . /workspace/
 COPY --from=development-dependencies-env /workspace/node_modules /workspace/node_modules
 WORKDIR /workspace

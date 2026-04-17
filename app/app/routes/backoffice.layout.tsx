@@ -1,6 +1,6 @@
 import { useLoaderData, Form, useNavigation, useActionData } from "react-router";
 import { BackofficeToast } from "~/components/Backoffice/BackofficeToast";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, getPocketBasePublicBaseUrl } from "~/lib/pocketbase";
 import { ensureLayoutDefaults, type LayoutData, type LayoutMenuItem, type LayoutSocialItem, type LayoutFooterContent, type LayoutSmallCtaContent } from "~/lib/services/layout.service";
 import type { Route } from "./+types/backoffice.layout";
 import { buildSeoMeta } from "~/lib/seo";
@@ -15,13 +15,13 @@ export async function loader({ request }: Route.LoaderArgs) {
   } catch (e: unknown) {
     const err = e as { status?: number; message?: string; data?: { message?: string } };
     if (err?.status === 404 || /collection|not found/i.test(err?.message ?? "") || /collection|not found/i.test(err?.data?.message ?? "")) {
-      const baseUrl = pb.baseUrl.replace(/\/$/, "");
+      const baseUrl = getPocketBasePublicBaseUrl();
       return { layout: null, baseUrl, error: "no_collection" as const };
     }
     throw e;
   }
   const layout = await ensureLayoutDefaults(pb);
-  const baseUrl = pb.baseUrl.replace(/\/$/, "");
+  const baseUrl = getPocketBasePublicBaseUrl();
   return { layout, baseUrl, error: null };
 }
 

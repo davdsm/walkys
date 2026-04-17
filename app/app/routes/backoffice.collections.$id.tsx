@@ -1,6 +1,6 @@
 import { useLoaderData, useParams, Form, useNavigation, redirect, useActionData } from "react-router";
 import { BackofficeToast } from "~/components/Backoffice/BackofficeToast";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, getPocketBasePublicBaseUrl } from "~/lib/pocketbase";
 import type { Route } from "./+types/backoffice.collections.$id";
 import { Link } from "react-router";
 
@@ -13,12 +13,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const id = params.id;
   if (!id) return redirect("/backoffice/collections");
   if (id === "new") {
-    return { collection: null, baseUrl: pb.baseUrl.replace(/\/$/, ""), isNew: true };
+    return { collection: null, baseUrl: getPocketBasePublicBaseUrl(), isNew: true };
   }
 
   const collection = await pb.collection("collection").getOne(id).catch(() => null);
   if (!collection) return redirect("/backoffice/collections");
-  return { collection, baseUrl: pb.baseUrl.replace(/\/$/, ""), isNew: false };
+  return { collection, baseUrl: getPocketBasePublicBaseUrl(), isNew: false };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {

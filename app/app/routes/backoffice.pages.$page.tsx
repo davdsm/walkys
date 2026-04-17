@@ -1,6 +1,6 @@
 import { useLoaderData, useParams, Form, useNavigation, useActionData } from "react-router";
 import { BackofficeToast } from "~/components/Backoffice/BackofficeToast";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, getPocketBasePublicBaseUrl } from "~/lib/pocketbase";
 import { translations } from "~/lib/translations";
 import type { Route } from "./+types/backoffice.pages.$page";
 
@@ -38,7 +38,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const page = params.page || "Homepage";
   const collectionName = page === "Homepage" ? "Homepage" : "AboutPage";
   const records = await pb.collection(collectionName).getFullList({ sort: "section_id" });
-  const baseUrl = pb.baseUrl.replace(/\/$/, "");
+  const baseUrl = getPocketBasePublicBaseUrl();
 
   let productsList: { id: string; name_pt?: string; name_en?: string; slug?: string }[] = [];
   let categoriesList: { id: string; name_pt?: string; name_en?: string; slug?: string }[] = [];

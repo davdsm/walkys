@@ -1,6 +1,6 @@
 import { Link, redirect, useLoaderData, useSearchParams, Form } from "react-router";
 import { BackofficeToast } from "~/components/Backoffice/BackofficeToast";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, getPocketBasePublicBaseUrl } from "~/lib/pocketbase";
 import type { Route } from "./+types/backoffice.categories";
 import { Plus, Image as ImageIcon, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -36,7 +36,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user?.admin) return { categories: [], baseUrl: "" };
 
   const categories = await pb.collection("category").getFullList({ sort: "name_pt" });
-  const baseUrl = pb.baseUrl.replace(/\/$/, "");
+  const baseUrl = getPocketBasePublicBaseUrl();
   return { categories, baseUrl };
 }
 

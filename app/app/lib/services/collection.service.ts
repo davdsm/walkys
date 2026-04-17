@@ -1,4 +1,5 @@
 import type PocketBase from "pocketbase";
+import { getPocketBasePublicBaseUrl } from "../pocketbase";
 import type { BaseRecord } from "./page.service";
 
 export interface CollectionRecord extends BaseRecord {
@@ -33,7 +34,7 @@ export class CollectionService {
    */
   private buildImageUrl(collectionId: string, recordId: string, filename: string | undefined): string {
     if (!filename) return "";
-    const baseUrl = this.pb.baseUrl.replace(/\/$/, "");
+    const baseUrl = getPocketBasePublicBaseUrl();
     return `${baseUrl}/api/files/collection/${recordId}/${filename}`;
   }
 

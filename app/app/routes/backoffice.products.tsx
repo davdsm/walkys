@@ -1,6 +1,6 @@
 import { Link, redirect, useLoaderData, useSearchParams, Form } from "react-router";
 import { BackofficeToast } from "~/components/Backoffice/BackofficeToast";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, buildPocketBasePublicFileUrl, getBrowserPocketBaseFileUrl } from "~/lib/pocketbase";
 import type { Route } from "./+types/backoffice.products";
 import { Plus, Image as ImageIcon, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -31,16 +31,38 @@ export async function action({ request }: Route.ActionArgs) {
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
-  if (!pb.authStore.isValid) return { products: [], baseUrl: "" };
+  if (!pb.authStore.isValid) return { products: [] };
   const user = pb.authStore.model as { admin?: boolean } | null;
-  if (!user?.admin) return { products: [], baseUrl: "" };
+  if (!user?.admin) return { products: [] };
 
   try {
     const products = await pb.collection("products").getFullList({ sort: "-created", expand: "category,collection" });
-    const baseUrl = pb.baseUrl.replace(/\/$/, "");
-    return { products, baseUrl };
+    let fileToken: string | undefined;
+    if (pb.authStore.isValid) {
+      try {
+        const t = await pb.files.getToken();
+        if (typeof t === "string" && t.length > 0) fileToken = t;
+      } catch {
+        /* optional */
+      }
+    }
+    const enriched = products.map((p: { id: string; collectionId?: string; media?: string | string[] }) => {
+      const collectionId = p.collectionId ?? "products";
+      const file = Array.isArray(p.media) ? p.media[0] : p.media;
+      const _thumbUrl =
+        file && p.id
+          ? getBrowserPocketBaseFileUrl(
+              pb,
+              { id: p.id, collectionId, collectionName: "products" },
+              String(file),
+              fileToken
+            )
+          : null;
+      return { ...p, _thumbUrl };
+    });
+    return { products: enriched };
   } catch {
-    return { products: [], baseUrl: pb.baseUrl.replace(/\/$/, "") };
+    return { products: [] };
   }
 }
 
@@ -48,21 +70,33 @@ export function meta() {
   return [{ title: "Produtos – Walkys Backoffice" }];
 }
 
-function ProductImage({ baseUrl, recordId, media }: { baseUrl: string; recordId: string; media?: string | string[] }) {
+function ProductImage({
+  collectionId,
+  recordId,
+  media,
+  thumbUrl,
+}: {
+  collectionId: string;
+  recordId: string;
+  media?: string | string[];
+  thumbUrl?: string | null;
+}) {
   const file = Array.isArray(media) ? media[0] : media;
-  if (!file || !recordId || !baseUrl) return (
+  if (!file || !recordId) return (
     <span className="flex items-center justify-center w-12 h-12 rounded-sm bg-slate-100 text-slate-400" aria-hidden>
       <ImageIcon className="w-6 h-6" />
     </span>
   );
-  const src = `${baseUrl}/api/files/products/${recordId}/${file}`;
+  const src =
+    thumbUrl ||
+    buildPocketBasePublicFileUrl(collectionId, recordId, String(file));
   return (
     <img src={src} alt="" className="w-12 h-12 rounded-sm object-cover border border-slate-200" width={48} height={48} />
   );
 }
 
 export default function BackofficeProducts() {
-  const { products, baseUrl } = useLoaderData<typeof loader>();
+  const { products } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
   const successParam = searchParams.get("success");
   const errorParam = searchParams.get("error");
@@ -156,7 +190,12 @@ export default function BackofficeProducts() {
                     />
                   </td>
                   <td className="px-6 py-4">
-                    <ProductImage baseUrl={baseUrl || ""} recordId={p.id} media={p.media} />
+                    <ProductImage
+                      collectionId={p.collectionId ?? "products"}
+                      recordId={p.id}
+                      media={p.media}
+                      thumbUrl={(p as { _thumbUrl?: string | null })._thumbUrl}
+                    />
                   </td>
                   <td className="px-6 py-4 text-slate-900 font-medium">{p.name_pt ?? "—"}</td>
                   <td className="px-6 py-4 text-slate-900">{p.name_en ?? "—"}</td>

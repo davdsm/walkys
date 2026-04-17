@@ -1,4 +1,5 @@
 import type PocketBase from "pocketbase";
+import { getPocketBasePublicBaseUrl } from "../pocketbase";
 import type { BaseRecord } from "./page.service";
 
 export interface CategoryRecord extends BaseRecord {
@@ -39,7 +40,7 @@ export class CategoryService {
    */
   private buildFileUrl(recordId: string, filename: string | string[] | undefined, collectionId: string): string {
     if (!filename) return "";
-    const baseUrl = this.pb.baseUrl.replace(/\/$/, "");
+    const baseUrl = getPocketBasePublicBaseUrl();
     // Handle array media (take first item) or single string
     const actualFilename = Array.isArray(filename) ? filename[0] : filename;
     if (!actualFilename) return "";

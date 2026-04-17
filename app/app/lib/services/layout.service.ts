@@ -1,4 +1,5 @@
 import type PocketBase from "pocketbase";
+import { getPocketBasePublicBaseUrl } from "../pocketbase";
 
 export type LayoutSectionId = "header" | "footer" | "small_cta" | "favicon";
 
@@ -88,9 +89,9 @@ export interface LayoutData {
   favicon: LayoutFaviconData | null;
 }
 
-function buildFileUrl(pb: PocketBase, recordId: string, filename: string | undefined, collectionName: string): string | null {
+function buildFileUrl(recordId: string, filename: string | undefined, collectionName: string): string | null {
   if (!filename) return null;
-  const baseUrl = pb.baseUrl.replace(/\/$/, "");
+  const baseUrl = getPocketBasePublicBaseUrl();
   return `${baseUrl}/api/files/${collectionName}/${recordId}/${filename}`;
 }
 
@@ -111,22 +112,22 @@ export async function getLayoutData(pb: PocketBase): Promise<LayoutData> {
         result.header = {
           id: rec.id,
           content: content as LayoutHeaderContent,
-          logoUrl: rec.logo ? buildFileUrl(pb, rec.id, rec.logo, col) : null,
+          logoUrl: rec.logo ? buildFileUrl(rec.id, rec.logo, col) : null,
         };
       } else if (sectionId === "footer") {
         result.footer = {
           id: rec.id,
           content: content as LayoutFooterContent,
-          logoUrl: rec.logo ? buildFileUrl(pb, rec.id, rec.logo, col) : null,
-          imageUrl: rec.image ? buildFileUrl(pb, rec.id, rec.image, col) : null,
-          imageCtaUrl: rec.image_cta ? buildFileUrl(pb, rec.id, rec.image_cta, col) : null,
+          logoUrl: rec.logo ? buildFileUrl(rec.id, rec.logo, col) : null,
+          imageUrl: rec.image ? buildFileUrl(rec.id, rec.image, col) : null,
+          imageCtaUrl: rec.image_cta ? buildFileUrl(rec.id, rec.image_cta, col) : null,
         };
       } else if (sectionId === "small_cta") {
         result.smallCta = { id: rec.id, content: content as LayoutSmallCtaContent };
       } else if (sectionId === "favicon") {
         result.favicon = {
           id: rec.id,
-          faviconUrl: rec.logo ? buildFileUrl(pb, rec.id, rec.logo, col) : null,
+          faviconUrl: rec.logo ? buildFileUrl(rec.id, rec.logo, col) : null,
         };
       }
     }

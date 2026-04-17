@@ -5,6 +5,17 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
+      args:
+        VITE_API_ENDPOINT: http://localhost:8090
+        VITE_PUBLIC_POCKETBASE_URL: http://localhost:8090
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      # SSR: server → PocketBase on the Docker network
+      POCKETBASE_URL: "http://walkys-api:8090"
+      # Browser file URLs (use localhost so it matches users who open the app at http://localhost:3000)
+      PUBLIC_POCKETBASE_URL: "http://localhost:8090"
     networks:
       - walkys
 

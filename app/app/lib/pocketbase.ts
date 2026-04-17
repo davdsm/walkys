@@ -1,9 +1,110 @@
 import PocketBase from "pocketbase";
 
-const getPbUrl = () => import.meta.env.VITE_API_ENDPOINT || "http://127.0.0.1:8090";
+const defaultPbUrl = "http://127.0.0.1:8090";
+
+/**
+ * URL the PocketBase client uses for HTTP (SSR in Docker: POCKETBASE_URL → walkys-api).
+ */
+function getPocketBaseRequestUrl(): string {
+    const fromVite = import.meta.env.VITE_API_ENDPOINT as string | undefined;
+    if (typeof window !== "undefined") {
+        return fromVite || defaultPbUrl;
+    }
+    const fromProcess =
+        (typeof process !== "undefined" && process.env.POCKETBASE_URL) ||
+        (typeof process !== "undefined" && process.env.VITE_API_ENDPOINT);
+    return fromProcess || fromVite || defaultPbUrl;
+}
+
+/**
+ * Origin for /api/files/... links shown in HTML. Must resolve in the user's browser, not only inside Docker
+ * (never use walkys-api here). On the server, set PUBLIC_POCKETBASE_URL when POCKETBASE_URL is internal.
+ */
+export function getPocketBasePublicBaseUrl(): string {
+    const vitePublic = import.meta.env.VITE_PUBLIC_POCKETBASE_URL as string | undefined;
+    const fromVite = import.meta.env.VITE_API_ENDPOINT as string | undefined;
+    if (typeof window !== "undefined") {
+        return (vitePublic || fromVite || defaultPbUrl).replace(/\/$/, "");
+    }
+    const fromProcess =
+        (typeof process !== "undefined" && process.env.PUBLIC_POCKETBASE_URL) ||
+        (typeof process !== "undefined" && process.env.VITE_PUBLIC_POCKETBASE_URL) ||
+        (typeof process !== "undefined" && process.env.VITE_API_ENDPOINT);
+    const raw = fromProcess || fromVite || defaultPbUrl;
+    return String(raw).replace(/\/$/, "");
+}
+
+/**
+ * Same path rules as PocketBase's pb.files.getURL (encodeURIComponent per segment).
+ * Shoe / product uploads often include spaces or "(" in filenames; unencoded paths break in img src.
+ */
+export function buildPocketBasePublicFileUrl(collectionIdOrName: string, recordId: string, filename: string): string {
+    if (!filename) return "";
+    if (filename.startsWith("http://") || filename.startsWith("https://")) {
+        return rewritePocketBaseAssetOriginForBrowser(filename);
+    }
+    const base = getPocketBasePublicBaseUrl();
+    const path = ["api", "files", encodeURIComponent(collectionIdOrName), encodeURIComponent(recordId), encodeURIComponent(filename)].join("/");
+    return `${base}/${path}`;
+}
+
+/** Appends a short-lived file token for PocketBase *protected* file fields (`pb.files.getToken()`). */
+export function appendPocketBaseFileToken(url: string, token: string): string {
+    if (!url || !token) return url;
+    try {
+        const u = new URL(url);
+        u.searchParams.set("token", token);
+        return u.toString();
+    } catch {
+        const sep = url.includes("?") ? "&" : "?";
+        return `${url}${sep}token=${encodeURIComponent(token)}`;
+    }
+}
+
+/** If a URL was built against the internal Docker PB origin, swap it to the public origin for the browser. */
+function rewritePocketBaseAssetOriginForBrowser(absoluteUrl: string): string {
+    const publicBase = getPocketBasePublicBaseUrl();
+    const internalRaw = typeof process !== "undefined" ? process.env.POCKETBASE_URL?.replace(/\/$/, "") : "";
+    try {
+        if (internalRaw && absoluteUrl.startsWith(internalRaw)) {
+            return `${publicBase}${absoluteUrl.slice(internalRaw.length)}`;
+        }
+        const u = new URL(absoluteUrl);
+        if (u.hostname === "walkys-api") {
+            const pub = new URL(publicBase.includes("://") ? publicBase : `http://${publicBase}`);
+            u.protocol = pub.protocol;
+            u.hostname = pub.hostname;
+            u.port = pub.port;
+            return u.toString();
+        }
+    } catch {
+        return absoluteUrl;
+    }
+    return absoluteUrl;
+}
+
+/**
+ * Build a browser-loadable file URL using the PocketBase SDK (same encoding as the server)
+ * and rewrite an internal Docker origin (e.g. walkys-api) to PUBLIC_POCKETBASE_URL.
+ * Pass `fileToken` from `pb.files.getToken()` when the file field is protected (img tags cannot send Authorization).
+ */
+export function getBrowserPocketBaseFileUrl(
+    pb: PocketBase,
+    record: { id: string; collectionId?: string; collectionName?: string },
+    filename: string,
+    fileToken?: string
+): string {
+    if (!filename) return "";
+    if (filename.startsWith("http://") || filename.startsWith("https://")) {
+        return rewritePocketBaseAssetOriginForBrowser(filename);
+    }
+    const query = fileToken ? ({ token: fileToken } as Record<string, string>) : undefined;
+    const raw = pb.files.getURL(record as { id: string; collectionId?: string; collectionName?: string }, filename, query);
+    return rewritePocketBaseAssetOriginForBrowser(raw);
+}
 
 export function createPocketBase(request?: Request) {
-    const url = getPbUrl();
+    const url = getPocketBaseRequestUrl();
     const pb = new PocketBase(url);
 
     // load the store data from the request cookie string
@@ -47,7 +148,7 @@ function getAdminCredentials(): { email: string; password: string } | null {
 export async function createPocketBaseAsAdmin(): Promise<PocketBase | null> {
     const creds = getAdminCredentials();
     if (!creds) return null;
-    const url = getPbUrl();
+    const url = getPocketBaseRequestUrl();
     const pb = new PocketBase(url);
     try {
         await pb.admins.authWithPassword(creds.email, creds.password);

@@ -1,4 +1,5 @@
 import type PocketBase from "pocketbase";
+import { getBrowserPocketBaseFileUrl } from "../pocketbase";
 import type { BaseRecord } from "./page.service";
 import type { CategoryRecord } from "./category.service";
 import type { CollectionRecord } from "./collection.service";
@@ -50,54 +51,89 @@ export class ProductService {
     this.language = language;
   }
 
+  /** For PageService / homepage expanded products — same token as product list/detail. */
+  getProductFileAccessToken(): Promise<string | undefined> {
+    return this.getOptionalFileToken();
+  }
+
+  /** PocketBase protected file fields need `?token=`; img tags cannot send Authorization. */
+  private async getOptionalFileToken(): Promise<string | undefined> {
+    if (!this.pb.authStore.isValid) return undefined;
+    try {
+      const token = await this.pb.files.getToken();
+      return typeof token === "string" && token.length > 0 ? token : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  /** Normalize PocketBase file field (array, single string, or JSON array string). */
+  private normalizeFilenames(raw: unknown): string[] | undefined {
+    if (raw == null) return undefined;
+    if (Array.isArray(raw)) {
+      return raw.filter((f): f is string => typeof f === "string" && f.length > 0);
+    }
+    if (typeof raw === "string") {
+      const t = raw.trim();
+      if (!t) return undefined;
+      if (t.startsWith("[")) {
+        try {
+          const p = JSON.parse(t) as unknown;
+          return Array.isArray(p) ? p.filter((x): x is string => typeof x === "string" && x.length > 0) : [t];
+        } catch {
+          return [raw];
+        }
+      }
+      return [raw];
+    }
+    return undefined;
+  }
+
   /**
    * Build file URL for a product media file
    */
-  private buildFileUrl(recordId: string, filename: string | undefined, collectionId: string): string {
+  private buildFileUrl(recordId: string, filename: string | undefined, collectionId: string, fileToken?: string): string {
     if (!filename) return "";
-    const baseUrl = this.pb.baseUrl.replace(/\/$/, "");
-    return `${baseUrl}/api/files/${collectionId}/${recordId}/${filename}`;
+    return getBrowserPocketBaseFileUrl(
+      this.pb,
+      { id: recordId, collectionId, collectionName: "products" },
+      filename,
+      fileToken
+    );
   }
 
   /**
    * Build file URLs for product media array
    */
-  private buildFileUrls(recordId: string, filenames: string[] | undefined, collectionId: string): string[] {
+  private buildFileUrls(recordId: string, filenames: string[] | undefined, collectionId: string, fileToken?: string): string[] {
     if (!filenames || filenames.length === 0) return [];
-    const baseUrl = this.pb.baseUrl.replace(/\/$/, "");
-    return filenames.map((filename) => `${baseUrl}/api/files/${collectionId}/${recordId}/${filename}`);
+    return filenames.map((filename) => this.buildFileUrl(recordId, filename, collectionId, fileToken));
   }
 
   /**
    * Transform product record to include file URLs and translated fields
    */
-  public transform(product: ProductRecord): TranslatedProduct {
+  public transform(product: ProductRecord, fileToken?: string): TranslatedProduct {
     const lang = this.language;
     const collectionId = product.collectionId ?? "products";
+    const mediaFiles = this.normalizeFilenames(product.media);
+    const media360Files = this.normalizeFilenames(product.media_360);
     return {
       ...product,
       name: (lang === "pt" ? product.name_pt : product.name_en) || "",
       description: (lang === "pt" ? product.description_pt : product.description_en) || "",
       details: (lang === "pt" ? product.details_pt : product.details_en) || "",
-      media: Array.isArray(product.media)
-        ? this.buildFileUrls(product.id, product.media, collectionId)
-        : typeof product.media === "string" && product.media
-          ? this.buildFileUrls(product.id, [product.media], collectionId)
-          : [],
-      media_hover: this.buildFileUrl(product.id, product.media_hover, collectionId),
-      media_360: Array.isArray(product.media_360)
-        ? this.buildFileUrls(product.id, product.media_360, collectionId)
-        : typeof (product as any).media_360 === "string" && (product as any).media_360
-          ? this.buildFileUrls(product.id, [(product as any).media_360], collectionId)
-          : [],
+      media: mediaFiles?.length ? this.buildFileUrls(product.id, mediaFiles, collectionId, fileToken) : [],
+      media_hover: this.buildFileUrl(product.id, product.media_hover, collectionId, fileToken),
+      media_360: media360Files?.length ? this.buildFileUrls(product.id, media360Files, collectionId, fileToken) : [],
     };
   }
 
   /**
    * Deprecated: Use transform() instead.
    */
-  private transformProduct(product: ProductRecord): TranslatedProduct {
-    return this.transform(product);
+  private transformProduct(product: ProductRecord, fileToken?: string): TranslatedProduct {
+    return this.transform(product, fileToken);
   }
 
   /**
@@ -117,7 +153,8 @@ export class ProductService {
         fields: options?.fields,
       });
 
-      return products.map((product) => this.transformProduct(product));
+      const fileToken = await this.getOptionalFileToken();
+      return products.map((product) => this.transformProduct(product, fileToken));
     } catch (error) {
       console.error("Error fetching products:", error);
       throw error;
@@ -136,7 +173,8 @@ export class ProductService {
         fields: options?.fields,
       });
 
-      return products.map((product) => this.transformProduct(product));
+      const fileToken = await this.getOptionalFileToken();
+      return products.map((product) => this.transformProduct(product, fileToken));
     } catch (error) {
       console.error("Error fetching products by collection:", error);
       throw error;
@@ -155,7 +193,8 @@ export class ProductService {
         fields: options?.fields,
       });
 
-      return products.map((product) => this.transformProduct(product));
+      const fileToken = await this.getOptionalFileToken();
+      return products.map((product) => this.transformProduct(product, fileToken));
     } catch (error) {
       console.error("Error fetching products by category:", error);
       throw error;
@@ -175,7 +214,8 @@ export class ProductService {
         expand: options?.expand || "category,sizes",
         fields: options?.fields,
       });
-      return products.map((product) => this.transformProduct(product));
+      const fileToken = await this.getOptionalFileToken();
+      return products.map((product) => this.transformProduct(product, fileToken));
     } catch (error) {
       console.error("Error fetching products by category IDs:", error);
       throw error;
@@ -198,7 +238,8 @@ export class ProductService {
         expand: options?.expand || "category,sizes,collection",
         fields: options?.fields,
       });
-      const transformed = products.map((product) => this.transformProduct(product));
+      const fileToken = await this.getOptionalFileToken();
+      const transformed = products.map((product) => this.transformProduct(product, fileToken));
       return safeIds
         .map((id) => transformed.find((p) => p.id === id))
         .filter((p): p is TranslatedProduct => p !== undefined);
@@ -221,7 +262,8 @@ export class ProductService {
         }
       );
 
-      return this.transformProduct(product);
+      const fileToken = await this.getOptionalFileToken();
+      return this.transformProduct(product, fileToken);
     } catch (error) {
       if ((error as any)?.status === 404) {
         return null;
@@ -241,7 +283,8 @@ export class ProductService {
         fields: options?.fields,
       });
 
-      return this.transformProduct(product);
+      const fileToken = await this.getOptionalFileToken();
+      return this.transformProduct(product, fileToken);
     } catch (error) {
       if ((error as any)?.status === 404) {
         return null;
@@ -271,7 +314,8 @@ export class ProductService {
         fields: options?.fields,
       });
 
-      return products.map((product) => this.transformProduct(product));
+      const fileToken = await this.getOptionalFileToken();
+      return products.map((product) => this.transformProduct(product, fileToken));
     } catch (error) {
       console.error("Error filtering products:", error);
       throw error;
@@ -291,7 +335,8 @@ export class ProductService {
         fields: options?.fields,
       });
 
-      return products.map((product) => this.transformProduct(product));
+      const fileToken = await this.getOptionalFileToken();
+      return products.map((product) => this.transformProduct(product, fileToken));
     } catch (error) {
       console.error("Error searching products:", error);
       throw error;

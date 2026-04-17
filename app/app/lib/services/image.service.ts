@@ -1,4 +1,5 @@
 import type PocketBase from "pocketbase";
+import { getPocketBasePublicBaseUrl } from "../pocketbase";
 import type { PageRecord } from "./page.service";
 
 export interface ImageRecord {
@@ -35,7 +36,7 @@ export class ImageService {
    * @returns The full URL to the image
    */
   buildImageUrl(recordId: string, fileName: string): string {
-    const baseUrl = this.pb.baseUrl.replace(/\/$/, ""); // Remove trailing slash if present
+    const baseUrl = getPocketBasePublicBaseUrl();
     return `${baseUrl}/api/files/${this.collectionName}/${recordId}/${fileName}`;
   }
 
@@ -59,7 +60,7 @@ export class ImageService {
       return sectionData.media as string[];
     }
 
-    const baseUrl = this.pb.baseUrl.replace(/\/$/, "");
+    const baseUrl = getPocketBasePublicBaseUrl();
     return sectionData.media.map(
       (filename) =>
         `${baseUrl}/api/files/${this.collectionName}/${sectionData.id}/${filename}`

@@ -125,17 +125,12 @@ export const ProductPage = () => {
     () => (Array.isArray((product as any)?.media_360) ? (product as any).media_360 : []),
     [product]
   );
-  // Inside the product page we only want to show the 360° viewer when available.
-  // If there is no 360° media, fall back to the main media array.
-  const mediaForViewer = useMemo(
-    () => (media360.length > 0 ? [] : mediaMain),
-    [media360.length, mediaMain]
-  );
   const expand = (product as any)?.expand || {};
   const productSlug = (product as any)?.slug ?? "";
   const productId = (product as any)?.id ?? "";
   const firstMediaUrl =
-    Array.isArray(mediaMain) && mediaMain.length > 0 ? mediaMain[0] : undefined;
+    (Array.isArray(mediaMain) && mediaMain.length > 0 ? mediaMain[0] : undefined) ??
+    (media360.length > 0 ? media360[0] : undefined);
 
   // Get collection name
   const collectionList = expand.collection
@@ -209,7 +204,7 @@ export const ProductPage = () => {
             <motion.div className="w-1/2 relative h-full">
               <ProductMediaView
                 media360={media360}
-                media={mediaForViewer}
+                media={mediaMain}
                 selectedIndex={selectedImage}
                 onSelectIndex={setSelectedImage}
                 productName={productName}
@@ -255,7 +250,7 @@ export const ProductPage = () => {
             productDescription={productDescription}
             collectionName={collectionName}
             media360={media360}
-            media={mediaForViewer}
+            media={mediaMain}
             selectedImage={selectedImage}
             onImageSelect={setSelectedImage}
             sizes={sortedSizes}
