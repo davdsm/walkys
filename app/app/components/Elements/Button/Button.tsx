@@ -78,12 +78,14 @@ export const Button = ({
         );
     }
 
-    // Render as button
+    // Render as button (default type="button" so controls inside <form> never submit by accident)
+    const { type: buttonType, ...buttonRest } = props as HTMLMotionProps<"button">;
     return (
         <motion.button
+            type={buttonType ?? "button"}
             className={combinedClassName}
             disabled={disabled || isLoading}
-            {...(props as HTMLMotionProps<"button">)}
+            {...buttonRest}
         >
             {content}
         </motion.button>

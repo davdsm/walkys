@@ -1,5 +1,4 @@
-import { redirect, useLoaderData, useNavigation, Form, useSearchParams } from "react-router";
-import { Link } from "react-router";
+import { redirect, useLoaderData, useNavigation, Form, useSearchParams, useNavigate, Link } from "react-router";
 import type { Route } from "./+types/checkout";
 import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
 import { createUserService, createOrder, createNotification, type OrderItem } from "~/lib/services";
@@ -139,6 +138,7 @@ export function meta() {
 export default function Checkout() {
   const { user } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { items } = useCart();
   const { t } = useLanguage();
@@ -309,12 +309,14 @@ export default function Checkout() {
                 ? "..."
                 : (checkoutT.placeOrder ?? "Place order")}
             </button>
-            <Link
-              to="/"
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={() => navigate("/", { replace: true })}
               className="py-3 px-4 border border-slate-300 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 text-center"
             >
               {checkoutT.cancel ?? "Cancelar"}
-            </Link>
+            </button>
           </div>
         </Form>
       </div>

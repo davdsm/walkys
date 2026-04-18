@@ -3,7 +3,7 @@
 FROM node:20-alpine AS development-dependencies-env
 COPY . /workspace
 WORKDIR /workspace
-RUN npm ci
+RUN npm ci --include=dev
 
 FROM node:20-alpine AS production-dependencies-env
 COPY ./package.json package-lock.json /workspace/
