@@ -8,7 +8,9 @@
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
     "repair:product-media": "node --env-file=.env ./scripts/repair-product-media-from-storage.mjs",
-    "products:disable-no-images": "node --env-file=.env ./scripts/disable-products-without-images.mjs"
+    "products:disable-no-images": "node --env-file=.env ./scripts/disable-products-without-images.mjs",
+    "products:wipe-and-import": "node --env-file=.env ./scripts/import-products-from-produtos.mjs",
+    "products:add-descriptions": "node --env-file=.env ./scripts/add-product-descriptions.mjs"
   },
   "dependencies": {
     "@mladenilic/threesixty.js": "^1.3.0",

@@ -17,17 +17,17 @@ export function resolveProductCardMedia(product: ProductMediaLike): {
   const media = Array.isArray(product.media) ? product.media : [];
 
   const image =
-    media360[0] ||
     media[0] ||
+    media360[0] ||
     product.media_hover ||
     "";
 
   const hover =
+    product.media_hover ||
+    media[1] ||
     media360[1] ||
     media360[0] ||
-    media[1] ||
     media[0] ||
-    product.media_hover ||
     image;
 
   return { image, hover };
