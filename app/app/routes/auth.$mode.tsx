@@ -6,7 +6,7 @@ import { LoginForm } from "~/components/Forms/LoginForm";
 import { SignupForm } from "~/components/Forms/SignupForm";
 
 import { redirect, data } from "react-router";
-import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus } from "~/lib/pocketbase";
+import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus, buildAuthCookie } from "~/lib/pocketbase";
 import { buildSeoMeta } from "~/lib/seo";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -108,10 +108,7 @@ export async function action({ request }: Route.ActionArgs) {
     const redirectTo = isAdmin ? "/backoffice" : isBlocked ? "/blocked" : canAccess ? "/?success=login" : "/pending-approval";
     return redirect(redirectTo, {
       headers: {
-        "set-cookie": pb.authStore.exportToCookie({
-          httpOnly: true,
-          secure: import.meta.env.PROD,
-        }),
+        "set-cookie": buildAuthCookie(pb, request),
       },
     });
   } catch (error: any) {

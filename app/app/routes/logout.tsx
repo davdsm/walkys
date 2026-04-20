@@ -1,6 +1,6 @@
 import { redirect } from "react-router";
 import type { Route } from "../+types/root";
-import { createPocketBase } from "~/lib/pocketbase";
+import { createPocketBase, buildAuthCookie } from "~/lib/pocketbase";
 
 export async function action({ request }: Route.ActionArgs) {
     const pb = createPocketBase(request);
@@ -11,7 +11,7 @@ export async function action({ request }: Route.ActionArgs) {
 
     return redirect(redirectTo as string, {
         headers: {
-            "set-cookie": pb.authStore.exportToCookie({ httpOnly: true, secure: import.meta.env.PROD }),
+            "set-cookie": buildAuthCookie(pb, request),
         },
     });
 }

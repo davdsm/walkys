@@ -103,6 +103,35 @@ export function getBrowserPocketBaseFileUrl(
     return rewritePocketBaseAssetOriginForBrowser(raw);
 }
 
+/**
+ * True when the incoming request is served over HTTPS (directly or via a reverse proxy
+ * that sets `x-forwarded-proto`). Used to decide whether to mark the auth cookie `Secure`:
+ * over plain HTTP the browser silently drops `Secure` cookies and the user appears logged out.
+ */
+export function isRequestSecure(request?: Request): boolean {
+    if (!request) return false;
+    try {
+        const xfProto = request.headers.get("x-forwarded-proto");
+        if (xfProto) return xfProto.split(",")[0].trim().toLowerCase() === "https";
+        const url = new URL(request.url);
+        return url.protocol === "https:";
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Build a Set-Cookie value for the current pb.authStore that is `Secure` only when the
+ * request itself is HTTPS. Keep SSR/HTTP dev and HTTP-only VPS deploys working without
+ * losing HTTPS hardening in production.
+ */
+export function buildAuthCookie(pb: PocketBase, request?: Request): string {
+    return pb.authStore.exportToCookie({
+        httpOnly: true,
+        secure: isRequestSecure(request),
+    });
+}
+
 export function createPocketBase(request?: Request) {
     const url = getPocketBaseRequestUrl();
     const pb = new PocketBase(url);
