@@ -150,10 +150,18 @@ export const CollectionPage = () => {
     const header = document.getElementById("main-header");
     if (!header) return;
 
-    header.style.display = showFilter ? "none" : "";
+    header.style.transition = "opacity 220ms ease, transform 220ms ease";
+    header.style.willChange = "opacity, transform";
+    header.style.opacity = showFilter ? "0" : "1";
+    header.style.transform = showFilter ? "translateY(-16px)" : "translateY(0)";
+    header.style.pointerEvents = showFilter ? "none" : "";
 
     return () => {
-      header.style.display = "";
+      header.style.transition = "";
+      header.style.willChange = "";
+      header.style.opacity = "";
+      header.style.transform = "";
+      header.style.pointerEvents = "";
     };
   }, [showFilter]);
 
@@ -164,10 +172,10 @@ export const CollectionPage = () => {
       <FadeEntry image={collection.image} title={title} />
       {showFilter && (
         <motion.div
-          initial={{ opacity: 0, y: -60 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="fixed top-22 md:top-28 left-1/2 w-[calc(100%-1rem)] max-w-lg md:max-w-none md:w-auto bg-black/40 transform -translate-x-1/2 py-2 px-3 md:py-4 md:px-8 rounded-xl z-10 backdrop-blur-sm"
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed top-4 md:top-6 left-1/2 w-[calc(100%-1rem)] md:w-[min(92vw,1200px)] bg-black/40 transform -translate-x-1/2 py-2 px-3 md:py-4 md:px-8 rounded-xl z-10 backdrop-blur-sm"
         >
           <Filters
             items={filters}
