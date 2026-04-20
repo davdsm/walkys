@@ -145,6 +145,18 @@ export const CollectionPage = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Hide global header while sticky filters are visible.
+  useEffect(() => {
+    const header = document.getElementById("main-header");
+    if (!header) return;
+
+    header.style.display = showFilter ? "none" : "";
+
+    return () => {
+      header.style.display = "";
+    };
+  }, [showFilter]);
+
   if (!collection) return null;
 
   return (
