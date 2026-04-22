@@ -47,19 +47,19 @@ export const ContactForm = () => {
   };
 
   return (
-    <article className="max-w-4xl md:max-w-[1200px] mx-auto px-4 font-sans md:grid md:grid-cols-2 md:gap-x-32 md:items-start">
+    <article className="w-full max-w-4xl md:max-w-[1200px] mx-auto px-4 sm:px-6 font-sans md:grid md:grid-cols-2 md:gap-x-32 md:items-start">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-        className="mb-16 md:mb-0 md:col-start-1 md:row-start-1"
+        className="mb-12 md:mb-0 md:col-start-1 md:row-start-1"
       >
-        <h1 className="text-4xl md:text-6xl font-bold mb-4 uppercase font-display">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl leading-tight font-bold mb-4 uppercase font-display break-words">
           {t.contact.title}
         </h1>
         <a
           href={`mailto:${t.contact.email}`}
-          className="text-gray-500 hover:text-black transition-colors text-lg"
+          className="text-gray-500 hover:text-black transition-colors text-base sm:text-lg break-all"
         >
           {t.contact.email}
         </a>
@@ -67,9 +67,9 @@ export const ContactForm = () => {
 
       <fetcher.Form
         method="post"
-        className="space-y-12 md:col-start-2 md:row-span-2"
+        className="space-y-8 sm:space-y-12 md:col-start-2 md:row-span-2"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8 sm:gap-y-12">
           <Input
             label={t.contact.name}
             name="name"
@@ -123,13 +123,13 @@ export const ContactForm = () => {
           />
         </div>
 
-        <div className="pt-8 flex flex-col gap-4">
+        <div className="pt-6 sm:pt-8 flex flex-col gap-4">
           <Button
             id="contact-submit-btn"
             type="submit"
             variant={submitStatus === "success" ? "secondary" : "primary"}
             size="sm"
-            className={`transition-all md:w-1/2 duration-500 ${submitStatus === "success" ? "!bg-green-500 !text-white !border-green-500 hover:!bg-green-600" : ""}`}
+            className={`w-full md:w-1/2 transition-all duration-500 ${submitStatus === "success" ? "!bg-green-500 !text-white !border-green-500 hover:!bg-green-600" : ""}`}
             disabled={isSubmitting}
             rightIcon={
               isSubmitting ? (
@@ -152,7 +152,7 @@ export const ContactForm = () => {
         </div>
       </fetcher.Form>
 
-      <div className="mt-32 md:mt-0 flex flex-col md:flex-row justify-between items-start md:items-end gap-12 md:col-start-1 md:row-start-2 md:self-end">
+      <div className="mt-20 md:mt-0 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 md:gap-12 md:col-start-1 md:row-start-2 md:self-end">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}

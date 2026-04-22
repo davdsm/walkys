@@ -58,7 +58,7 @@ export async function loader({
   let products = await productService.getByCollection(collection.id, {
     expand: "category",
     fields:
-      "id,slug,name_en,name_pt,description_en,description_pt,media,media_hover,enabled,category,expand.category.id,expand.category.slug,expand.category.name_en,expand.category.name_pt,expand.category.description_en,expand.category.description_pt,expand.category.media,expand.category.hover",
+      "id,collectionId,collectionName,slug,name_en,name_pt,description_en,description_pt,media,media_hover,enabled,category,expand.category.id,expand.category.collectionId,expand.category.collectionName,expand.category.slug,expand.category.name_en,expand.category.name_pt,expand.category.description_en,expand.category.description_pt,expand.category.media,expand.category.hover",
   });
   if (allowedIds?.length) products = products.filter((p: any) => allowedIds.includes(p.id));
 
@@ -79,6 +79,8 @@ export function meta({ data, params }: Route.MetaArgs) {
     description,
     pathname: params.collection ? `/collection/${params.collection}` : "/collection",
     image: data?.collection?.image,
+    imageAlt: `${collectionName} collection by Walkys`,
+    keywords: [collectionName, "walkys collection", "portuguese leather shoes"],
   });
 }
 

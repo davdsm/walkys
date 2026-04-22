@@ -99,6 +99,9 @@ export function meta({ data, params }: Route.MetaArgs) {
     description: productDescription,
     pathname: params.product ? `/product/${params.product}` : "/product",
     image: Array.isArray(product?.media) ? product.media[0] : undefined,
+    imageAlt: `${productName} by Walkys`,
+    type: "product",
+    keywords: [productName, "walkys shoes", "portuguese footwear"],
   });
 }
 

@@ -34,6 +34,28 @@ const LoginSuccessToast = lazy(() =>
     default: mod.LoginSuccessToast,
   }))
 );
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      name: "Walkys",
+      url: "https://walkys.com",
+      logo: "https://walkys.com/favicon.png",
+      sameAs: ["https://walkys.com"],
+    },
+    {
+      "@type": "WebSite",
+      name: "Walkys",
+      url: "https://walkys.com",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://walkys.com/collection/{search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
 
 export const links: Route.LinksFunction = () => [];
 
@@ -71,6 +93,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
           crossOrigin="anonymous"
         />
         <Meta />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <Links />
       </head>
       <body className="flex flex-col min-h-screen">

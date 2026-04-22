@@ -59,14 +59,15 @@ export function meta() {
     description:
       "Get in touch with Walkys for product questions, wholesale enquiries, order support, or brand partnerships.",
     pathname: "/contact",
+    keywords: ["contact walkys", "walkys support", "shoe wholesale portugal"],
   });
 }
 
 export const Contacts = () => {
   return (
-    <section className="bg-[#f1f1f1] min-h-screen flex flex-col items-center justify-start pt-64 gap-12                                                  ">
+    <section className="bg-[#f1f1f1] min-h-screen flex flex-col items-center justify-start pt-40 md:pt-64 gap-12">
       <ContactForm />
-      <div className="mx-auto pt-16 px-16 w-full">
+      <div className="w-full pt-16 px-0 md:px-16">
         <SmallCTA />
       </div>
     </section>

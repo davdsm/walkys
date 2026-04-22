@@ -57,6 +57,7 @@ export function meta() {
     description:
       "Discover the Walkys story, our Portuguese craftsmanship, and the values behind our elegant and comfortable footwear.",
     pathname: "/about",
+    keywords: ["about walkys", "portuguese craftsmanship", "shoe brand portugal"],
   });
 }
 

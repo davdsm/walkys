@@ -75,6 +75,8 @@ export function meta({ data, params }: Route.MetaArgs) {
     description: categoryDescription,
     pathname: params.category ? `/category/${params.category}` : "/category",
     image: category?.media,
+    imageAlt: `${categoryName} shoes by Walkys`,
+    keywords: [categoryName, "walkys category", "made in portugal shoes"],
   });
 }
 

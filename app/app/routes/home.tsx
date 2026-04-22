@@ -191,6 +191,13 @@ export function meta({ data }: Route.MetaArgs) {
     title: heroTitle || "Portuguese Shoes",
     description: heroSubtitle || DEFAULT_DESCRIPTION,
     pathname: "/",
+    type: "website",
+    keywords: [
+      "portuguese shoes",
+      "handmade shoes portugal",
+      "walkys footwear",
+      "elegant leather shoes",
+    ],
   });
 }
 
