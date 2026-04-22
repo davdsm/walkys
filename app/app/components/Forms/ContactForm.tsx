@@ -163,9 +163,22 @@ export const ContactForm = () => {
             {t.contact.findUs}
           </h3>
           <div className="flex gap-6 text-gray-500 font-bold text-sm tracking-widest">
-            <span>FB</span>
-            <span>IG</span>
-            <span>IN</span>
+            <a
+              href="https://www.instagram.com/walkys_shoes/"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-black transition-colors"
+            >
+              IG
+            </a>
+            <a
+              href="https://www.linkedin.com/company/walkys-by-shoe-me/"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-black transition-colors"
+            >
+              IN
+            </a>
           </div>
         </motion.div>
         <motion.div

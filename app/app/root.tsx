@@ -76,7 +76,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const rootData = useRouteLoaderData("root") as { language?: "pt" | "en"; layout?: LayoutData | null } | undefined;
-  const lang = rootData?.language ?? "pt";
+  const lang = rootData?.language ?? "en";
   const layout = rootData?.layout ?? null;
   return (
     <html lang={lang}>

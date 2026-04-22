@@ -144,6 +144,14 @@ const defaultHeaderMenuItems: LayoutMenuItem[] = [
   { label_pt: "Contactos", label_en: "Contacts", link: "/contact" },
 ];
 
+const defaultFooterMenuItems: LayoutMenuItem[] = [
+  { label_pt: "Início", label_en: "Begin", link: "/" },
+  { label_pt: "A Walkys", label_en: "Walkys", link: "/about" },
+  { label_pt: "Outono / Inverno", label_en: "Autumn / Winter", link: "/collection/autmn-winter-25" },
+  { label_pt: "Termos & Condições", label_en: "Terms & Conditions", link: "/terms" },
+  { label_pt: "Privacidade", label_en: "Privacy", link: "/privacy" },
+];
+
 const defaultHeaderSocialItems: LayoutSocialItem[] = [
   { label: "Instagram", link: "https://instagram.com" },
   { label: "Facebook", link: "https://facebook.com" },
@@ -152,7 +160,7 @@ const defaultHeaderSocialItems: LayoutSocialItem[] = [
 
 const defaultFooterContent: LayoutFooterContent = {
   logoText: "WALKYS",
-  menuItems: defaultHeaderMenuItems,
+  menuItems: defaultFooterMenuItems,
   address_pt: "Lote 2-A, Pedras Agudas-Revinhade, 4650-372 Felgueiras",
   address_en: "Lote 2-A, Pedras Agudas-Revinhade, 4650-372 Felgueiras",
   phone: "",
