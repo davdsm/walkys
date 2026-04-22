@@ -14,7 +14,7 @@ import CategoriesList from "~/components/CategoriesList";
 import { useScrollSpy } from "~/hooks/useScrollSpy";
 import { getCategoryFilters } from "~/utils/filters";
 import { mapCategoriesWithProducts } from "~/utils/categories";
-import { createPocketBase, canAccessUserBackoffice, getUserBlockedStatus, getUserAllowedProductIds } from "~/lib/pocketbase";
+import { createPocketBase, getUserAccessSnapshot } from "~/lib/pocketbase";
 import {
   createCollectionService,
   createProductService,
@@ -37,11 +37,12 @@ export async function loader({
     return redirect("/auth/login");
   }
   const user = pb.authStore.model as { id?: string; admin?: boolean } | null;
-  if (user?.id && (await getUserBlockedStatus(pb, user))) return redirect("/blocked");
-  if (user?.id && !(await canAccessUserBackoffice(pb, user))) return redirect("/pending-approval");
+  const access = await getUserAccessSnapshot(pb, user);
+  if (access.blocked) return redirect("/blocked");
+  if (!access.canAccessBackoffice) return redirect("/pending-approval");
 
   const language = getLanguageFromRequest(request);
-  const allowedIds = await getUserAllowedProductIds(pb, user);
+  const allowedIds = access.allowedProductIds;
 
   const collectionService = createCollectionService(pb, language);
   const productService = createProductService(pb, language);

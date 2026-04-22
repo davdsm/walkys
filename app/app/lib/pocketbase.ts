@@ -253,3 +253,43 @@ export async function getUserAllowedProductIds(
         return null;
     }
 }
+
+export interface UserAccessSnapshot {
+    blocked: boolean;
+    canAccessBackoffice: boolean;
+    allowedProductIds: string[] | null;
+}
+
+/**
+ * Fetches all access flags for a user in a single record read.
+ * This avoids multiple sequential auth + user queries in route loaders.
+ */
+export async function getUserAccessSnapshot(
+    pb: PocketBase,
+    user: { id?: string; admin?: boolean } | null
+): Promise<UserAccessSnapshot> {
+    if (!user?.id) {
+        return { blocked: false, canAccessBackoffice: false, allowedProductIds: null };
+    }
+    if (user.admin === true) {
+        return { blocked: false, canAccessBackoffice: true, allowedProductIds: null };
+    }
+    try {
+        const adminPb = await createPocketBaseAsAdmin();
+        const client = adminPb ?? pb;
+        const rec = await client.collection("users").getOne(user.id, {
+            fields: "approved,blocked,catalog_products",
+        });
+        const r = rec as { approved?: boolean; blocked?: boolean; catalog_products?: unknown };
+        const blocked = r.blocked === true;
+        const canAccessBackoffice = !blocked && r.approved === true;
+        const allowedIds = normalizeCatalogProductIds(r.catalog_products);
+        return {
+            blocked,
+            canAccessBackoffice,
+            allowedProductIds: allowedIds.length ? allowedIds : null,
+        };
+    } catch {
+        return { blocked: false, canAccessBackoffice: false, allowedProductIds: null };
+    }
+}
