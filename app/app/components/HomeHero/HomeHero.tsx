@@ -38,7 +38,7 @@ export const HomeHero = ({
   }, []);
 
   return (
-    <article className="min-h-[100dvh] w-full max-w-full pt-24 pb-8 md:pt-12 md:pb-12 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-20 relative">
+    <article className="min-h-[100dvh] w-full max-w-full pt-30 pb-12 md:pt-12 md:pb-12 flex flex-col justify-center items-center px-5 sm:px-6 lg:px-20 relative">
       <div className="w-full max-w-[1400px] flex flex-col lg:flex-row items-center justify-center gap-4 md:gap-12">
         {/* Text Content - Desktop: Left, Mobile: Top */}
         <div className="flex flex-col items-start w-full lg:w-1/2 order-1 pr-0 md:pr-8 lg:pr-16 xl:pr-24">

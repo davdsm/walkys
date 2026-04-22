@@ -28,7 +28,7 @@ export const CategoriesList = ({
             initial={{ opacity: 0, y: 60 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ amount: 0.2, once: true }}
-            transition={{ delay: 0.5 + indexC / 8, duration: 1.2 }}
+            transition={{ delay: 0.1 + indexC * 0.03, duration: 0.45 }}
             className="flex justify-start w-full py-8"
           >
             <div>
@@ -48,7 +48,7 @@ export const CategoriesList = ({
                   initial={{ opacity: 0, y: 60 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ amount: 0.2, once: true }}
-                  transition={{ duration: 1.2 }}
+                  transition={{ duration: 0.4 }}
                   className="w-[calc(50%-6px)] md:w-[calc(25%-9px)]"
                 >
                   <ProductCard

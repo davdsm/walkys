@@ -56,7 +56,9 @@ export async function loader({
 
   // Get products for this collection
   let products = await productService.getByCollection(collection.id, {
-    expand: "category,sizes",
+    expand: "category",
+    fields:
+      "id,slug,name_en,name_pt,description_en,description_pt,media,media_hover,enabled,category,expand.category.id,expand.category.slug,expand.category.name_en,expand.category.name_pt,expand.category.description_en,expand.category.description_pt,expand.category.media,expand.category.hover",
   });
   if (allowedIds?.length) products = products.filter((p: any) => allowedIds.includes(p.id));
 
@@ -191,7 +193,7 @@ export const CollectionPage = () => {
           items={filters}
           activeFilter={activeCategory}
           itemClassName="text-white text-md md:text-xl"
-          delay={1.8}
+          delay={0.15}
         />
         <div className="mx-auto max-w-7xl">
           <div className="products flex justify-center gap-4 pt-16 items-center flex-wrap md:flex-nowrap">
@@ -201,7 +203,7 @@ export const CollectionPage = () => {
                   key={product.id}
                   initial={{ opacity: 0, y: 60 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 2.2 + index / 8, duration: 1.2 }}
+                  transition={{ delay: 0.2 + index * 0.04, duration: 0.45 }}
                   className="md:w-1/6 w-[calc(50%-20px)]"
                 >
                   <ProductCard
