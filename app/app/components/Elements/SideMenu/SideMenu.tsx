@@ -87,12 +87,12 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
   const textWrapRef = useRef<HTMLSpanElement | null>(null);
   const [textLines, setTextLines] = useState<string[]>([
     t.header.menu,
-    t.header.close,
+    t.header.menu,
   ]);
 
   useEffect(() => {
-    setTextLines([t.header.menu, t.header.close]);
-  }, [t.header.menu, t.header.close]);
+    setTextLines([t.header.menu, t.header.menu]);
+  }, [t.header.menu]);
 
   const openTlRef = useRef<gsap.core.Timeline | null>(null);
   const closeTweenRef = useRef<gsap.core.Tween | null>(null);
@@ -386,7 +386,7 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
       textCycleAnimRef.current?.kill();
 
       const menuLabel = t.header.menu;
-      const closeLabel = t.header.close;
+      const closeLabel = t.header.menu;
       const currentLabel = opening ? menuLabel : closeLabel;
       const targetLabel = opening ? closeLabel : menuLabel;
       const cycles = 3;
@@ -412,7 +412,7 @@ export const StaggeredMenu: FC<StaggeredMenuProps> = ({
         ease: "power4.out",
       });
     },
-    [t.header.menu, t.header.close]
+    [t.header.menu]
   );
 
   const toggleMenu = useCallback(() => {

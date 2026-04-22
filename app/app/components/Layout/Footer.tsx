@@ -34,7 +34,15 @@ export const Footer = ({
 
   const address = c?.[`address_${lang}` as keyof typeof c] ?? c?.address_pt ?? t.footer.addressValue;
   const phone = c?.phone ?? t.footer.phoneValue;
-  const email = c?.email ?? "hello@walkys.pt";
+  const email = c?.email ?? "walkys@walkys.com";
+  const contactHref = String(phone).includes("@")
+    ? `mailto:${phone}`
+    : /^https?:\/\//i.test(String(phone))
+      ? String(phone)
+      : String(phone).includes(".")
+        ? `https://${phone}`
+        : `tel:${String(phone).replace(/\s/g, "")}`;
+
   const scheduleLabel = t.footer.schedule;
   const scheduleHours = c?.[`schedule_${lang}` as keyof typeof c] ?? c?.schedule_pt ?? t.footer.scheduleHours;
   const explore = c?.[`explore_${lang}` as keyof typeof c] ?? c?.explore_pt ?? t.footer.explore;
@@ -83,17 +91,19 @@ export const Footer = ({
 
               <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-10 md:gap-16 lg:gap-32 min-w-0">
                 <div className="flex flex-col gap-8 md:gap-12 w-full min-w-0 md:max-w-none">
-                  <div>
-                    <h4 className="text-sm font-bold uppercase tracking-[0.15em] text-white/50 mb-5">
-                      {t.footer.contact}
-                    </h4>
-                    <a
-                      href={`tel:${String(phone).replace(/\s/g, "")}`}
-                      className="text-2xl font-light tracking-tight hover:text-white/70 transition-colors block"
-                    >
-                      ( {phone} )
-                    </a>
-                  </div>
+                  {phone ? (
+                    <div>
+                      <h4 className="text-sm font-bold uppercase tracking-[0.15em] text-white/50 mb-5">
+                        {t.footer.contact}
+                      </h4>
+                      <a
+                        href={contactHref}
+                        className="text-2xl font-light tracking-tight hover:text-white/70 transition-colors block"
+                      >
+                        ( {phone} )
+                      </a>
+                    </div>
+                  ) : null}
 
                   <div className="flex flex-col md:grid grid-cols-2 gap-12">
                     <div>

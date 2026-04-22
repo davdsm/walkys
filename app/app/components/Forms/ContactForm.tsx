@@ -176,7 +176,9 @@ export const ContactForm = () => {
           viewport={{ amount: 0.2, once: true }}
         >
           <h3 className="font-bold mb-2 text-lg">{t.contact.address}</h3>
-          <p className="text-gray-500 text-lg">{t.contact.phone}</p>
+          {t.contact.phone ? (
+            <p className="text-gray-500 text-lg">{t.contact.phone}</p>
+          ) : null}
         </motion.div>
       </div>
     </article>

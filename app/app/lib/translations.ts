@@ -165,7 +165,7 @@ export const translations = {
                 {
                     heading: "4. Encarregado do tratamento e contacto",
                     paragraphs: [
-                        "O responsável pelo tratamento dos dados é Walkys. Para questões relacionadas com proteção de dados, pedidos de exercício de direitos ou reclamações, contacte-nos através do email: support@your-domain.example (substitua pelo email real da sua organização)."
+                        "O responsável pelo tratamento dos dados é Walkys. Para questões relacionadas com proteção de dados, pedidos de exercício de direitos ou reclamações, contacte-nos através do email: walkys@walkys.com."
                     ]
                 },
                 {
@@ -232,11 +232,11 @@ export const translations = {
                 {
                     heading: "13. Contacto",
                     paragraphs: [
-                        "Para questões sobre estes Termos ou sobre os seus dados pessoais contacte-nos em: support@your-domain.example."
+                        "Para questões sobre estes Termos ou sobre os seus dados pessoais contacte-nos em: walkys@walkys.com."
                     ]
                 }
             ],
-            note: "Nota: Substitua support@your-domain.example e o nome da empresa pelos seus dados reais antes de publicar."
+            note: "Nota: contacte-nos em walkys@walkys.com para questões legais e de privacidade."
         },
         // Privacy
         privacy: {
@@ -247,7 +247,7 @@ export const translations = {
                 {
                     heading: "1. Responsável pelo tratamento",
                     paragraphs: [
-                        "O responsável pelo tratamento dos seus dados é Walkys (" + '"nós"' + "). Para questões relacionadas com privacidade contacte: support@your-domain.example (substitua pelo email real)."
+                        "O responsável pelo tratamento dos seus dados é Walkys (" + '"nós"' + "). Para questões relacionadas com privacidade contacte: walkys@walkys.com."
                     ]
                 },
                 {
@@ -317,7 +317,7 @@ export const translations = {
                     ]
                 }
             ],
-            note: "Nota: substitua support@your-domain.example pelo email real da organização antes de publicar."
+            note: "Nota: para questões de privacidade contacte walkys@walkys.com."
         },
         // Small CTA Component
         smallCTA: {
@@ -423,7 +423,7 @@ export const translations = {
         // Contact
         contact: {
             title: "VAMOS CONVERSAR",
-            email: "administracao@walkys.pt",
+            email: "walkys@walkys.com",
             name: "Nome",
             namePlaceholder: "O seu nome",
             subject: "Assunto",
@@ -439,8 +439,8 @@ export const translations = {
             success: "Mensagem enviada com sucesso!",
             error: "Erro ao enviar mensagem. Tente novamente.",
             findUs: "ENCONTRE-NOS",
-            address: "V.N. Sande, Famalicão",
-            phone: "+351 253 162 123",
+            address: "Lote 2-A, Pedras Agudas-Revinhade, 4650-372 Felgueiras",
+            phone: "",
         },
         // Footer
         footer: {
@@ -458,8 +458,8 @@ export const translations = {
             newCollection: "NOVA COLEÇÃO",
             copyright: "© 2025 – Copyright",
             backToTop: "Voltar ao topo",
-            addressValue: "V.N. Sande, Famalicão",
-            phoneValue: "+351 253 412 421",
+            addressValue: "Lote 2-A, Pedras Agudas-Revinhade, 4650-372 Felgueiras",
+            phoneValue: "",
             scheduleHours: "9h—18h",
         },
         // Account / Auth
@@ -634,7 +634,7 @@ export const translations = {
                 {
                     heading: "4. Data controller and contact",
                     paragraphs: [
-                        "The data controller is Walkys. For questions related to data protection, rights requests or complaints, contact us at: support@your-domain.example (replace with your organization's real email)."
+                        "The data controller is Walkys. For questions related to data protection, rights requests or complaints, contact us at: walkys@walkys.com."
                     ]
                 },
                 {
@@ -701,11 +701,11 @@ export const translations = {
                 {
                     heading: "13. Contact",
                     paragraphs: [
-                        "For questions about these Terms or your personal data contact us at: support@your-domain.example."
+                        "For questions about these Terms or your personal data contact us at: walkys@walkys.com."
                     ]
                 }
             ],
-            note: "Note: Replace support@your-domain.example and the company name with your real details before publishing."
+            note: "Note: contact us at walkys@walkys.com for legal and privacy matters."
         },
         // Privacy
         privacy: {
@@ -716,7 +716,7 @@ export const translations = {
                 {
                     heading: "1. Data controller",
                     paragraphs: [
-                        "The data controller is Walkys (\"we\"). For privacy questions contact: support@your-domain.example (replace with your real email)."
+                        "The data controller is Walkys (\"we\"). For privacy questions contact: walkys@walkys.com."
                     ]
                 },
                 {
@@ -786,7 +786,7 @@ export const translations = {
                     ]
                 }
             ],
-            note: "Note: replace support@your-domain.example with your real contact email before publishing."
+            note: "Note: for privacy questions contact walkys@walkys.com."
         },
         // Small CTA Component
         smallCTA: {
@@ -892,7 +892,7 @@ export const translations = {
         // Contact
         contact: {
             title: "LET'S TALK",
-            email: "administracao@walkys.pt",
+            email: "walkys@walkys.com",
             name: "Name",
             namePlaceholder: "Your Name",
             subject: "Subject",
@@ -908,8 +908,8 @@ export const translations = {
             success: "Message sent successfully!",
             error: "Failed to send message. Please try again.",
             findUs: "FIND US",
-            address: "V.N. Sande, Famalicão",
-            phone: "+351 253 162 123",
+            address: "Lote 2-A, Pedras Agudas-Revinhade, 4650-372 Felgueiras",
+            phone: "",
         },
         // Footer
         footer: {
@@ -927,8 +927,8 @@ export const translations = {
             newCollection: "NEW COLLECTION",
             copyright: "© 2025 – Copyright",
             backToTop: "Back to top",
-            addressValue: "2972 Westheimer Rd. Santa Ana, Illinois 85486",
-            phoneValue: "+351 253 412 421",
+            addressValue: "Lote 2-A, Pedras Agudas-Revinhade, 4650-372 Felgueiras",
+            phoneValue: "",
             scheduleHours: "9am—6pm",
         },
         // Account / Auth

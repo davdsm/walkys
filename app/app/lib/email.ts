@@ -105,7 +105,7 @@ export function buildOrderReceivedUser(lang: EmailLang, orderId: string, userNam
     <p style="margin:0 0 24px; font-size: 15px; line-height: 1.5; color: #444;">${message}</p>
     <p style="margin:0 0 8px; font-size: 13px; color: #666;">${orderLabel}: <strong style="font-family: ui-monospace, monospace;">#${shortId}</strong></p>
     <p style="margin: 24px 0 0;">
-      <a href="${typeof process !== "undefined" && process.env?.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : "https://walkys.pt"}/orders" style="display: inline-block; padding: 12px 24px; background: #1a1a1a; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 8px;">${viewOrders}</a>
+      <a href="${typeof process !== "undefined" && process.env?.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : "https://walkys.com"}/orders" style="display: inline-block; padding: 12px 24px; background: #1a1a1a; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 8px;">${viewOrders}</a>
     </p>`;
   return { subject, html: baseWrap(content, lang) };
 }
@@ -132,7 +132,7 @@ export function buildOrderStatusChangedUser(
     <p style="margin:0 0 24px; font-size: 15px; line-height: 1.5; color: #444;">${message.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")}</p>
     <p style="margin:0 0 8px; font-size: 13px; color: #666;">${orderLabel}: <strong style="font-family: ui-monospace, monospace;">#${shortId}</strong></p>
     <p style="margin: 24px 0 0;">
-      <a href="${typeof process !== "undefined" && process.env?.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : "https://walkys.pt"}/orders" style="display: inline-block; padding: 12px 24px; background: #1a1a1a; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 8px;">${viewOrders}</a>
+      <a href="${typeof process !== "undefined" && process.env?.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : "https://walkys.com"}/orders" style="display: inline-block; padding: 12px 24px; background: #1a1a1a; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 8px;">${viewOrders}</a>
     </p>`;
   return { subject, html: baseWrap(content, lang) };
 }
@@ -147,7 +147,7 @@ export function buildNewOrderAdmin(lang: EmailLang, orderId: string): { subject:
     : "Foi registado um novo pedido. Consulte o backoffice para ver detalhes.";
   const viewOrders = isEn ? "View orders" : "Ver pedidos";
   const shortId = orderId.slice(0, 8);
-  const base = typeof process !== "undefined" && process.env?.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : "https://walkys.pt";
+  const base = typeof process !== "undefined" && process.env?.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : "https://walkys.com";
   const content = `
     <p style="margin:0 0 8px; font-size: 18px; font-weight: 600; color: #1a1a1a;">${title}</p>
     <p style="margin:0 0 24px; font-size: 15px; line-height: 1.5; color: #444;">${message}</p>
@@ -167,7 +167,7 @@ export function buildNewMessageAdmin(lang: EmailLang, messageId: string): { subj
     ? "You have received a new message from the contact form."
     : "Recebeu uma nova mensagem do formulário de contacto.";
   const viewMessage = isEn ? "View message" : "Ver mensagem";
-  const base = typeof process !== "undefined" && process.env?.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : "https://walkys.pt";
+  const base = typeof process !== "undefined" && process.env?.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : "https://walkys.com";
   const content = `
     <p style="margin:0 0 8px; font-size: 18px; font-weight: 600; color: #1a1a1a;">${title}</p>
     <p style="margin:0 0 24px; font-size: 15px; line-height: 1.5; color: #444;">${message}</p>
@@ -186,7 +186,7 @@ export function buildNewUserAdmin(lang: EmailLang, userEmail: string, userId: st
     ? `A new user has signed up: ${userEmail}`
     : `Um novo utilizador registou-se: ${userEmail}`;
   const viewUsers = isEn ? "View users" : "Ver utilizadores";
-  const base = typeof process !== "undefined" && process.env?.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : "https://walkys.pt";
+  const base = typeof process !== "undefined" && process.env?.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : "https://walkys.com";
   const content = `
     <p style="margin:0 0 8px; font-size: 18px; font-weight: 600; color: #1a1a1a;">${title}</p>
     <p style="margin:0 0 24px; font-size: 15px; line-height: 1.5; color: #444;">${message}</p>
