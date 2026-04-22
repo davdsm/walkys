@@ -24,6 +24,7 @@ WORKDIR /workspace
 RUN npm run build
 
 FROM node:20-alpine
+ENV NODE_ENV=production
 COPY ./package.json package-lock.json /workspace/
 COPY --from=production-dependencies-env /workspace/node_modules /workspace/node_modules
 COPY --from=build-env /workspace/build /workspace/build

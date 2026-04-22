@@ -112,6 +112,9 @@ export const HomeHero = ({
                 src={product.image}
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
               />
             )}
 

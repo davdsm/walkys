@@ -49,14 +49,14 @@ export function PageTransition({ children }: PageTransitionProps) {
   const isAboutPage = location.pathname === "/about";
 
   return (
-    <AnimatePresence mode="wait" initial={isHomepage}>
+    <AnimatePresence mode="sync" initial={isHomepage}>
       <motion.main
         key={location.pathname}
-        initial={isAboutPage ? { opacity: 0 } : { opacity: 0, x: -20 }}
+        initial={isAboutPage ? { opacity: 0 } : { opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
-        exit={isAboutPage ? { opacity: 0 } : { opacity: 0, x: 20 }}
+        exit={isAboutPage ? { opacity: 0 } : { opacity: 0, x: 10 }}
         transition={{
-          duration: 0.3,
+          duration: 0.18,
           ease: [0.22, 1, 0.36, 1],
         }}
         className="w-full flex flex-col flex-1"

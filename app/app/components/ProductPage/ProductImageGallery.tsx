@@ -41,6 +41,8 @@ export const ProductImageGallery = ({
               src={selectedUrl}
               alt={productName}
               className="w-full h-full object-contain"
+              loading="eager"
+              decoding="async"
             />
           ))}
       </motion.div>
@@ -76,6 +78,8 @@ export const ProductImageGallery = ({
                   src={url}
                   alt={`${productName} ${index + 1}`}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               )}
             </motion.button>

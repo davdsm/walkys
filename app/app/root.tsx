@@ -8,6 +8,7 @@ import {
   useOutlet,
   useRouteLoaderData,
 } from "react-router";
+import { Suspense, lazy } from "react";
 import { ParallaxProvider } from "react-scroll-parallax";
 
 import type { Route } from "./+types/root";
@@ -19,11 +20,20 @@ import { Footer } from "./components/Layout/Footer";
 import { Header } from "./components/Layout/Header";
 import { LanguageProvider, LayoutProvider, CartProvider, HeaderBackgroundProvider } from "./contexts";
 import { PageTransition } from "./components/Layout/PageTransition";
-import { CartSidebar } from "./components/Cart/CartSidebar";
-import { LoginSuccessToast } from "./components/LoginSuccessToast";
 import { useFooter } from "./hooks/useFooter";
 import { useHeader } from "./hooks/useHeader";
 import { buildSeoMeta } from "./lib/seo";
+
+const CartSidebar = lazy(() =>
+  import("./components/Cart/CartSidebar").then((mod) => ({
+    default: mod.CartSidebar,
+  }))
+);
+const LoginSuccessToast = lazy(() =>
+  import("./components/LoginSuccessToast").then((mod) => ({
+    default: mod.LoginSuccessToast,
+  }))
+);
 
 export const links: Route.LinksFunction = () => [];
 
@@ -93,8 +103,10 @@ export default function App() {
           {outlet}
           {!shouldHideFooter && <Footer variant={footerVariant} />}
         </PageTransition>
-        <CartSidebar />
-        <LoginSuccessToast />
+        <Suspense fallback={null}>
+          <CartSidebar />
+          <LoginSuccessToast />
+        </Suspense>
       </HeaderBackgroundProvider>
     </CartProvider>
   );

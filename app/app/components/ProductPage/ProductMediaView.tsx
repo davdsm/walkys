@@ -89,6 +89,8 @@ export const ProductMediaView = ({
               src={showUrl}
               alt={productName}
               className="w-full h-full object-cover"
+              loading="eager"
+              decoding="async"
             />
           )
         ) : null}
