@@ -94,24 +94,6 @@ export const MobileProductLayout = ({
           )
         ) : null}
 
-        {/* Size Selector - Square Buttons Overlaid at Bottom */}
-        {sizes.length > 0 && (
-          <div className="absolute bottom-16 left-0 w-full flex justify-center gap-2 px-6 flex-wrap">
-            {sizes.map((size) => (
-              <button
-                key={`size-square-${size}`}
-                onClick={() => onSizeSelect(size)}
-                className={`w-12 h-12 flex items-center justify-center text-sm font-medium transition-all rounded-sm ${
-                  selectedSize === size
-                    ? "bg-white text-black"
-                    : "bg-[#F9F9F9]/60 text-black"
-                }`}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Content Section (White card) */}
@@ -177,6 +159,32 @@ export const MobileProductLayout = ({
             {productDescription}
           </p>
         </motion.div>
+
+        {/* Size Selector - moved to bottom of product information on mobile */}
+        {sizes.length > 0 && (
+          <motion.div
+            className="mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.26, ease: "easeOut" }}
+          >
+            <div className="flex justify-start gap-2 flex-wrap">
+              {sizes.map((size) => (
+                <button
+                  key={`size-square-${size}`}
+                  onClick={() => onSizeSelect(size)}
+                  className={`w-12 h-12 flex items-center justify-center text-sm font-medium transition-all rounded-sm border ${
+                    selectedSize === size
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-black border-neutral-300"
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
       </div>
     </div>
