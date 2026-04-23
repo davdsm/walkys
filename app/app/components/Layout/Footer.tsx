@@ -10,6 +10,8 @@ export const Footer = ({
 }: {
   variant?: "light" | "dark";
 }) => {
+  const REAL_ADDRESS = "Lote 2-A, Pedras Agudas-Revinhade, 4650-372 Felgueiras";
+  const REAL_EMAIL = "walkys@walkys.com";
   const { t, language } = useLanguage();
   const { layout } = useLayout();
   const c = layout?.footer?.content;
@@ -32,8 +34,8 @@ export const Footer = ({
     return items.filter((item) => item.link !== "/contact");
   }, [c?.menuItems]);
 
-  const address = c?.[`address_${lang}` as keyof typeof c] ?? c?.address_pt ?? t.footer.addressValue;
-  const email = c?.email ?? "walkys@walkys.com";
+  const address = REAL_ADDRESS;
+  const email = REAL_EMAIL;
 
   const scheduleLabel = t.footer.schedule;
   const scheduleHours = c?.[`schedule_${lang}` as keyof typeof c] ?? c?.schedule_pt ?? t.footer.scheduleHours;
