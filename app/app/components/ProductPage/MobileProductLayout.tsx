@@ -56,7 +56,7 @@ export const MobileProductLayout = ({
   return (
     <div className="md:hidden min-h-screen bg-[#f1f1f1]">
       {/* Full Screen Image Section (70% height) */}
-      <div className="h-[70vh] w-full relative bg-[#f1f1f1] flex items-center justify-center p-6">
+      <div className="h-[70vh] w-full relative bg-[#f1f1f1] flex items-center justify-center">
         {is360 && current.type === "360" ? (
           <motion.div
             key="360"
