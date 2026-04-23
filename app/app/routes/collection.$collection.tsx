@@ -69,7 +69,9 @@ export async function loader({
 }
 
 export function meta({ data, params }: Route.MetaArgs) {
-  const collectionName = data?.collection?.name || params.collection || "Collection";
+  const collection = data?.collection as ({ name?: string; name_en?: string } | undefined);
+  const collectionName =
+    collection?.name_en || collection?.name || params.collection || "Collection";
   const description = data?.products?.length
     ? `Explore ${data.products.length} styles from the ${collectionName} collection by Walkys.`
     : `Explore the ${collectionName} collection by Walkys.`;

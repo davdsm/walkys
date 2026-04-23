@@ -31,11 +31,6 @@ export function getLanguageFromRequest(request: Request): "en" | "pt" {
     return cookies.language;
   }
 
-  // Fallback to Accept-Language header
-  const acceptLanguage = request.headers.get("accept-language");
-  if (acceptLanguage?.includes("pt")) {
-    return "pt";
-  }
-
-  return "en"; // Default
+  // Always default to English unless user explicitly switches language.
+  return "en";
 }

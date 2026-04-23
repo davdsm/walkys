@@ -183,9 +183,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export function meta({ data }: Route.MetaArgs) {
   const heroTitle =
-    data?.homepageData?.find((section) => section.section_id === "intro-title")?.value;
+    data?.homepageData?.find((section) => section.section_id === "intro-title")?.value_en;
   const heroSubtitle =
-    data?.homepageData?.find((section) => section.section_id === "intro-text")?.value;
+    data?.homepageData?.find((section) => section.section_id === "intro-text")?.value_en;
 
   return buildSeoMeta({
     title: heroTitle || "Portuguese Shoes",

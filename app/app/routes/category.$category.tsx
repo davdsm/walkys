@@ -64,11 +64,13 @@ export function meta({ data, params }: Route.MetaArgs) {
         name?: string;
         description?: string;
         media?: string;
+        name_en?: string;
+        description_en?: string;
       })
     | undefined;
-  const categoryName = category?.name || params.category || "Category";
+  const categoryName = category?.name_en || category?.name || params.category || "Category";
   const categoryDescription =
-    category?.description || `Browse the ${categoryName} selection from Walkys.`;
+    category?.description_en || category?.description || `Browse the ${categoryName} selection from Walkys.`;
 
   return buildSeoMeta({
     title: categoryName,
