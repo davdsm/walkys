@@ -18,7 +18,7 @@ export function LanguageSwitcher({ variant = "light", className }: LanguageSwitc
     const isDark = variant === "dark";
 
     return (
-        <div className={`z-50 flex items-center gap-2 rounded-full p-2 border ${isDark
+        <div className={`relative z-10 flex items-center gap-2 rounded-full p-2 border ${isDark
             ? "bg-white/10 backdrop-blur-md border-white/10"
             : "bg-white/10 backdrop-blur-md border-white/20"
             } ${className}`}>
