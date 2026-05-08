@@ -18,7 +18,13 @@ interface FormErrors {
     confirmPassword?: string;
 }
 
-export const SignupForm = () => {
+interface AntiBotProps {
+    honeypotField: string;
+    tokenField: string;
+    token: string;
+}
+
+export const SignupForm = ({ antiBot }: { antiBot?: AntiBotProps }) => {
     const { t } = useLanguage();
     const [formData, setFormData] = useState<SignupFormData>({
         fullName: "",
@@ -93,6 +99,37 @@ export const SignupForm = () => {
 
             <Form method="post" onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <input type="hidden" name="mode" value="register" />
+                {antiBot ? (
+                    <>
+                        <input
+                            type="hidden"
+                            name={antiBot.tokenField}
+                            value={antiBot.token}
+                        />
+                        <div
+                            aria-hidden="true"
+                            style={{
+                                position: "absolute",
+                                left: "-9999px",
+                                top: "auto",
+                                width: "1px",
+                                height: "1px",
+                                overflow: "hidden",
+                            }}
+                        >
+                            <label>
+                                Website
+                                <input
+                                    type="text"
+                                    name={antiBot.honeypotField}
+                                    tabIndex={-1}
+                                    autoComplete="off"
+                                    defaultValue=""
+                                />
+                            </label>
+                        </div>
+                    </>
+                ) : null}
                 <Input
                     label={t.signup.fullName}
                     type="text"

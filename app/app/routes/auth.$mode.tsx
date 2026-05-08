@@ -5,9 +5,12 @@ import { useParams } from "react-router";
 import { LoginForm } from "~/components/Forms/LoginForm";
 import { SignupForm } from "~/components/Forms/SignupForm";
 
-import { redirect, data } from "react-router";
+import { redirect, data, useLoaderData } from "react-router";
 import { createPocketBase, createPocketBaseAsAdmin, canAccessUserBackoffice, getUserBlockedStatus, buildAuthCookie } from "~/lib/pocketbase";
 import { buildSeoMeta } from "~/lib/seo";
+import { issueAntiBotToken, verifyAntiBot } from "~/lib/antibot";
+import { createNotification } from "~/lib/services";
+import { getAdminEmail, getLanguageFromRequest, sendEmail, buildNewUserAdmin } from "~/lib/email";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const pb = createPocketBase(request);
@@ -25,7 +28,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     return redirect("/auth/login");
   }
 
-  return null;
+  return { antiBot: issueAntiBotToken() };
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -36,6 +39,28 @@ export async function action({ request }: Route.ActionArgs) {
 
   try {
     if (mode === "register") {
+      const antiBot = verifyAntiBot(formData, request, {
+        context: "register",
+        maxPerWindow: 3,
+        windowMs: 10 * 60 * 1000,
+      });
+      if (!antiBot.ok) {
+        if (antiBot.reason === "honeypot") {
+          // Silently pretend success so bots think it worked.
+          return redirect("/registration-success");
+        }
+        if (antiBot.reason === "rate_limited") {
+          return data(
+            { error: "Too many attempts. Please try again later." },
+            { status: 429 }
+          );
+        }
+        return data(
+          { error: "Could not validate request. Please reload the page and try again." },
+          { status: 400 }
+        );
+      }
+
       const email = (formData.get("email") as string)?.trim();
       const fullName = (formData.get("fullName") as string)?.trim();
       const password = formData.get("password") as string;
@@ -69,13 +94,16 @@ export async function action({ request }: Route.ActionArgs) {
         name: fullName,
         admin: false,
       };
+      let createdUserId: string | null = null;
       try {
         payload.approved = false;
-        await client.collection("users").create(payload);
+        const created = await client.collection("users").create(payload);
+        createdUserId = created.id;
       } catch (firstErr: unknown) {
         delete payload.approved;
         try {
-          await client.collection("users").create(payload);
+          const created = await client.collection("users").create(payload);
+          createdUserId = created.id;
         } catch (createErr: unknown) {
           const err = createErr as { response?: { data?: Record<string, unknown>; message?: string }; message?: string };
           const msg =
@@ -90,6 +118,29 @@ export async function action({ request }: Route.ActionArgs) {
             { error: msg + dataFields + " (Check PocketBase: users collection → API rules → Create must allow new signups, or set API_PB_ADMIN_EMAIL/PASSWORD so the app creates as admin.)" },
             { status: 400 }
           );
+        }
+      }
+
+      if (createdUserId) {
+        try {
+          await createNotification(client, {
+            type: "user_registered",
+            user: null,
+            payload: { userId: createdUserId, email },
+          });
+        } catch (notifErr) {
+          console.error("[register] notification create failed:", notifErr);
+        }
+
+        const adminTo = getAdminEmail();
+        if (adminTo) {
+          try {
+            const lang = getLanguageFromRequest(request);
+            const { subject: adminSubject, html: adminHtml } = buildNewUserAdmin(lang, email, createdUserId);
+            await sendEmail(adminTo, adminSubject, adminHtml);
+          } catch (mailErr) {
+            console.error("[register] admin email failed:", mailErr);
+          }
         }
       }
 
@@ -142,6 +193,8 @@ export const Auth = () => {
   const [isMobile, setIsMobile] = useState(false);
   const { mode } = useParams();
   const isRegister = mode === "register";
+  const loaderData = useLoaderData<typeof loader>() as { antiBot?: { honeypotField: string; tokenField: string; token: string } } | null;
+  const antiBot = loaderData?.antiBot;
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -232,7 +285,7 @@ export const Auth = () => {
               transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="w-full max-w-md bg-white rounded-[20px] p-6 sm:p-8 md:p-0 mx-auto"
             >
-              {isRegister ? <SignupForm /> : <LoginForm />}
+              {isRegister ? <SignupForm antiBot={antiBot} /> : <LoginForm />}
             </motion.div>
           </motion.div>
         </div>

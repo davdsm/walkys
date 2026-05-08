@@ -16,6 +16,16 @@ services:
       NODE_ENV: "production"
       POCKETBASE_URL: "http://walkys-api:8090"
       PUBLIC_POCKETBASE_URL: ${PUBLIC_POCKETBASE_URL:-http://localhost:8090}
+      PUBLIC_APP_URL: ${PUBLIC_APP_URL:-https://walkys.com}
+      API_PB_ADMIN_EMAIL: ${API_PB_ADMIN_EMAIL:-}
+      API_PB_ADMIN_PASSWORD: ${API_PB_ADMIN_PASSWORD:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      ANTI_BOT_SECRET: ${ANTI_BOT_SECRET:-}
     networks:
       - walkys
 

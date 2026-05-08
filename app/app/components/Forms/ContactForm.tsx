@@ -7,7 +7,13 @@ import { Input } from "../Elements/Input/Input";
 import { Button } from "../Elements/Button/Button";
 import confetti from "canvas-confetti";
 
-export const ContactForm = () => {
+interface AntiBotProps {
+  honeypotField: string;
+  tokenField: string;
+  token: string;
+}
+
+export const ContactForm = ({ antiBot }: { antiBot?: AntiBotProps }) => {
   const { t } = useLanguage();
   const fetcher = useFetcher<{ ok?: boolean; error?: string }>();
   const [formData, setFormData] = useState({
@@ -69,6 +75,37 @@ export const ContactForm = () => {
         method="post"
         className="space-y-8 sm:space-y-12 md:col-start-2 md:row-span-2"
       >
+        {antiBot ? (
+          <>
+            <input
+              type="hidden"
+              name={antiBot.tokenField}
+              value={antiBot.token}
+            />
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                left: "-9999px",
+                top: "auto",
+                width: "1px",
+                height: "1px",
+                overflow: "hidden",
+              }}
+            >
+              <label>
+                Website
+                <input
+                  type="text"
+                  name={antiBot.honeypotField}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  defaultValue=""
+                />
+              </label>
+            </div>
+          </>
+        ) : null}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8 sm:gap-y-12">
           <Input
             label={t.contact.name}
